@@ -1,0 +1,216 @@
+import User from "../models/User.model.js";
+import { createError } from "../utils/error.js";
+import jwt from "jsonwebtoken";
+
+// Create a new user (Admin only)
+export const createUser = async (req, res, next) => {
+    const { username, email, password, country, role } = req.body;
+
+    if (!username || !email || !password || !country || !role) {
+        return next(createError(400, "All fields are required."));
+    }
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return next(createError(400, "User already exists with this email."));
+        }
+
+        const newUser = new User({
+            username,
+            email,
+            password,
+            country,
+            role,
+        });
+
+        await newUser.save();
+
+        res.status(201).json({ message: "User created successfully", user: newUser });
+    } catch (err) {
+        next(createError(500, "Server Error, could not create user."));
+    }
+};
+
+// Update user details (Admin only)
+export const updateUser = async (req, res, next) => {
+    const { userId } = req.params;
+    const { username, email, country, role } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return next(createError(404, "User not found."));
+        }
+
+        user.username = username || user.username;
+        user.email = email || user.email;
+        user.country = country || user.country;
+        user.role = role || user.role;
+
+        await user.save();
+        res.status(200).json({ message: "User updated successfully", user });
+    } catch (err) {
+        next(createError(500, "Server Error, could not update user."));
+    }
+};
+
+// Delete a user (Admin only)
+export const deleteUser = async (req, res, next) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return next(createError(404, "User not found."));
+        }
+
+        await user.deleteOne();
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (err) {
+        next(createError(500, "Server Error, could not delete user."));
+    }
+};
+
+// Get a user by ID (Admin only)
+export const getUserById = async (req, res, next) => {
+    const { userId } = req.params;
+
+    try {
+        const user = await User.findById(userId).select("-password"); // Exclude password
+        if (!user) {
+            return next(createError(404, "User not found."));
+        }
+
+        res.status(200).json({ user });
+    } catch (err) {
+        next(createError(500, "Server Error, could not fetch user."));
+    }
+};
+
+// Get all users (Admin only)
+export const getAllUsers = async (req, res, next) => {
+    try {
+        const users = await User.find().select("-password"); // Exclude passwords
+        res.status(200).json({ users });
+    } catch (err) {
+        next(createError(500, "Server Error, could not fetch users."));
+    }
+};
+
+// Update user profile (he is the only one that can update his profile)
+export const updateUserProfile = async (req, res, next) => {
+    console.log("Request User Object:", req.user); // Debugging log
+
+    if (!req.user || !req.user._id) {
+        console.error("Unauthorized access: No User ID found in token!");
+        return next(createError(401, "Unauthorized access! No User ID found."));
+    }
+
+    try {
+        console.log("🔎 Searching user with ID:", req.user._id);
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            console.error("User not found in database");
+            return next(createError(404, "User not found."));
+        }
+
+
+        const updateData = {}; // Object to store only valid fields
+
+        // Only update fields if they are provided in the request
+        if (req.body.occupation !== undefined) updateData.occupation = req.body.occupation;
+        if (req.body.skills !== undefined) updateData.skills = req.body.skills;
+        if (req.body.education !== undefined) updateData.education = req.body.education;
+        if (req.body.certificates !== undefined) updateData.certificates = req.body.certificates;
+        if (req.body.languages !== undefined) updateData.languages = req.body.languages;
+        if (req.body.experiences !== undefined) updateData.experiences = req.body.experiences;
+        if (req.body.posts !== undefined) updateData.posts = req.body.posts;
+
+        console.log("Updating with data:", updateData); // Debugging log
+
+        // Update only the valid fields
+        Object.assign(user, updateData);
+
+        console.log("Saving updated profile...");
+        await user.save(); // This is where validation happens
+
+        console.log("Profile updated successfully!");
+        res.status(200).json({ message: "Profile updated successfully", user });
+    } catch (err) {
+        console.error("Error updating profile:", err);
+
+        if (err.name === "ValidationError") {
+            return next(createError(400, "Validation failed: " + err.message));
+        }
+
+        next(createError(500, "Server Error, could not update profile."));
+    }
+};
+
+
+
+// Récupérer un freelancer par son ID
+export const getFreelancerById = async (req, res, next) => {
+    const { freelancerId } = req.params;
+
+    try {
+        const freelancer = await User.findById(freelancerId).select("-password");
+        if (!freelancer || freelancer.role !== "freelancer") {
+            return next(createError(404, "Freelancer not found."));
+        }
+
+        res.status(200).json({ freelancer });
+    } catch (err) {
+        next(createError(500, "Server Error, could not fetch freelancer."));
+    }
+};
+
+// Récupérer tous les freelancers ou filtrer par nom/skills
+export const getAllFreelancers = async (req, res, next) => {
+    const { name, skill } = req.query;
+    let query = { role: "freelancer" };
+
+    if (name) {
+        query.username = { $regex: name, $options: "i" }; // Recherche insensible à la casse
+    }
+    if (skill) {
+        query.skills = { $in: [skill] }; // Vérifie si la compétence est dans le tableau des skills
+    }
+
+    try {
+        const freelancers = await User.find(query).select("-password");
+        res.status(200).json({ freelancers });
+    } catch (err) {
+        next(createError(500, "Server Error, could not fetch freelancers."));
+    }
+};
+
+export const getCurrentUser = async (req, res) => {
+    try {
+      const token = req.cookies.access_token;
+      if (!token) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+  
+      // Decode the token
+      const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
+  
+      // Check if decoded.userId exists and is valid
+      if (!decoded.userId) {
+        return res.status(400).json({ message: "Invalid token structure" });
+      }
+  
+      // Find the user by ID
+      const user = await User.findById(decoded.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      res.status(200).json(user);
+    } catch (error) {
+      console.error("Error during getCurrentUser:", error);  // Log the error
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  };
