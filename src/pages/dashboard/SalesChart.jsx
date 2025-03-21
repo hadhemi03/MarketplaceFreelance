@@ -163,7 +163,7 @@ export default function SalesChart() {
     }));
   }, [primary, secondary, line, warning, primaryMain, successDark, income, cos, xsDown]);
 
-  return (
+  /*return (
     <MainCard sx={{ mt: 1 }} content={false}>
       <Box sx={{ p: 2.5, pb: 0 }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -188,5 +188,5 @@ export default function SalesChart() {
         </Box>
       </Box>
     </MainCard>
-  );
+  );*/
 }

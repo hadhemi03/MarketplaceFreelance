@@ -22,7 +22,7 @@ export default function UniqueVisitorCard() {
         <Grid item>
           <Typography variant="h5">Unique Visitor</Typography>
         </Grid>
-        <Grid item>
+        {/*<Grid item>
           <Stack direction="row" alignItems="center" spacing={0}>
             <Button
               size="small"
@@ -41,7 +41,7 @@ export default function UniqueVisitorCard() {
               Week
             </Button>
           </Stack>
-        </Grid>
+        </Grid>*/}
       </Grid>
       <MainCard content={false} sx={{ mt: 1.5 }}>
         <Box sx={{ pt: 1, pr: 2 }}>

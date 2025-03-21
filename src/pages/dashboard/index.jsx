@@ -129,7 +129,7 @@ export default function DashboardDefault() {
               <Typography variant="h5">Low</Typography>
             </ListItemButton>
           </List>
-          <ReportAreaChart />
+          {<ReportAreaChart />}
         </MainCard>
       </Grid>
 

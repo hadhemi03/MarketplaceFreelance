@@ -97,7 +97,7 @@ const headCells = [
 // ==============================|| ORDER TABLE - HEADER ||============================== //
 
 function OrderTableHead({ order, orderBy }) {
-  return (
+  /*return (
     <TableHead>
       <TableRow>
         {headCells.map((headCell) => (
@@ -112,7 +112,7 @@ function OrderTableHead({ order, orderBy }) {
         ))}
       </TableRow>
     </TableHead>
-  );
+  );*/
 }
 
 function OrderStatus({ status }) {
@@ -151,7 +151,7 @@ export default function OrderTable() {
   const order = 'asc';
   const orderBy = 'tracking_no';
 
-  return (
+  /*return (
     <Box>
       <TableContainer
         sx={{
@@ -195,7 +195,7 @@ export default function OrderTable() {
         </Table>
       </TableContainer>
     </Box>
-  );
+  );*/
 }
 
 OrderTableHead.propTypes = { order: PropTypes.any, orderBy: PropTypes.string };
