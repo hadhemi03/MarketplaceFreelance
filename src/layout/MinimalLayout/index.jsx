@@ -5,6 +5,7 @@ import { Outlet } from 'react-router-dom';
 export default function MinimalLayout() {
   return (
     <>
+      {/** a placeholder to render the content of the currently active nested route */}
       <Outlet />
     </>
   );

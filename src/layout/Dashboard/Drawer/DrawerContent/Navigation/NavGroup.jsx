@@ -9,7 +9,8 @@ import NavItem from './NavItem';
 import { useGetMenuMaster } from 'api/menu';
 
 export default function NavGroup({ item }) {
-  const { menuMaster } = useGetMenuMaster();
+  //which controls whether the menu drawer is open
+  const { menuMaster } = useGetMenuMaster();  
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
 
   const navCollapse = item.children?.map((menuItem) => {

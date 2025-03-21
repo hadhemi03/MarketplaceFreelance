@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';    
 import { forwardRef } from 'react';
 
 // material-ui
@@ -12,18 +12,18 @@ import Typography from '@mui/material/Typography';
 // header style
 const headerSX = {
   p: 2.5,
-  '& .MuiCardHeader-action': { m: '0px auto', alignSelf: 'center' }
+  '& .MuiCardHeader-action': { m: '0px auto', alignSelf: 'center' }  // Styles .MuiCardHeader-action (which is the action area in the header) to be centered.
 };
 
 function MainCard(
   {
     border = true,
     boxShadow,
-    children,
+    children,        // the content inside the card
     content = true,
-    contentSX = {},
-    darkTitle,
-    elevation,
+    contentSX = {},     // styles for crad content
+    darkTitle,          // if true renders the title with a dark mode
+    elevation,         // Optional element (like an action button) placed in the header.
     secondary,
     shadow,
     sx = {},
@@ -32,8 +32,10 @@ function MainCard(
   },
   ref
 ) {
+
+  //If the theme is in dark mode, it ensures boxShadow is enabled.
   const theme = useTheme();
-  boxShadow = theme.palette.mode === 'dark' ? boxShadow || true : boxShadow;
+  boxShadow = theme.palette.mode === 'dark' ? boxShadow || true : boxShadow;  
 
   return (
     <Card
@@ -57,11 +59,11 @@ function MainCard(
         ...sx
       }}
     >
-      {/* card header and action */}
+      {/* card header and action (optional) */}  
       {!darkTitle && title && <CardHeader sx={headerSX} titleTypographyProps={{ variant: 'subtitle1' }} title={title} action={secondary} />}
       {darkTitle && title && <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={secondary} />}
 
-      {/* card content */}
+      {/* card content  where i will change */}
       {content && <CardContent sx={contentSX}>{children}</CardContent>}
       {!content && children}
     </Card>
@@ -70,6 +72,8 @@ function MainCard(
 
 export default forwardRef(MainCard);
 
+
+// Ensures correct prop types for type checking
 MainCard.propTypes = {
   border: PropTypes.bool,
   boxShadow: PropTypes.bool,

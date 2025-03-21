@@ -15,7 +15,7 @@ import AnimateButton from 'components/@extended/AnimateButton';
 // ==============================|| DRAWER CONTENT - NAVIGATION CARD ||============================== //
 
 export default function NavCard() {
-  return (
+  /*return (
     <MainCard sx={{ bgcolor: 'grey.50', m: 3 }}>
       <Stack alignItems="center" spacing={2.5}>
         <CardMedia component="img" image={avatar} sx={{ width: 112 }} />
@@ -32,5 +32,5 @@ export default function NavCard() {
         </AnimateButton>
       </Stack>
     </MainCard>
-  );
+  );*/
 }

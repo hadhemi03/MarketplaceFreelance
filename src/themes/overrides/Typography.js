@@ -7,7 +7,8 @@ export default function Typography() {
         gutterBottom: {
           marginBottom: 12
         }
-      }
+      },
+      
     }
   };
 }

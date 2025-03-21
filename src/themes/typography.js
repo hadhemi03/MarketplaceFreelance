@@ -3,7 +3,7 @@
 export default function Typography(fontFamily) {
   return {
     htmlFontSize: 16,
-    fontFamily,
+    fontFamily: fontFamily,
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,

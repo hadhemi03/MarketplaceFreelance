@@ -16,7 +16,7 @@ import FallOutlined from '@ant-design/icons/FallOutlined';
 
 const iconSX = { fontSize: '0.75rem', color: 'inherit', marginLeft: 0, marginRight: 0 };
  
-// boxes elli fehom nbr total ... ( admin dashboard)
+
 
 export default function AnalyticEcommerce({ color = 'primary', title, count, percentage, isLoss, extra }) {
   /*return (
