@@ -147,10 +147,6 @@ const MainRoutes = {
       element: <Home /> // Make Home the root element for the main route
     },
     {
-      path: 'home', // Direct route to Home page
-      element: <Home /> // Home component directly at /home
-    },
-    {
       path: 'dashboard',
       element: <Dashboard />, // Dashboard route
       children: [
@@ -180,3 +176,5 @@ const MainRoutes = {
 };
 
 export default MainRoutes;
+
+

@@ -4,19 +4,15 @@
   align-items: center;
   background-color: #0d084d;
   color: white;
-  transition: 0.5s all ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
   position: sticky;
   top: 0;
+  width: 100%;
+  z-index: 1000;
 
   &.active {
     background-color: white;
     color: black;
-
-    button {
-      background-color: white !important;
-      color: #1dbf73 !important;
-      border: 1px solid #1dbf73 !important;
-    }
   }
 
   .container {
@@ -24,12 +20,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 0px;
-
-    .logo {
-      font-size: 34px;
-      font-weight: bold;
-    }
+    padding: 20px 0;
 
     .links {
       display: flex;
@@ -40,52 +31,28 @@
 
       span {
         white-space: nowrap;
-      }
-
-      .user {
-        display: flex;
-        align-items: center;
-        gap: 10px;
         cursor: pointer;
-        position: relative;
 
-        img {
-          width: 50px; /* Increased size for debugging */
-          height: 50px; /* Increased size for debugging */
-          border-radius: 50%;
-          object-fit: cover;
-          visibility: visible; /* Ensure image is visible */
-        }
-
-        .options {
-          position: absolute;
-          top: 50px;
-          right: 0;
-          padding: 20px;
-          background-color: white;
-          border-radius: 10px;
-          z-index: 999;
-          border: 1px solid lightgrey;
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          width: 200px;
-          font-weight: 300;
-          color: gray;
+        &:hover {
+          color: #1dbf73;
+          transition: color 0.3s ease;
         }
       }
 
-      button {
+      .nav-button {
         color: white;
         padding: 10px 20px;
         border-radius: 5px;
-        border: 1px solid white;
-        background-color: transparent;
+        border: 1px solid  #1dbf73 !important;
+        background-color: white;
         cursor: pointer;
+        transition: all 0.3s ease;
+        color: black;
 
         &:hover {
           background-color: #7ae582;
           border-color: #1dbf73;
+          color: black;
         }
       }
     }
@@ -93,14 +60,13 @@
 
   hr {
     width: calc(100% - 2px);
-    height: 0;
+    border: none;
     border-top: 0.5px solid #ebe9e9;
-    border-bottom: 0.5px solid #ebe9e9;
   }
 
   .menu {
     width: 1400px;
-    padding: 10px 0px;
+    padding: 10px 0;
     display: flex;
     justify-content: space-between;
     color: gray;

@@ -17,7 +17,7 @@ export default function AuthFooter() {
       >
         <Typography variant="subtitle2" color="secondary">
           This site is protected by{' '}
-          <Typography component={Link} variant="subtitle2" href="#mantis-privacy" target="_blank" underline="hover">
+          <Typography  variant="subtitle2" target="_blank" underline="hover">
             Privacy Policy
           </Typography>
         </Typography>
@@ -26,8 +26,6 @@ export default function AuthFooter() {
           <Typography
             variant="subtitle2"
             color="secondary"
-            component={Link}
-            href="https://codedthemes.com"
             target="_blank"
             underline="hover"
           >
@@ -36,8 +34,6 @@ export default function AuthFooter() {
           <Typography
             variant="subtitle2"
             color="secondary"
-            component={Link}
-            href="https://codedthemes.com"
             target="_blank"
             underline="hover"
           >
@@ -46,8 +42,6 @@ export default function AuthFooter() {
           <Typography
             variant="subtitle2"
             color="secondary"
-            component={Link}
-            href="https://codedthemes.com"
             target="_blank"
             underline="hover"
           >

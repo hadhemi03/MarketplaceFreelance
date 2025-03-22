@@ -23,9 +23,7 @@ const Navbar = () => {
     <div className={active || pathname !== "/" ? "navbar active" : "navbar"}>
       <div className="container">
         <div className="logo">
-          <Link to="/" className="link">
-            <Logo />
-          </Link>
+          <span className="text1"><Logo /></span>
         </div>
 
         <div className="links">
@@ -33,8 +31,8 @@ const Navbar = () => {
           <span>Explore</span>
           <span>Become a Client</span>
 
-          <Link to="/login"><button>Login</button></Link>
-          <button>Register</button>
+          <Link className="link" to="/login"><button className="nav-button">Login</button></Link>
+          <Link className="link" to="/register"><button className="nav-button">Register</button></Link>
         </div>
       </div>
 
