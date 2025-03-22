@@ -61,16 +61,16 @@ const Logo = () => {
         </defs>
       </svg>*/}
 
-<Typography
-      variant="h3"
-      sx={{
-        fontFamily: theme.typography.fontFamily,  // This pulls from the theme
-        fontWeight: theme.typography.fontWeightBold,
-        color: theme.palette.primary.main
-      }}
-    >
-      CollabWork
-    </Typography>
+      <Typography
+        variant="h3"
+        sx={{
+          fontFamily: theme.typography.fontFamily,  // This pulls from the theme
+          fontWeight: theme.typography.fontWeightBold,
+          color: theme.palette.primary.main
+        }}
+      >
+        CollabWork
+      </Typography>
     </>
   );
 };
