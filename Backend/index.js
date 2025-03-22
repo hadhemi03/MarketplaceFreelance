@@ -12,7 +12,7 @@ dotenv.config()
 
 // Middlewares
 app.use(cors({
-    origin: "http://localhost:3000/free",  // Allow frontend requests
+    origin: "http://localhost:3000",  // Allow frontend requests
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true,  // Allow sending cookies (if needed)

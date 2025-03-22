@@ -29,6 +29,9 @@ import avatar1 from 'assets/images/users/avatar-1.png';
 import avatar2 from 'assets/images/users/avatar-2.png';
 import avatar3 from 'assets/images/users/avatar-3.png';
 import avatar4 from 'assets/images/users/avatar-4.png';
+import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
+import { useMediaQuery } from '@mui/system';
+import { useEffect } from 'react';
 
 // avatar style
 const avatarSX = {
@@ -50,6 +53,15 @@ const actionSX = {
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 export default function DashboardDefault() {
+  const { menuMasterLoading } = useGetMenuMaster();
+  const downXL = useMediaQuery((theme) => theme.breakpoints.down('xl'));
+
+  useEffect(() => {
+    handlerDrawerOpen(!downXL);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [downXL]);
+
+  if (menuMasterLoading) return <Loader />;
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       {/* row 1 */}
