@@ -127,6 +127,8 @@ import { lazy } from 'react';
 // project import
 import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
+import ClientDashboard from 'layout/Clientdashboard';
+import DashboardLayout from 'layout/Dashboard/index';
 
 const Home = Loadable(lazy(() => import('pages/home/Home')));  // Home Page
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -137,40 +139,68 @@ const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
 // render - sample page
 const SamplePage = Loadable(lazy(() => import('pages/extra-pages/sample-page')));
 
+
+const AuthLogin = Loadable(lazy(() => import('pages/authentication/login')));
+const AuthRegister = Loadable(lazy(() => import('pages/authentication/register')));
+
+// Pages du client
+const DashboardClient = Loadable(lazy(() => import('pages/client/DashboardClient')));
+const Projects = Loadable(lazy(() => import('pages/client/Projects')));
+const MyProjects = Loadable(lazy(() => import('pages/client/MyProjects')));
+const Freelancers = Loadable(lazy(() => import('pages/client/Freelancers')));
+const Payments = Loadable(lazy(() => import('pages/client/Payments')));
+
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
-  path: '/',
+  path: '/',  // Root path, can either be Home or Dashboard depending on logic
   children: [
     {
-      path: '/', // Root path, can either be Home or Dashboard depending on logic
-      element: <Home /> // Make Home the root element for the main route
+      path: '/', // Root path - Home page
+      element: <Home />  // Home Page
     },
     {
-      path: 'dashboard',
-      element: <Dashboard />, // Dashboard route
+      path: 'login',  // Login route
+      element: <AuthLogin />
+    },
+    {
+      path: 'register',  // Register route
+      element: <AuthRegister />
+    },
+    {
+      path: 'client',  // Client dashboard route
+      element: <ClientDashboard />,  // Main layout for client routes
       children: [
-        {
-          path: 'default',
-          element: <DashboardDefault /> // Default dashboard page
-        }
+        { path: 'dashboardclient', element: <DashboardClient /> },
+        { path: 'projects', element: <Projects /> },
+        { path: 'my-projects', element: <MyProjects /> },
+        { path: 'freelancers', element: <Freelancers /> },
+        { path: 'payments', element: <Payments /> },
       ]
     },
     {
-      path: 'color',
+      path: 'dashboard',  // Admin dashboard route
+      element: <DashboardLayout />,  // Main layout for admin routes
+      children: [
+        { path: 'default', element: <DashboardDefault /> },  // Admin's default dashboard page
+      ]
+    },
+    {
+      path: 'color',  // Color page route
       element: <Color />
     },
     {
-      path: 'sample-page',
+      path: 'typography',  // Typography page route
+      element: <Typography />
+    },
+    {
+      path: 'sample-page',  // Sample page route
       element: <SamplePage />
     },
     {
-      path: 'shadow',
+      path: 'shadow',  // Shadow page route
       element: <Shadow />
-    },
-    {
-      path: 'typography',
-      element: <Typography />
     }
   ]
 };

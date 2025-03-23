@@ -52,20 +52,31 @@ export default function AuthLogin({ isDemo = false }) {
       const response = await newRequest.post(
         'http://localhost:5000/api/auth/login',
         {
-          email: values.email, // Ensure correct email
-          password: values.password, // Ensure correct password
+          email: values.email,
+          password: values.password,
         },
         { withCredentials: true }
       );
-
+  
+      console.log("Login Response:", response.data);
+  
       // Store the user in localStorage
       localStorage.setItem('currentUser', JSON.stringify(response.data.user));
-
+      localStorage.setItem('userRole', response.data.user.role);
+  
       // Show success toast
       toast.success('Login successful!');
-      
-      // Navigate to another page after a short delay
-      setTimeout(() => navigate('/dashboard/default'), 500);
+  
+      // Navigate to the correct dashboard after a short delay
+      setTimeout(() => {
+        const userRole = localStorage.getItem('userRole');
+        if (userRole === 'client') {
+          navigate('/client/dashboardclient');
+        } else {
+          navigate('/dashboard/default');
+        }
+      }, 100); // Short delay before redirect
+  
     } catch (err) {
       console.log('Login failed:', err);
       // Show error toast
