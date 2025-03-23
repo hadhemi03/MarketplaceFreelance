@@ -17,6 +17,10 @@ import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 
 export default function MainDrawer({ window }) {
   const { menuMaster } = useGetMenuMaster();
+  if (!menuMaster) return null; // Prevents the error
+
+  const { isDashboardDrawerOpened } = menuMaster || {}; // Ensures no undefined error
+
   const drawerOpen = menuMaster.isDashboardDrawerOpened;
   const matchDownMD = useMediaQuery((theme) => theme.breakpoints.down('lg'));
 
