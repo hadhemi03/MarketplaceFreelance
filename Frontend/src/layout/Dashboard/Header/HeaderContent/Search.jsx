@@ -9,7 +9,7 @@ import SearchOutlined from '@ant-design/icons/SearchOutlined';
 
 // ==============================|| HEADER CONTENT - SEARCH ||============================== //
 
-export default function Search() {
+export default function Search({ value, onChange, placeholder, ...props }) {
   return (
     <Box sx={{ width: '100%', ml: { xs: 0, md: 1 } }}>
       <FormControl sx={{ width: { xs: '100%', md: 224 } }}>
@@ -21,11 +21,10 @@ export default function Search() {
               <SearchOutlined />
             </InputAdornment>
           }
-          aria-describedby="header-search-text"
-          inputProps={{
-            'aria-label': 'weight'
-          }}
-          placeholder="Ctrl + K"
+          value={value}
+          onChange={onChange} // This is important
+          placeholder={placeholder}
+          {...props}
         />
       </FormControl>
     </Box>

@@ -35,7 +35,7 @@ export const createUser = async (req, res, next) => {
 // Update user details (Admin only)
 export const updateUser = async (req, res, next) => {
     const { userId } = req.params;
-    const { username, email, country, role } = req.body;
+    const { username, email, country, role, desc, occupation, skills } = req.body;
 
     try {
         const user = await User.findById(userId);
@@ -47,6 +47,9 @@ export const updateUser = async (req, res, next) => {
         user.email = email || user.email;
         user.country = country || user.country;
         user.role = role || user.role;
+        user.desc = desc || user.desc;
+        user.occupation = occupation || user.occupation;
+        user.skills = skills || user.skills;
 
         await user.save();
         res.status(200).json({ message: "User updated successfully", user });
@@ -169,7 +172,7 @@ export const getFreelancerById = async (req, res, next) => {
 
 // Récupérer tous les freelancers ou filtrer par nom/skills
 export const getAllFreelancers = async (req, res, next) => {
-    const { name, skill } = req.query;
+    const { name, skill, country } = req.query;
     let query = { role: "freelancer" };
 
     if (name) {
@@ -178,6 +181,10 @@ export const getAllFreelancers = async (req, res, next) => {
     if (skill) {
         query.skills = { $in: [skill] }; // Vérifie si la compétence est dans le tableau des skills
     }
+    if (country) {
+        query.country = { $regex: country, $options: "i" }; // Search by country (case insensitive)
+    }
+
 
     try {
         const freelancers = await User.find(query).select("-password");

@@ -29,6 +29,9 @@ import avatar1 from 'assets/images/users/avatar-1.png';
 import avatar2 from 'assets/images/users/avatar-2.png';
 import avatar3 from 'assets/images/users/avatar-3.png';
 import avatar4 from 'assets/images/users/avatar-4.png';
+import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
+import { useMediaQuery } from '@mui/system';
+import { useEffect } from 'react';
 
 // avatar style
 const avatarSX = {
@@ -50,6 +53,15 @@ const actionSX = {
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 export default function DashboardDefault() {
+  const { menuMasterLoading } = useGetMenuMaster();
+  const downXL = useMediaQuery((theme) => theme.breakpoints.down('xl'));
+
+  useEffect(() => {
+    handlerDrawerOpen(!downXL);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [downXL]);
+
+  if (menuMasterLoading) return <Loader />;
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       {/* row 1 */}
@@ -72,7 +84,7 @@ export default function DashboardDefault() {
       <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} />
 
       {/* row 2 */}
-      <Grid item xs={12} md={7} lg={8}>
+      {/*<Grid item xs={12} md={7} lg={8}>
         <UniqueVisitorCard />
       </Grid>
       <Grid item xs={12} md={5} lg={4}>
@@ -93,10 +105,10 @@ export default function DashboardDefault() {
           </Box>
           <MonthlyBarChart />
         </MainCard>
-      </Grid>
+      </Grid>*/}
 
       {/* row 3 */}
-      <Grid item xs={12} md={7} lg={8}>
+      {/*<Grid item xs={12} md={7} lg={8}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
             <Typography variant="h5">Recent Orders</Typography>
@@ -131,10 +143,10 @@ export default function DashboardDefault() {
           </List>
           {<ReportAreaChart />}
         </MainCard>
-      </Grid>
+      </Grid>*/}
 
       {/* row 4 */}
-      <Grid item xs={12} md={7} lg={8}>
+      {/*<Grid item xs={12} md={7} lg={8}>
         <SaleReportCard />
       </Grid>
       <Grid item xs={12} md={5} lg={4}>
@@ -240,7 +252,7 @@ export default function DashboardDefault() {
             </Button>
           </Stack>
         </MainCard>
-      </Grid>
+      </Grid>*/}
     </Grid>
   );
 }

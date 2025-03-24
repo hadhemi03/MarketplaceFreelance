@@ -1,24 +1,40 @@
 import Project from "../models/Project.model.js";
 import { createError } from "../utils/error.js";
 import User from "../models/User.model.js";
+import multer from "multer";
+import path from "path";
+
+// Configuration de stockage pour les images
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/"); // Dossier où stocker les images
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // Renommer l'image avec un timestamp
+    },
+});
+
+const upload = multer({ storage: storage });
+
 
 // Create a new project (Client only)
 export const createProject = async (req, res, next) => {
-    console.log("User from JWT:", req.user); // Log user object from JWT
-    const { projectName, description, skillsRequired, price, category } = req.body;
-
-    if (!projectName || !description || !skillsRequired || !price || !category) {
-        return res.status(400).json({ message: "All fields are required." });
-    }
-
     try {
+        console.log("User from JWT:", req.user);
+        const { projectName, description, skillsRequired, price, category } = req.body;
+
+        if (!projectName || !description || !skillsRequired || !price || !category) {
+            return res.status(400).json({ message: "All fields are required." });
+        }
+
         console.log("Creating project for client ID:", req.user._id);
         const client = await User.findById(req.user._id);
-        console.log("Fetched client:", client);
-
         if (!client) {
             return res.status(404).json({ message: "Client not found." });
         }
+
+        // Image URL si l'utilisateur a uploadé une image
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : "";
 
         const newProject = new Project({
             projectName,
@@ -27,16 +43,20 @@ export const createProject = async (req, res, next) => {
             price,
             category,
             clientId: req.user._id,
-            clientName: client.username
+            clientName: client.username,
+            image: imageUrl, // Ajouter l'image
         });
 
         await newProject.save();
         res.status(201).json({ message: "Project created successfully", project: newProject });
     } catch (err) {
-        console.error("Error:", err);  // Log the actual error
+        console.error("Error:", err);
         next(createError(500, "Server Error, could not create project."));
     }
 };
+
+// Middleware pour gérer l'upload
+export const uploadProjectImage = upload.single("image");
 
 
 // Update an existing project (Client only)
@@ -111,11 +131,12 @@ export const getAllProjects = async (req, res, next) => {
         // Build query based on search, skills, and price filters
         let query = {};
 
+        // Filtering by name or skills
         if (search) {
-            query.projectName = { $regex: search, $options: "i" };
-        }
-        if (skills) {
-            query.skillsRequired = { $in: skills.split(",") };
+            query.$or = [
+                { projectName: { $regex: search, $options: "i" } }, // Case-insensitive name search
+                { skillsRequired: { $in: [new RegExp(search, "i")] } } // Case-insensitive skills search
+            ];
         }
         if (price) {
             query.price = { $lte: Number(price) }; // Filter by price 
@@ -125,7 +146,14 @@ export const getAllProjects = async (req, res, next) => {
         }
 
         const projects = await Project.find(query);
-        res.status(200).json({ projects });
+        // Return price in DT (Tunisian Dinar)
+        const projectsWithDT = projects.map(project => ({
+            ...project.toObject(),
+            price: project.price, // You can convert here if needed
+            currency: 'DT', // Add currency if needed
+        }));
+
+        res.status(200).json({ projects: projectsWithDT });
     } catch (err) {
         next(createError(500, "Server Error, could not fetch projects."));
     }
