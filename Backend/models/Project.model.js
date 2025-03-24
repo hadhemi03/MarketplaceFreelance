@@ -57,6 +57,11 @@ const ProjectSchema = new mongoose.Schema(
             ],
             required: true,
           },
+          image: {
+            type: String, // URL de l'image
+            default: "",  // Optionnel si le client ne met pas d’image
+        }
+
 
     },
     { timestamps: true }

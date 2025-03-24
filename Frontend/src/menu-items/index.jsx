@@ -3,8 +3,10 @@ import dashboard from './dashboard';
 import pages from './page';
 import utilities from './utilities';
 import support from './support';
-import projects from './projects';
-import clientprofile from './clientprofile';
+import clientdashboard from './clientdashboard';
+import clientExplore from './clientexplore';
+import clientActivity from './clientactivity';
+import clientPayment from './payments';
 
 // ==============================|| MENU ITEMS ||============================== //
 
@@ -17,7 +19,7 @@ export default menuItems;*/
 const getMenuItems = (role) => {
   if (role === 'client') {
     return {
-      items: [ projects, clientprofile]
+      items: [ clientdashboard, clientExplore, clientActivity, clientPayment]
     };
   } else {
     return {

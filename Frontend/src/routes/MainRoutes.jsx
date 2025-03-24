@@ -149,6 +149,7 @@ const Projects = Loadable(lazy(() => import('pages/client/Projects')));
 const MyProjects = Loadable(lazy(() => import('pages/client/MyProjects')));
 const Freelancers = Loadable(lazy(() => import('pages/client/Freelancers')));
 const Payments = Loadable(lazy(() => import('pages/client/Payments')));
+const Messages = Loadable(lazy(() => import('pages/client/Messages')));
 
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -176,6 +177,7 @@ const MainRoutes = {
         { path: 'projects', element: <Projects /> },
         { path: 'my-projects', element: <MyProjects /> },
         { path: 'freelancers', element: <Freelancers /> },
+        { path: 'messages', element: <Messages /> },
         { path: 'payments', element: <Payments /> },
       ]
     },

@@ -1,17 +1,17 @@
 // assets
-import { ChromeOutlined, QuestionOutlined } from '@ant-design/icons';
+import { ProfileOutlined, MessageOutlined} from '@ant-design/icons';
 
 // icons
 const icons = {
-  ChromeOutlined,
-  QuestionOutlined
+    ProfileOutlined,
+    MessageOutlined
 };
 
 // ==============================|| MENU ITEMS - SAMPLE PAGE & DOCUMENTATION ||============================== //
 
-const clientprofile = {
+const clientActivity = {
   id: 'clientprofile',
-  title: 'History',
+  title: 'My Activity',
   type: 'group',
   children: [
     {
@@ -19,18 +19,18 @@ const clientprofile = {
       title: 'My Projects',
       type: 'item',
       url: '/client/my-project',
-      icon: icons.ChromeOutlined
+      icon: icons.ProfileOutlined
     },
     {
-      id: 'payments',
-      title: 'Payments',
+      id: 'messages',
+      title: 'My Messages',
       type: 'item',
-      url: '/client/payments',
-      icon: icons.QuestionOutlined,
+      url: '/client/messages',
+      icon: icons.MessageOutlined,
       external: true,
       target: true
     }
   ]
 };
 
-export default clientprofile;
+export default clientActivity;

@@ -1,16 +1,17 @@
 // assets
-import { DashboardOutlined } from '@ant-design/icons';
+import { InsertRowBelowOutlined, UsergroupAddOutlined } from '@ant-design/icons';
 
 // icons
 const icons = {
-  DashboardOutlined
+    InsertRowBelowOutlined,
+    UsergroupAddOutlined
 };
 
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
 
-const projects = {
+const clientExplore = {
   id: 'group-projects',
-  title: 'Navigation',
+  title: 'Explore',
   type: 'group',
   children: [
     {
@@ -18,16 +19,16 @@ const projects = {
       title: 'Projects',
       type: 'item',
       url: '/client/projects',
-      icon: icons.DashboardOutlined,
+      icon: icons.InsertRowBelowOutlined,
     },
     {
         id: 'freelancers',
         title: 'Freelancers',
         type: 'item',
         url: '/client/freelancers',
-        icon: icons.DashboardOutlined,
+        icon: icons.UsergroupAddOutlined,
       }
   ]
 };
 
-export default projects;
+export default clientExplore;
