@@ -35,8 +35,8 @@ const Freelancers = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Title */}
-      <Typography variant="h4" gutterBottom>
-        Explore Freelancers
+      <Typography variant="h4" gutterBottom fontWeight={700} color="primary">
+        🔍 Explore Freelancers
       </Typography>
 
       {/* Search Filters Row */}
@@ -65,7 +65,7 @@ const Freelancers = () => {
           />
         </Grid>
 
-        {/* Search by Country (Dropdown) */}
+        {/* Search by Country */}
         <Grid item xs={12} md={4}>
           <TextField
             fullWidth
@@ -79,7 +79,6 @@ const Freelancers = () => {
             <MenuItem value="Tunisia">Tunisia</MenuItem>
             <MenuItem value="France">France</MenuItem>
             <MenuItem value="USA">USA</MenuItem>
-            {/* Add more countries as needed */}
           </TextField>
         </Grid>
       </Grid>
@@ -87,48 +86,69 @@ const Freelancers = () => {
       {/* Freelancer Cards */}
       <Grid container spacing={3}>
         {freelancers?.map((freelancer) => {
-          // Only show image if freelancer has a valid img URL
-          const imageUrl = freelancer.img && freelancer.img.trim() !== "" 
-            ? `${import.meta.env.VITE_PUBLIC_URL}${freelancer.img}` 
+          // Image Handling
+          const imageUrl = freelancer.img?.trim()
+            ? `http://localhost:5000${freelancer.img}`
             : null;
 
           return (
             <Grid item xs={12} sm={6} md={4} key={freelancer._id}>
-              <Card sx={{ height: "100%", display: "flex", flexDirection: "column", p: 2 }}>
+              <Card
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  p: 2,
+                  borderRadius: 3,
+                  boxShadow: 3,
+                  transition: "transform 0.2s ease-in-out",
+                  "&:hover": { transform: "scale(1.03)" },
+                }}
+              >
                 {/* Avatar + Name + Country */}
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Avatar
-                    src={imageUrl} // If no image, will not display anything
+                    src={imageUrl}
                     alt={freelancer.username}
-                    sx={{ width: 50, height: 50, mr: 2 }}
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      mr: 2,
+                      bgcolor: "primary.main",
+                      fontSize: 24,
+                      color: "white",
+                    }}
                   >
-                    {/* If no image, show initials */}
-                    {!imageUrl && freelancer.username && freelancer.username[0]}
+                    {!imageUrl && freelancer.username?.charAt(0).toUpperCase()}
                   </Avatar>
                   <Box>
-                    <Typography variant="h6">{freelancer.username}</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {freelancer.country}
+                    <Typography variant="h6" fontWeight={600} color="text.primary">
+                      {freelancer.username}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      📍 {freelancer.country}
                     </Typography>
                   </Box>
                 </Box>
 
                 {/* Occupation */}
-                <Typography variant="body1" color="primary">
-                  {freelancer.occupation}
+                <Typography variant="subtitle1" color="primary" fontWeight={500} gutterBottom>
+                  {freelancer.occupation || "Freelancer"}
                 </Typography>
 
                 {/* Description */}
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {freelancer.desc}
+                  {freelancer.desc || "No description available."}
                 </Typography>
 
                 {/* Skills */}
-                <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", mb: 1 }}>
-                  {freelancer.skills.map((skill, index) => (
-                    <Chip key={index} label={skill} color="primary" size="small" />
-                  ))}
-                </Stack>
+                {freelancer.skills.length > 0 && (
+                  <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", mb: 1 }}>
+                    {freelancer.skills.map((skill, index) => (
+                      <Chip key={index} label={skill} color="primary" size="small" />
+                    ))}
+                  </Stack>
+                )}
               </Card>
             </Grid>
           );

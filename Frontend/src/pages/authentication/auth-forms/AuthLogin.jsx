@@ -57,16 +57,19 @@ export default function AuthLogin({ isDemo = false }) {
         },
         { withCredentials: true }
       );
-  
+
       console.log("Login Response:", response.data);
-  
+
+      // Store the JWT token in localStorage
+      localStorage.setItem('token', response.data.token);  // ✅ Store token
+
       // Store the user in localStorage
       localStorage.setItem('currentUser', JSON.stringify(response.data.user));
       localStorage.setItem('userRole', response.data.user.role);
-  
+
       // Show success toast
       toast.success('Login successful!');
-  
+
       // Navigate to the correct dashboard after a short delay
       setTimeout(() => {
         const userRole = localStorage.getItem('userRole');
@@ -75,8 +78,8 @@ export default function AuthLogin({ isDemo = false }) {
         } else {
           navigate('/dashboard/default');
         }
-      }, 100); // Short delay before redirect
-  
+      }, 300); // Short delay before redirect
+
     } catch (err) {
       console.log('Login failed:', err);
       // Show error toast

@@ -186,6 +186,9 @@ export const getAllFreelancers = async (req, res, next) => {
     }
 
 
+
+
+
     try {
         const freelancers = await User.find(query).select("-password");
         res.status(200).json({ freelancers });
@@ -196,28 +199,28 @@ export const getAllFreelancers = async (req, res, next) => {
 
 export const getCurrentUser = async (req, res) => {
     try {
-      const token = req.cookies.access_token;
-      if (!token) {
-        return res.status(401).json({ message: "Not authenticated" });
-      }
-  
-      // Decode the token
-      const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
-  
-      // Check if decoded.userId exists and is valid
-      if (!decoded.userId) {
-        return res.status(400).json({ message: "Invalid token structure" });
-      }
-  
-      // Find the user by ID
-      const user = await User.findById(decoded.userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      res.status(200).json(user);
+        const token = req.cookies.access_token;
+        if (!token) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+
+        // Decode the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
+
+        // Check if decoded.userId exists and is valid
+        if (!decoded.userId) {
+            return res.status(400).json({ message: "Invalid token structure" });
+        }
+
+        // Find the user by ID
+        const user = await User.findById(decoded.userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user);
     } catch (error) {
-      console.error("Error during getCurrentUser:", error);  // Log the error
-      res.status(500).json({ message: "Server error", error: error.message });
+        console.error("Error during getCurrentUser:", error);  // Log the error
+        res.status(500).json({ message: "Server error", error: error.message });
     }
-  };
+};

@@ -94,6 +94,7 @@ export const login = async (req, res) => {
         // Send the response with the token and user data
         res.status(200).json({
             message: "Login successful",
+            token, // Now the frontend can store it in localStorage
             user: {
                 userId: user._id,
                 username: user.username,

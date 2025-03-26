@@ -18,7 +18,7 @@ const clientActivity = {
       id: 'my-projects',
       title: 'My Projects',
       type: 'item',
-      url: '/client/my-project',
+      url: '/client/my-projects',
       icon: icons.ProfileOutlined
     },
     {
@@ -27,8 +27,6 @@ const clientActivity = {
       type: 'item',
       url: '/client/messages',
       icon: icons.MessageOutlined,
-      external: true,
-      target: true
     }
   ]
 };
