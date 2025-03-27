@@ -125,32 +125,52 @@ export const deleteProject = async (req, res, next) => {
 
 // Get all projects (Freelancers and Clients )
 export const getAllProjects = async (req, res, next) => {
-    const { search, skills, price, category } = req.query;
+    const { search, minPrice, maxPrice, category } = req.query;
 
     try {
-        // Build query based on search, skills, and price filters
         let query = {};
+
+        let conditions = [];
 
         // Filtering by name or skills
         if (search) {
-            query.$or = [
-                { projectName: { $regex: search, $options: "i" } }, // Case-insensitive name search
-                { skillsRequired: { $in: [new RegExp(search, "i")] } } // Case-insensitive skills search
-            ];
+            conditions.push({
+                $or: [
+                    { projectName: { $regex: search, $options: "i" } }, // Case-insensitive search
+                    { skillsRequired: { $in: [new RegExp(search, "i")] } } // Case-insensitive skills search
+                ]
+            });
         }
-        if (price) {
-            query.price = { $lte: Number(price) }; // Filter by price 
+
+        // Filtering by price range
+        let priceFilter = {};
+        if (minPrice) {
+            priceFilter.$gte = Number(minPrice);
         }
+        if (maxPrice) {
+            priceFilter.$lte = Number(maxPrice);
+        }
+        if (Object.keys(priceFilter).length > 0) {
+            conditions.push({ price: priceFilter });
+        }
+
+        // Filtering by category
         if (category) {
-            query.category = category;
+            conditions.push({ category });
+        }
+
+        // If we have multiple filters, use `$and`
+        if (conditions.length > 0) {
+            query.$and = conditions;
         }
 
         const projects = await Project.find(query);
-        // Return price in DT (Tunisian Dinar)
+
+        // Return projects with price in DT (Tunisian Dinar)
         const projectsWithDT = projects.map(project => ({
             ...project.toObject(),
-            price: project.price, // You can convert here if needed
-            currency: 'DT', // Add currency if needed
+            price: project.price, 
+            currency: 'DT'
         }));
 
         res.status(200).json({ projects: projectsWithDT });
@@ -158,6 +178,7 @@ export const getAllProjects = async (req, res, next) => {
         next(createError(500, "Server Error, could not fetch projects."));
     }
 };
+
 
 
 // Get projects by client (Client only can see their own projects)

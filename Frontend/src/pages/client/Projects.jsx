@@ -46,7 +46,8 @@ const Projects = () => {
         const response = await axios.get("http://localhost:5000/api/projects/view-projects", {
           params: {
             search: searchTerm,
-            price: priceRange[1], // Max price filter
+            minPrice: priceRange[0],
+            maxPrice: priceRange[1], // Max price filter
             category: selectedCategory !== "" ? selectedCategory : undefined, // Ignore filter if empty
           },
           withCredentials: true,
@@ -92,8 +93,10 @@ const Projects = () => {
               variant="outlined"
               value={priceRange[0]}
               onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-              sx={{ width: "80px", height: "56px" }} // Ensure height consistency
-            />
+              sx={{
+                width: "120px", // Increased width
+                '& input': { textAlign: 'center', padding: '10px' } // Ensures proper spacing
+              }}            />
             <Slider
               value={priceRange}
               onChange={(event, newValue) => setPriceRange(newValue)}
@@ -108,8 +111,10 @@ const Projects = () => {
               variant="outlined"
               value={priceRange[1]}
               onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-              sx={{ width: "80px", height: "56px" }} // Ensure height consistency
-            />
+              sx={{
+                width: "120px", // Increased width
+                '& input': { textAlign: 'center', padding: '10px' } // Ensures proper spacing
+              }}            />
           </Box>
         </Grid>
 
@@ -146,7 +151,7 @@ const Projects = () => {
               <CardMedia
                 component="img"
                 height="150"
-                image={project.image ? `http://localhost:5000/${project.image}` : null } // Corrected image field name
+                image={project.image ? `http://localhost:5000${project.image}` : ""}
                 alt={project.projectName}
               />
 
