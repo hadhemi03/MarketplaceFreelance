@@ -179,6 +179,23 @@ export const getAllProjects = async (req, res, next) => {
     }
 };
 
+// Get project by id (all users)
+export const getProjectById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const project = await Project.findById(id);
+
+        if(!project) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+
+        res.status(200).json(project);  // get project 
+    } catch (err) {
+        console.error("Error fetching project:", err);
+        res.status(500).json({ message: "Server error while fetching project"});
+    }
+};
+
 
 
 // Get projects by client (Client only can see their own projects)
@@ -201,6 +218,8 @@ export const getCategories = async (req, res, next) => {
         res.status(500).json({ message: "Erreur serveur lors de la récupération des catégories." });
     }
 };
+
+
 
 
 

@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyClient, verifyToken } from "../utils/verifyToken.js";
-import { createProject, deleteProject, getAllProjects, getCategories, getClientProjects, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
+import { createProject, deleteProject, getAllProjects, getCategories, getClientProjects, getProjectById, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
 
 const router = express.Router();
 
@@ -16,5 +16,7 @@ router.get("/view-projects", verifyToken, getAllProjects);
 
 // Categories
 router.get("/get-categories", verifyToken, getCategories);
+
+router.get("/get-project/:projectId", verifyToken, getProjectById)
 
 export default router;
