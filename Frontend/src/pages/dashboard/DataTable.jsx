@@ -53,7 +53,7 @@ const DataTable = ({ columns, rows }) => {
                         borderBottom: '1px solid #ddd',
                       }}
                     >
-                      {col.format ? col.format(row[col.id]) : row[col.id]}
+                      {col.format ? col.format(row[col.id], row) : row[col.id]}
                     </TableCell>
                   ))}
                 </TableRow>

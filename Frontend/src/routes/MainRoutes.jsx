@@ -129,6 +129,7 @@ import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
 import ClientDashboard from 'layout/Clientdashboard';
 import DashboardLayout from 'layout/Dashboard/index';
+import { element } from 'prop-types';
 
 const Home = Loadable(lazy(() => import('pages/home/Home')));  // Home Page
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -144,13 +145,15 @@ const AuthLogin = Loadable(lazy(() => import('pages/authentication/login')));
 const AuthRegister = Loadable(lazy(() => import('pages/authentication/register')));
 
 // Pages du client
-const DashboardClient = Loadable(lazy(() => import('pages/client/DashboardClient')));
+const DashboardClient = Loadable(lazy(() => import('pages/client/DashboardClient')));      // with lazy loading react will only load the page when the user user needs it 
 const Projects = Loadable(lazy(() => import('pages/client/Projects')));
 const MyProjects = Loadable(lazy(() => import('pages/client/MyProjects')));
 const Freelancers = Loadable(lazy(() => import('pages/client/Freelancers')));
 const Payments = Loadable(lazy(() => import('pages/client/Payments')));
 const Messages = Loadable(lazy(() => import('pages/client/Messages')));
 const CreateProject = Loadable(lazy(() => import('pages/client/CreateProject')));
+const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')));
+
 
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -178,6 +181,7 @@ const MainRoutes = {
         { path: 'projects', element: <Projects /> },
         { path: 'my-projects', element: <MyProjects /> },
         { path: 'create-project', element: <CreateProject /> },
+        { path: 'projectDetails/:projectId', element: <ProjectDetails /> },
         { path: 'freelancers', element: <Freelancers /> },
         { path: 'messages', element: <Messages /> },
         { path: 'payments', element: <Payments /> },

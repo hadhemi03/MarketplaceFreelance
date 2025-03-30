@@ -54,8 +54,26 @@ const MyProjects = () => {
     { id: 'projectName', label: 'Project Name' },
     { id: 'category', label: 'Category' },
     { id: 'status', label: 'Status', format: (value) => <StatusIndicator status={value} /> },
-    { id: 'price', label: 'Budget', align: 'right', format: (value) => <NumericFormat value={value} displayType="text" thousandSeparator suffix="DT" /> },
+    { id: 'price', label: 'Price', align: 'right', format: (value) => <NumericFormat value={value} displayType="text" thousandSeparator suffix="DT" /> },
     { id: 'createdAt', label: 'Created At', format: (value) => new Date(value).toLocaleDateString() },
+    {
+      id: 'action',
+      label: 'View',
+      format: (value, row) => {
+        console.log("Row data in format function:", row); // Debugging
+        return row && row._id ? (
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => navigate(`/client/projectDetails/${row._id}`)}
+          >
+            View
+          </Button>
+        ) : (
+          <Typography color="error">No ID</Typography>
+        );
+      }
+    }
   ];
 
   if (loading) return <Box display="flex" justifyContent="center"><CircularProgress /></Box>;

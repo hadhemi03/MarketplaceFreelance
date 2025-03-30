@@ -182,8 +182,8 @@ export const getAllProjects = async (req, res, next) => {
 // Get project by id (all users)
 export const getProjectById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const project = await Project.findById(id);
+        const { projectId } = req.params;
+        const project = await Project.findById(projectId);
 
         if(!project) {
             return res.status(404).json({ message: "Project not found" });
