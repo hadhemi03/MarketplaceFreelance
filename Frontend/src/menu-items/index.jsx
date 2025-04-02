@@ -1,12 +1,12 @@
 // project import
-import dashboard from './dashboard';
+/*import dashboard from './dashboard';
 import pages from './page';
 import utilities from './utilities';
 import support from './support';
 import clientdashboard from './clientdashboard';
 import clientExplore from './clientexplore';
 import clientActivity from './clientactivity';
-import clientPayment from './payments';
+import clientPayment from './payments';*/
 
 // ==============================|| MENU ITEMS ||============================== //
 
@@ -16,7 +16,7 @@ import clientPayment from './payments';
 
 export default menuItems;*/
 
-const getMenuItems = (role) => {
+/*const getMenuItems = (role) => {
   if (role === 'client') {
     return {
       items: [ clientdashboard, clientExplore, clientActivity, clientPayment]
@@ -32,4 +32,4 @@ const role = localStorage.getItem('userRole'); // Retrieve the user's role (clie
 
 const menuItems = getMenuItems(role);  // Get the menu items based on the role
 
-export default menuItems;
+export default menuItems;*/

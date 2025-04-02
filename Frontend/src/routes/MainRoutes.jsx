@@ -130,6 +130,7 @@ import Dashboard from 'layout/Dashboard';
 import ClientDashboard from 'layout/Clientdashboard';
 import DashboardLayout from 'layout/Dashboard/index';
 import { element } from 'prop-types';
+import { Navigate } from 'react-router';
 
 const Home = Loadable(lazy(() => import('pages/home/Home')));  // Home Page
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -158,6 +159,7 @@ const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')
 
 // ==============================|| MAIN ROUTING ||============================== //
 
+
 const MainRoutes = {
   path: '/',  // Root path, can either be Home or Dashboard depending on logic
   children: [
@@ -177,7 +179,6 @@ const MainRoutes = {
       path: 'client',  // Client dashboard route
       element: <ClientDashboard />,  // Main layout for client routes
       children: [
-        { path: 'dashboardclient', element: <DashboardClient /> },
         { path: 'projects', element: <Projects /> },
         { path: 'my-projects', element: <MyProjects /> },
         { path: 'create-project', element: <CreateProject /> },
@@ -214,5 +215,6 @@ const MainRoutes = {
 };
 
 export default MainRoutes;
+
 
 

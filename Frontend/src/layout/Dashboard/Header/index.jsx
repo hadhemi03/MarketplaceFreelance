@@ -35,7 +35,7 @@ export default function Header() {
   // common header
   const mainHeader = (
     <Toolbar>
-      <IconButton
+      {/*<IconButton
         disableRipple
         aria-label="open drawer"
         onClick={() => handlerDrawerOpen(!drawerOpen)}
@@ -45,7 +45,7 @@ export default function Header() {
         sx={{ color: 'text.primary', bgcolor: drawerOpen ? iconBackColorOpen : iconBackColor, ml: { xs: 0, lg: -2 } }}
       >
         {!drawerOpen ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-      </IconButton>
+      </IconButton>*/}
       {headerContent}
     </Toolbar>
   );

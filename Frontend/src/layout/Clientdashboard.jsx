@@ -2,7 +2,7 @@ import { Outlet, Navigate } from 'react-router-dom';
 
 import Drawer from "./Dashboard/Drawer";
 import Header from './Dashboard/Header';
-import navigation from 'menu-items';
+import { menuItems as navigation } from '././Dashboard/Header/HeaderContent'; // Import menuItems from HeaderContent.js
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Breadcrumbs from 'components/@extended/Breadcrumbs';

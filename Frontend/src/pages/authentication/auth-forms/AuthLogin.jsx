@@ -74,7 +74,7 @@ export default function AuthLogin({ isDemo = false }) {
       setTimeout(() => {
         const userRole = localStorage.getItem('userRole');
         if (userRole === 'client') {
-          navigate('/client/dashboardclient');
+          navigate('/client/projects');
         } else {
           navigate('/dashboard/default');
         }

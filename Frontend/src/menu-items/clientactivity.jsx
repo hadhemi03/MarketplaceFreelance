@@ -10,7 +10,7 @@ const icons = {
 // ==============================|| MENU ITEMS - SAMPLE PAGE & DOCUMENTATION ||============================== //
 
 const clientActivity = {
-  id: 'clientprofile',
+  id: 'clientActivity',
   title: 'My Activity',
   type: 'group',
   children: [
