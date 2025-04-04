@@ -201,7 +201,7 @@ export const deleteProject = async (req, res, next) => {
 
 // Get all projects (Freelancers and Clients )
 export const getAllProjects = async (req, res, next) => {
-    const { search, minPrice, maxPrice, category } = req.query;
+    const { search, minPrice, maxPrice, category, skill } = req.query;
 
     try {
         let query = {};
@@ -211,10 +211,13 @@ export const getAllProjects = async (req, res, next) => {
         // Filtering by name or skills
         if (search) {
             conditions.push({
-                $or: [
-                    { projectName: { $regex: search, $options: "i" } }, // Case-insensitive search
-                    { skillsRequired: { $elemMatch: { $regex: search, $options: 'i' } } }
-                ]
+                projectName: { $regex: search, $options: "i" }
+            });
+        }
+        
+        if (skill) {
+            conditions.push({
+                skillsRequired: { $elemMatch: { $regex: skill, $options: "i" } }
             });
         }
 

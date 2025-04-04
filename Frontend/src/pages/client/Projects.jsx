@@ -1,45 +1,191 @@
+/*import { useEffect, useState } from "react";
+import {
+  Typography, Card, CardContent, CardMedia, Box, Stack, Chip,
+  TextField, Button, Divider
+} from "@mui/material";
+import axios from "axios";
+
+const Projects = () => {
+  const [projects, setProjects] = useState([]);
+  const [comments, setComments] = useState({});
+  const [newComment, setNewComment] = useState({});
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/projects/view-projects", {
+          withCredentials: true,
+        });
+        setProjects(res.data.projects || []);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const handleCommentChange = (projectId, text) => {
+    setNewComment((prev) => ({ ...prev, [projectId]: text }));
+  };
+
+  const handleCommentSubmit = async (projectId) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/comments/add-comment/${projectId}`,
+        { text: newComment[projectId] },
+        { withCredentials: true }
+      );
+
+      setComments((prev) => ({
+        ...prev,
+        [projectId]: [...(prev[projectId] || []), res.data.comment],
+      }));
+
+      setNewComment((prev) => ({ ...prev, [projectId]: "" }));
+    } catch (err) {
+      console.error("Error submitting comment:", err);
+    }
+  };
+
+  const fetchComments = async (projectId) => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/comments/getCommentsByProject/${projectId}`, {
+        withCredentials: true,
+      });
+      setComments((prev) => ({ ...prev, [projectId]: res.data.comments }));
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  return (
+    <Box sx={{ p: 3, maxWidth: 700, mx: "auto" }}>
+      <Typography variant="h4" gutterBottom fontWeight={700} color="primary">
+        🧩 Project Feed
+      </Typography>
+
+      <Stack spacing={4}>
+        {projects.map((project) => (
+          <Card key={project._id} sx={{ p: 2 }}>
+            {project.image && (
+              <CardMedia
+                component="img"
+                height="300"
+                image={`http://localhost:5000${project.image}`}
+                alt={project.projectName}
+                sx={{ borderRadius: 2 }}
+              />
+            )}
+
+            <CardContent>
+              <Typography variant="h6">{project.projectName}</Typography>
+              <Typography variant="body2" color="text.secondary">
+                {project.description}
+              </Typography>
+
+              <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                {project.skillsRequired?.map((skill, index) => (
+                  <Chip key={index} label={skill} size="small" color="primary" />
+                ))}
+              </Box>
+
+              <Typography variant="subtitle1" color="success.main" sx={{ mt: 2 }}>
+                💰 {project.price} DT
+              </Typography>
+
+              <Divider sx={{ my: 2 }} />
+
+
+              <Box>
+                <Typography variant="subtitle2" fontWeight="bold">
+                  Comments
+                </Typography>
+                <Button
+                  size="small"
+                  onClick={() => fetchComments(project._id)}
+                  sx={{ mb: 1, textTransform: "none" }}
+                >
+                  Load comments
+                </Button>
+                <Stack spacing={1}>
+                  {comments[project._id]?.map((comment) => (
+                    <Box key={comment._id} sx={{ bgcolor: "#f5f5f5", p: 1.2, borderRadius: 2 }}>
+                      <Typography variant="body2" fontWeight="bold">
+                        {comment.userName}
+                      </Typography>
+                      <Typography variant="body2">{comment.text}</Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+
+              <Box sx={{ mt: 2 }}>
+                <TextField
+                  fullWidth
+                  placeholder="Write a comment..."
+                  size="small"
+                  value={newComment[project._id] || ""}
+                  onChange={(e) => handleCommentChange(project._id, e.target.value)}
+                />
+                <Button
+                  onClick={() => handleCommentSubmit(project._id)}
+                  variant="contained"
+                  size="small"
+                  sx={{ mt: 1 }}
+                >
+                  Post
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Stack>
+    </Box>
+  );
+};
+
+export default Projects;*/
+
+
 import { useEffect, useState } from "react";
 import {
-  Grid, Typography, Card, CardContent, CardMedia, Box, Stack, Chip,
-  TextField, Slider, MenuItem, Select, FormControl, InputLabel
+  Typography, Card, CardContent, CardMedia, Box, Stack, Chip,
+  TextField, Button, Divider, Grid, Slider, FormControl, InputLabel, Select, MenuItem
 } from "@mui/material";
 import axios from "axios";
 import Search from "layout/Dashboard/Header/HeaderContent/Search";
 
 const categoryOptions = [
-  "Graphics & Designs",
-  "Digital Marketing",
-  "Writing & Translation",
-  "Video & Animation",
-  "Music & Audio",
-  "Programming & Tech",
-  "Business",
-  "Legal & Compliance",
-  "Data",
-  "Photography",
+  "Graphics & Designs", "Digital Marketing", "Writing & Translation", "Video & Animation",
+  "Music & Audio", "Programming & Tech", "Business", "Legal & Compliance", "Data", "Photography",
 ];
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 5000]); // Default price range
-  const [selectedCategory, setSelectedCategory] = useState(""); // Category filter
-
+  const [comments, setComments] = useState({});
+  const [newComment, setNewComment] = useState({});
+  const [searchTerm, setSearchTerm] = useState(""); // General search term
+  const [priceRange, setPriceRange] = useState([0, 10000]); // Price range filter state
+  const [selectedCategory, setSelectedCategory] = useState(""); // Category filter state
+  const [searchName, setSearchName] = useState(""); // Project name search state
+  const [selectedSkills, setSelectedSkills] = useState(""); // Skills filter state
+  
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/projects/view-projects",
-          { withCredentials: true }
-        );
-        setProjects(response.data.projects);
+        const res = await axios.get("http://localhost:5000/api/projects/view-projects", {
+          withCredentials: true,
+        });
+        setProjects(res.data.projects || []);
       } catch (error) {
         console.error("Error fetching projects:", error);
       }
     };
+
     fetchProjects();
   }, []);
 
-  // Fetch projects when filters change
   useEffect(() => {
     const fetchFilteredProjects = async () => {
       try {
@@ -47,12 +193,13 @@ const Projects = () => {
           params: {
             search: searchTerm,
             minPrice: priceRange[0],
-            maxPrice: priceRange[1], // Max price filter
-            category: selectedCategory !== "" ? selectedCategory : undefined, // Ignore filter if empty
+            maxPrice: priceRange[1],
+            category: selectedCategory !== "" ? selectedCategory : undefined,
+            skill: selectedSkills !== "" ? selectedSkills : undefined,
           },
           withCredentials: true,
         });
-
+    
         setProjects(response.data.projects || []);
       } catch (error) {
         console.error("Error filtering projects:", error);
@@ -60,32 +207,93 @@ const Projects = () => {
     };
 
     fetchFilteredProjects();
-  }, [searchTerm, priceRange, selectedCategory]); // Re-fetch when filters change
+  }, [searchTerm, priceRange, selectedCategory, selectedSkills]);
+
+  const handleCommentChange = (projectId, text) => {
+    setNewComment((prev) => ({ ...prev, [projectId]: text }));
+  };
+
+  const handleCommentSubmit = async (projectId) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:5000/api/comments/add-comment/${projectId}`,
+        { text: newComment[projectId] },
+        { withCredentials: true }
+      );
+
+      setComments((prev) => ({
+        ...prev,
+        [projectId]: [...(prev[projectId] || []), res.data.comment],
+      }));
+
+      setNewComment((prev) => ({ ...prev, [projectId]: "" }));
+    } catch (err) {
+      console.error("Error submitting comment:", err);
+    }
+  };
+
+  const fetchComments = async (projectId) => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/comments/getCommentsByProject/${projectId}`, {
+        withCredentials: true,
+      });
+  
+      setComments((prev) => ({
+        ...prev,
+        [projectId]: [...(prev[projectId] || []), ...res.data],
+      }));
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Title */}
-      <Typography variant="h4" gutterBottom fontWeight={700} color="primary">
-        🔍 Explore Projects
-      </Typography>
-
-      {/* Search Filters Row */}
-      <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
-        {/* Search by Name or Skills */}
-        <Grid item xs={12} md={4}>
-          <Search
+    <Box sx={{ p: 3, display: 'flex', backgroundColor: '#f4f4f9' }}>
+      {/* Left Sidebar - Filters */}
+      <Box
+        sx={{
+          width: 250,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          height: '100vh',
+          bgcolor: 'white',
+          boxShadow: 2,
+          borderRadius: 2,
+          p: 2,
+        }}
+      >
+        {/* Search by Project Name */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" fontWeight="bold" color="primary">Search by Project Name</Typography>
+          <TextField
             fullWidth
-            label="Search by Project Name or Skills"
+            label="Search by Project Name"
             variant="outlined"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by project name or skill..."
-            sx={{ height: "56px" }} // Ensure consistent height
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+            placeholder="Search by project name..."
+            sx={{ mb: 2 }}
           />
-        </Grid>
+        </Box>
+
+        {/* Search by Skills */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" fontWeight="bold" color="primary">Search by Skills</Typography>
+          <TextField
+            fullWidth
+            label="Search by Skills"
+            variant="outlined"
+            value={selectedSkills}
+            onChange={(e) => setSelectedSkills(e.target.value)}
+            placeholder="Search by skill..."
+            sx={{ mb: 2 }}
+          />
+        </Box>
 
         {/* Price Range Filter */}
-        <Grid item xs={12} md={4}>
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" fontWeight="bold" color="primary">Price Range</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <TextField
               type="number"
@@ -93,17 +301,15 @@ const Projects = () => {
               variant="outlined"
               value={priceRange[0]}
               onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-              sx={{
-                width: "120px", // Increased width
-                '& input': { textAlign: 'center', padding: '10px' } // Ensures proper spacing
-              }} />
+              sx={{ width: "160px", '& input': { textAlign: 'center', padding: '10px' }}}
+            />
             <Slider
               value={priceRange}
               onChange={(event, newValue) => setPriceRange(newValue)}
               valueLabelDisplay="auto"
               min={0}
               max={10000}
-              sx={{ flexGrow: 1, mt: "8px" }} // Align with text fields
+              sx={{ flexGrow: 1, mt: "8px" }}
             />
             <TextField
               type="number"
@@ -111,23 +317,22 @@ const Projects = () => {
               variant="outlined"
               value={priceRange[1]}
               onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-              sx={{
-                width: "120px", // Increased width
-                '& input': { textAlign: 'center', padding: '10px' } // Ensures proper spacing
-              }} />
+              sx={{ width: "160px", '& input': { textAlign: 'center', padding: '10px' }}}
+            />
           </Box>
-        </Grid>
+        </Box>
 
         {/* Category Filter */}
-        <Grid item xs={12} md={4}>
-          <FormControl fullWidth sx={{ height: "56px" }} variant="outlined">
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" fontWeight="bold" color="primary">Category</Typography>
+          <FormControl fullWidth variant="outlined">
             <InputLabel shrink>Category</InputLabel>
             <Select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               displayEmpty
               notched
-              sx={{ height: "56px", display: "flex", alignItems: "center" }} // Ensure height consistency
+              sx={{ height: "56px" }}
             >
               <MenuItem value="">
                 <em>All Categories</em>
@@ -139,58 +344,87 @@ const Projects = () => {
               ))}
             </Select>
           </FormControl>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
+      {/* Right Side - Project Feed */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Typography variant="h4" gutterBottom fontWeight={700} color="primary.main" sx={{ fontFamily: 'Roboto' }}>
+          🧩 Project Feed
+        </Typography>
 
-      {/* Project Cards */}
-      <Grid container spacing={3}>
-        {projects?.map((project) => (
-          <Grid item xs={12} sm={6} md={4} key={project._id}>
-            <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-              <CardMedia
-                component="img"
-                height="150"
-                image={project.image ? `http://localhost:5000${project.image}` : ""}
-                alt={project.projectName}
-              />
+        <Stack spacing={4} sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          {projects.map((project) => (
+            <Card key={project._id} sx={{ p: 3, width: "100%", maxWidth: 800, mx: "auto", boxShadow: 3, borderRadius: 3, transition: "transform 0.3s", '&:hover': { transform: 'scale(1.05)' } }}>
+              {project.image && (
+                <CardMedia
+                  component="img"
+                  height="300"
+                  image={`http://localhost:5000${project.image}`}
+                  alt={project.projectName}
+                  sx={{ borderRadius: 2 }}
+                />
+              )}
 
               <CardContent>
-                <Typography variant="h6">{project.projectName}</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {project.description}
-                </Typography>
+                <Typography variant="h6" fontWeight="bold">{project.projectName}</Typography>
+                <Typography variant="body2" color="text.secondary">{project.description}</Typography>
 
-                <Box sx={{ mt: 1, mb: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
-                  {(() => {
-                    const skills = (() => {
-                      if (Array.isArray(project.skillsRequired)) return project.skillsRequired;
-                      try {
-                        const parsed = JSON.parse(project.skillsRequired);
-                        if (Array.isArray(parsed)) return parsed;
-                        if (typeof parsed === 'string') return parsed.split(',').map(s => s.trim());
-                        return [];
-                      } catch {
-                        return typeof project.skillsRequired === 'string'
-                          ? project.skillsRequired.split(',').map(s => s.trim())
-                          : [];
-                      }
-                    })();
-
-                    return skills.map((skill, index) => (
-                      <Chip key={index} label={skill} size="small" color="primary" />
-                    ));
-                  })()}
+                <Box sx={{ mt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                  {project.skillsRequired?.map((skill, index) => (
+                    <Chip key={index} label={skill} size="small" color="primary" />
+                  ))}
                 </Box>
 
-                <Typography variant="h6" color="success.main">
-                  {project.price} DT
+                <Typography variant="subtitle1" color="success.main" sx={{ mt: 2 }} fontWeight="bold">
+                  💰 {project.price} DT
                 </Typography>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box>
+                  <Typography variant="subtitle2" fontWeight="bold">
+                    Comments
+                  </Typography>
+                  <Button
+                    size="small"
+                    onClick={() => fetchComments(project._id)}
+                    sx={{ mb: 1, textTransform: "none", backgroundColor: "#1976d2", color: "white", '&:hover': { backgroundColor: "#115293" } }}
+                  >
+                    View comments
+                  </Button>
+                  <Stack spacing={1}>
+                    {comments[project._id]?.map((comment) => (
+                      <Box key={comment._id} sx={{ bgcolor: "#f5f5f5", p: 1.2, borderRadius: 2 }}>
+                        <Typography variant="body2" fontWeight="bold">{comment.userName}</Typography>
+                        <Typography variant="body2">{comment.text}</Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+
+                <Box sx={{ mt: 2 }}>
+                  <TextField
+                    fullWidth
+                    placeholder="Write a comment..."
+                    size="small"
+                    value={newComment[project._id] || ""}
+                    onChange={(e) => handleCommentChange(project._id, e.target.value)}
+                  />
+                  <Button
+                    onClick={() => handleCommentSubmit(project._id)}
+                    variant="contained"
+                    size="small"
+                    sx={{ mt: 1, backgroundColor: "#1976d2", '&:hover': { backgroundColor: "#115293" } }}
+                  >
+                    Post
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
-          </Grid>
-        ))}
-      </Grid>
+          ))}
+        </Stack>
+      </Box>
     </Box>
   );
 };
