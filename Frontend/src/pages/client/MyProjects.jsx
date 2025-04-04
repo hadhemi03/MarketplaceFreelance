@@ -58,7 +58,7 @@ const MyProjects = () => {
     { id: 'createdAt', label: 'Created At', format: (value) => new Date(value).toLocaleDateString() },
     {
       id: 'action',
-      label: 'View',
+      label: 'View Details',
       format: (value, row) => {
         console.log("Row data in format function:", row); // Debugging
         return row && row._id ? (

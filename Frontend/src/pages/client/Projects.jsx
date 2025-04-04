@@ -96,7 +96,7 @@ const Projects = () => {
               sx={{
                 width: "120px", // Increased width
                 '& input': { textAlign: 'center', padding: '10px' } // Ensures proper spacing
-              }}            />
+              }} />
             <Slider
               value={priceRange}
               onChange={(event, newValue) => setPriceRange(newValue)}
@@ -114,7 +114,7 @@ const Projects = () => {
               sx={{
                 width: "120px", // Increased width
                 '& input': { textAlign: 'center', padding: '10px' } // Ensures proper spacing
-              }}            />
+              }} />
           </Box>
         </Grid>
 
@@ -160,11 +160,29 @@ const Projects = () => {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                   {project.description}
                 </Typography>
-                <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", mb: 1 }}>
-                  {project.skillsRequired.map((skill, index) => (
-                    <Chip key={index} label={skill} color="primary" size="small" />
-                  ))}
-                </Stack>
+
+                <Box sx={{ mt: 1, mb: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                  {(() => {
+                    const skills = (() => {
+                      if (Array.isArray(project.skillsRequired)) return project.skillsRequired;
+                      try {
+                        const parsed = JSON.parse(project.skillsRequired);
+                        if (Array.isArray(parsed)) return parsed;
+                        if (typeof parsed === 'string') return parsed.split(',').map(s => s.trim());
+                        return [];
+                      } catch {
+                        return typeof project.skillsRequired === 'string'
+                          ? project.skillsRequired.split(',').map(s => s.trim())
+                          : [];
+                      }
+                    })();
+
+                    return skills.map((skill, index) => (
+                      <Chip key={index} label={skill} size="small" color="primary" />
+                    ));
+                  })()}
+                </Box>
+
                 <Typography variant="h6" color="success.main">
                   {project.price} DT
                 </Typography>

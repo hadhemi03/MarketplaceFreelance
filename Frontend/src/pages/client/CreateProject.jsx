@@ -1,12 +1,16 @@
 import { useState } from 'react';
-import { Button, TextField, Box, Typography, FormControl, InputLabel, Select, MenuItem, CircularProgress, Snackbar, Alert } from '@mui/material';
+import {
+  Button, TextField, Box, Typography, FormControl,
+  InputLabel, Select, MenuItem, CircularProgress, Snackbar, Alert, Chip
+} from '@mui/material';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
 
 const CreateProject = () => {
   const [projectName, setProjectName] = useState('');
   const [description, setDescription] = useState('');
-  const [skillsRequired, setSkillsRequired] = useState('');
+  const [skillsRequired, setSkillsRequired] = useState([]); // State for skills
+  const [inputValue, setInputValue] = useState(''); // State for input value
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
@@ -17,23 +21,44 @@ const CreateProject = () => {
 
   const navigate = useNavigate();
 
-  const handleFileChange = (event) => {
-    setImage(event.target.files[0]);
+  // Handle adding skills
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && inputValue.trim() !== '') {
+      e.preventDefault(); // Prevent form submission
+
+      if (!skillsRequired.includes(inputValue.trim())) {
+        setSkillsRequired((prevSkills) => [...prevSkills, inputValue.trim()]);
+      }
+
+      setInputValue(''); // Clear input field after adding
+    }
   };
 
+  // Handle file upload
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
+  // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
+    setError('');
+
+    // Create FormData and append values
     const formData = new FormData();
     formData.append('projectName', projectName);
     formData.append('description', description);
-    formData.append('skillsRequired', skillsRequired);
+    formData.append('skillsRequired', JSON.stringify(skillsRequired)); // Ensure array is sent correctly
     formData.append('price', price);
     formData.append('category', category);
     if (image) formData.append('image', image);
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (!token) {
         setError('User not authenticated');
         setLoading(false);
@@ -45,21 +70,19 @@ const CreateProject = () => {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
-        withCredentials: true, // This ensures credentials (like cookies) are sent with the request
+        withCredentials: true,
       });
 
       setLoading(false);
       if (res.status === 201) {
-        // Show success message in Snackbar
         setSnackbarMessage('Project created successfully!');
         setOpenSnackbar(true);
-
-        // Navigate to "My Projects" page after a short delay
         setTimeout(() => {
           navigate('/client/my-projects');
-        }, 2000); // Delay the navigation to ensure the success message is visible
+        }, 1000);
       }
     } catch (err) {
+      console.error('Error creating project:', err.response?.data || err.message);
       setError('Error creating project. Please try again.');
       setLoading(false);
     }
@@ -96,15 +119,30 @@ const CreateProject = () => {
           sx={{ marginBottom: '16px' }}
         />
 
+        {/* Skills Input */}
         <TextField
           label="Skills Required"
           variant="outlined"
           fullWidth
-          required
-          value={skillsRequired}
-          onChange={(e) => setSkillsRequired(e.target.value)}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type a skill and press Enter"
           sx={{ marginBottom: '16px' }}
         />
+
+        {/* Display skills as Chips */}
+        <Box sx={{ marginBottom: '16px' }}>
+          {skillsRequired.map((skill, index) => (
+            <Chip
+              key={index}
+              label={skill}
+              onDelete={() => setSkillsRequired(skillsRequired.filter(s => s !== skill))}
+              color="primary"
+              sx={{ marginRight: '8px', marginBottom: '8px' }}
+            />
+          ))}
+        </Box>
 
         <TextField
           label="Price (in DT)"
@@ -152,7 +190,7 @@ const CreateProject = () => {
           />
         </Button>
 
-        {/* Image Preview or Placeholder */}
+        {/* Image Preview */}
         <Box
           sx={{
             display: 'flex',
@@ -165,7 +203,6 @@ const CreateProject = () => {
             height: '200px',
             backgroundColor: '#f9f9f9',
             alignItems: 'center',
-            justifyContent: 'center',
           }}
         >
           {image ? (
@@ -202,7 +239,7 @@ const CreateProject = () => {
       {/* Snackbar for Success Message */}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={3000} // Snackbar will disappear after 3 seconds
+        autoHideDuration={3000}
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >

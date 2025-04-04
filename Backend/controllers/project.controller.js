@@ -33,13 +33,30 @@ export const createProject = async (req, res, next) => {
             return res.status(404).json({ message: "Client not found." });
         }
 
+        // Ensure `skillsRequired` is always an array
+        let parsedSkills = [];
+        if (typeof skillsRequired === "string") {
+            try {
+                parsedSkills = JSON.parse(skillsRequired); // Convert JSON string to array
+            } catch (error) {
+                return res.status(400).json({ message: "Invalid skills format." });
+            }
+        } else if (Array.isArray(skillsRequired)) {
+            parsedSkills = skillsRequired;
+        } else {
+            return res.status(400).json({ message: "Skills must be an array." });
+        }
+
+        console.log("Skills Required after parsing:", parsedSkills);
+
+
         // Image URL si l'utilisateur a uploadé une image
         const imageUrl = req.file ? `/uploads/${req.file.filename}` : "";
 
         const newProject = new Project({
             projectName,
             description,
-            skillsRequired,
+            skillsRequired: parsedSkills,
             price,
             category,
             clientId: req.user._id,
@@ -137,7 +154,7 @@ export const getAllProjects = async (req, res, next) => {
             conditions.push({
                 $or: [
                     { projectName: { $regex: search, $options: "i" } }, // Case-insensitive search
-                    { skillsRequired: { $in: [new RegExp(search, "i")] } } // Case-insensitive skills search
+                    { skillsRequired: { $elemMatch: { $regex: search, $options: 'i' } } }
                 ]
             });
         }
@@ -169,8 +186,12 @@ export const getAllProjects = async (req, res, next) => {
         // Return projects with price in DT (Tunisian Dinar)
         const projectsWithDT = projects.map(project => ({
             ...project.toObject(),
-            price: project.price, 
-            currency: 'DT'
+            price: project.price,
+            currency: 'DT',
+            // Ensure skillsRequired is always an array, even if it was stored as a string
+            skillsRequired: Array.isArray(project.skillsRequired)
+                ? project.skillsRequired
+                : JSON.parse(project.skillsRequired || '[]')
         }));
 
         res.status(200).json({ projects: projectsWithDT });
@@ -185,14 +206,14 @@ export const getProjectById = async (req, res) => {
         const { projectId } = req.params;
         const project = await Project.findById(projectId);
 
-        if(!project) {
+        if (!project) {
             return res.status(404).json({ message: "Project not found" });
         }
 
         res.status(200).json(project);  // get project 
     } catch (err) {
         console.error("Error fetching project:", err);
-        res.status(500).json({ message: "Server error while fetching project"});
+        res.status(500).json({ message: "Server error while fetching project" });
     }
 };
 
