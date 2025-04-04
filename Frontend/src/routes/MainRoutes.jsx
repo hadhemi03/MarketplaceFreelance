@@ -153,6 +153,7 @@ const Freelancers = Loadable(lazy(() => import('pages/client/Freelancers')));
 const Payments = Loadable(lazy(() => import('pages/client/Payments')));
 const Messages = Loadable(lazy(() => import('pages/client/Messages')));
 const CreateProject = Loadable(lazy(() => import('pages/client/CreateProject')));
+const EditProject = Loadable(lazy(() => import('components/project/EditProject')));
 const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')));
 
 
@@ -182,6 +183,7 @@ const MainRoutes = {
         { path: 'projects', element: <Projects /> },
         { path: 'my-projects', element: <MyProjects /> },
         { path: 'create-project', element: <CreateProject /> },
+        { path: 'edit-project/:projectId', element: <EditProject /> },
         { path: 'projectDetails/:projectId', element: <ProjectDetails /> },
         { path: 'freelancers', element: <Freelancers /> },
         { path: 'messages', element: <Messages /> },

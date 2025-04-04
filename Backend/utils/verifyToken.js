@@ -24,7 +24,7 @@ export const verifyToken = (req, res, next) => {
 
 
 
-// ✅ Only Clients can access
+// Only Clients can access
 export const verifyClient = (req, res, next) => {
     verifyToken(req, res, () => {
         if (req.user.role === "client") {
@@ -35,7 +35,7 @@ export const verifyClient = (req, res, next) => {
     });
 };
 
-// ✅ Only Freelancers can access
+//  Only Freelancers can access
 export const verifyFreelancer = (req, res, next) => {
     verifyToken(req, res, () => {
         if (req.user.role === "freelancer") {
@@ -46,7 +46,7 @@ export const verifyFreelancer = (req, res, next) => {
     });
 };
 
-// ✅ Only Admins can access
+//  Only Admins can access
 export const verifyAdmin = (req, res, next) => {
     verifyToken(req, res, () => {
         if (req.user.role === "admin") {
@@ -69,3 +69,12 @@ export const verifyRole = (role) => {
         });
     };
 };
+
+// only client and admin can access
+export const verifyClientOrAdmin = (req, res, next) => {
+    if (req.user.role === 'client' || req.user.role === 'admin') {
+      next();
+    } else {
+      return res.status(403).json({ message: "Access denied." });
+    }
+  };

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Typography, CircularProgress, Paper, Button, Grid } from '@mui/material';
 import { NumericFormat } from 'react-number-format'; // If you need formatting
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
+  const navigate = useNavigate(); 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,18 +40,25 @@ const ProjectDetails = () => {
   if (error) return <Typography color="error">{error}</Typography>;
   if (!project) return <Typography>No project found.</Typography>;
 
+ 
+
+  // Define the edit handler function
+  const handleEditClick = () => {
+    navigate(`/client/edit-project/${projectId}`); // Navigate to the edit project page
+  };
+
   return (
     <Box sx={{ padding: 4, backgroundColor: '#f5f5f5' }}>
       <Paper sx={{ padding: 4, maxWidth: 1200, margin: 'auto', borderRadius: 2 }}>
-        
+
         {/* Project Header and Image */}
         <Grid container spacing={4} sx={{ mb: 4 }}>
           <Grid item xs={12} md={6}>
             {project.image && (
-              <img 
+              <img
                 src={project.image ? `http://localhost:5000${project.image}` : ""}
-                alt={project.projectName} 
-                style={{ maxWidth: '100%', borderRadius: '10px' }} 
+                alt={project.projectName}
+                style={{ maxWidth: '100%', borderRadius: '10px' }}
               />
             )}
           </Grid>
@@ -75,8 +83,18 @@ const ProjectDetails = () => {
             <Typography variant="body1" sx={{ marginTop: 3 }}>
               {project.description}
             </Typography>
+
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ marginTop: 2 }}
+              onClick={handleEditClick}
+            >
+              Edit Project
+            </Button>
+
           </Grid>
-        </Grid>  
+        </Grid>
       </Paper>
     </Box>
   );

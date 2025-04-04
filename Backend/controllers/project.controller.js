@@ -3,6 +3,8 @@ import { createError } from "../utils/error.js";
 import User from "../models/User.model.js";
 import multer from "multer";
 import path from "path";
+import fs from 'fs';             // node module that delete the old omage from the system
+import { fileURLToPath } from 'url';
 
 // Configuration de stockage pour les images
 const storage = multer.diskStorage({
@@ -76,7 +78,10 @@ export const createProject = async (req, res, next) => {
 export const uploadProjectImage = upload.single("image");
 
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // Update an existing project (Client only)
+// delete the old img from uploads and replace it with the new image 
 export const updateProject = async (req, res, next) => {
     const { projectId } = req.params;
     const { projectName, description, skillsRequired, price, category } = req.body;
@@ -92,20 +97,57 @@ export const updateProject = async (req, res, next) => {
             return next(createError(403, "You are not authorized to update this project."));
         }
 
-        project.projectName = projectName || project.projectName;
-        project.description = description || project.description;
-        project.skillsRequired = skillsRequired || project.skillsRequired;
-        project.price = price || project.price;
-        project.category = category || project.category;
+        // Update fields
+        if (projectName !== undefined) project.projectName = projectName;
+        if (description !== undefined) project.description = description;
 
+        // Ensure `skillsRequired` is always an array
+        let parsedSkills = [];
+        if (typeof skillsRequired === "string") {
+            try {
+                parsedSkills = JSON.parse(skillsRequired); // Convert JSON string to array
+            } catch (error) {
+                return res.status(400).json({ message: "Invalid skills format." });
+            }
+        } else if (Array.isArray(skillsRequired)) {
+            parsedSkills = skillsRequired;
+        } else {
+            return res.status(400).json({ message: "Skills must be an array." });
+        }
+
+        project.skillsRequired = parsedSkills; // Update skillsRequired correctly
+
+        if (price !== undefined) project.price = price;
+        if (category !== undefined) project.category = category;
+
+        // Handle image update
+        if (req.file) {
+            // Delete old image if exists
+            if (project.image) {
+                const oldImagePath = path.join(__dirname, '..', project.image);
+                fs.unlink(oldImagePath, (err) => {
+                    if (err) {
+                        console.error("Failed to delete old image:", err);
+                    }
+                });
+            }
+
+            // Set new image path
+            project.image = `/uploads/${req.file.filename}`;
+        }
+
+        // Save the updated project
         await project.save();
         res.status(200).json({ message: "Project updated successfully", project });
     } catch (err) {
+        console.error("Error updating project:", err);
         next(createError(500, "Server Error, could not update project."));
     }
 };
 
+
 // Delete a project (Client only)
+// delte the image too
 export const deleteProject = async (req, res, next) => {
     console.log("DELETE request received for:", req.params.projectId);
     console.log("User making the request:", req.user);
@@ -123,15 +165,32 @@ export const deleteProject = async (req, res, next) => {
 
         // Ensure only the client who created the project can delete it
         console.log("Checking ownership: project.clientId =", project.clientId, "req.user._id =", req.user._id);
-        if (project.clientId.toString() !== req.user._id.toString()) {
+        if (
+            req.user.role !== 'admin' && 
+            project.clientId.toString() !== req.user._id.toString()
+          ) {
             console.log("Unauthorized user:", req.user._id);
             return next(createError(403, "You are not authorized to delete this project."));
+        }
+
+        // Delete image file from uploads folder
+        if (project.image) {
+            const imagePath = path.join(__dirname, '..', project.image); // project.image is like "/uploads/image.jpg"
+            fs.unlink(imagePath, (err) => {
+                if (err) {
+                    console.error("Failed to delete image file:", err);
+                } else {
+                    console.log("Image file deleted:", imagePath);
+                }
+            });
         }
 
         console.log("Deleting project...");
         await project.deleteOne();
         console.log("Project deleted successfully");
+
         res.status(200).json({ message: "Project deleted successfully" });
+
     } catch (err) {
         console.error("Error deleting project:", err);
         next(createError(500, "Server Error, could not delete project."));
