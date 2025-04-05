@@ -1,12 +1,12 @@
-import { Outlet } from 'react-router-dom';
+// layout/MinimalLayout.js
+import React from 'react';
 
-// ==============================|| MINIMAL LAYOUT ||============================== //
-
-export default function MinimalLayout() {
+const MinimalLayout = ({ children }) => {
   return (
-    <>
-      {/** a placeholder to render the content of the currently active nested route */}
-      <Outlet />
-    </>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      {children}
+    </div>
   );
-}
+};
+
+export default MinimalLayout;

@@ -30,7 +30,7 @@ import FirebaseSocial from './FirebaseSocial';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Utils for making requests (you may need to adjust the path based on your project)
+// Utils for making requests
 import newRequest from '../../../utils/newRequest.js';
 
 export default function AuthLogin({ isDemo = false }) {
@@ -45,7 +45,6 @@ export default function AuthLogin({ isDemo = false }) {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -62,12 +61,9 @@ export default function AuthLogin({ isDemo = false }) {
 
       // Store the JWT token in localStorage
       localStorage.setItem('token', response.data.token);  // ✅ Store token
-
-      // Store the user in localStorage
       localStorage.setItem('currentUser', JSON.stringify(response.data.user));
       localStorage.setItem('userRole', response.data.user.role);
 
-      // Show success toast
       toast.success('Login successful!');
 
       // Navigate to the correct dashboard after a short delay
@@ -82,7 +78,6 @@ export default function AuthLogin({ isDemo = false }) {
 
     } catch (err) {
       console.log('Login failed:', err);
-      // Show error toast
       toast.error(err.response?.data?.message || 'Login failed, please try again.');
     } finally {
       setSubmitting(false);
@@ -105,90 +100,76 @@ export default function AuthLogin({ isDemo = false }) {
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="email-login">Email Address</InputLabel>
-                  <OutlinedInput
-                    id="email-login"
-                    type="email"
-                    value={values.email}
-                    name="email"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    placeholder="Enter email address"
-                    fullWidth
-                    error={Boolean(touched.email && errors.email)}
-                  />
-                </Stack>
-                {touched.email && errors.email && (
-                  <FormHelperText error id="standard-weight-helper-text-email-login">
-                    {errors.email}
-                  </FormHelperText>
-                )}
-              </Grid>
-              <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="password-login">Password</InputLabel>
-                  <OutlinedInput
-                    fullWidth
-                    error={Boolean(touched.password && errors.password)}
-                    id="password-login"
-                    type={showPassword ? 'text' : 'password'}
-                    value={values.password}
-                    name="password"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                          color="secondary"
-                        >
-                          {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    placeholder="Enter password"
-                  />
-                </Stack>
-                {touched.password && errors.password && (
-                  <FormHelperText error id="standard-weight-helper-text-password-login">
-                    {errors.password}
-                  </FormHelperText>
-                )}
-              </Grid>
+            <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12} sm={8} md={6} lg={4}>
+                <Stack spacing={4}>
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="email-login">Email Address</InputLabel>
+                    <OutlinedInput
+                      id="email-login"
+                      type="email"
+                      value={values.email}
+                      name="email"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      placeholder="Enter email address"
+                      fullWidth
+                      error={Boolean(touched.email && errors.email)}
+                    />
+                    {touched.email && errors.email && (
+                      <FormHelperText error>{errors.email}</FormHelperText>
+                    )}
+                  </Stack>
 
-              <br />
-              {errors.submit && (
-                <Grid item xs={12}>
-                  <FormHelperText error>{errors.submit}</FormHelperText>
-                </Grid>
-              )}
-              <Grid item xs={12}>
-                <AnimateButton>
-                  <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                    Login
-                  </Button>
-                </AnimateButton>
-              </Grid>
-              <Grid item xs={12}>
-                <Divider>
-                  <Typography variant="caption">Login with</Typography>
-                </Divider>
-              </Grid>
-              <Grid item xs={12}>
-                <FirebaseSocial />
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="password-login">Password</InputLabel>
+                    <OutlinedInput
+                      fullWidth
+                      error={Boolean(touched.password && errors.password)}
+                      id="password-login"
+                      type={showPassword ? 'text' : 'password'}
+                      value={values.password}
+                      name="password"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                            color="secondary"
+                          >
+                            {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      placeholder="Enter password"
+                    />
+                    {touched.password && errors.password && (
+                      <FormHelperText error>{errors.password}</FormHelperText>
+                    )}
+                  </Stack>
+
+                  <AnimateButton>
+                    <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
+                      Login
+                    </Button>
+                  </AnimateButton>
+
+                  <Divider>
+                    <Typography variant="caption">Login with</Typography>
+                  </Divider>
+
+                  <FirebaseSocial />
+                </Stack>
               </Grid>
             </Grid>
           </form>
         )}
       </Formik>
 
-      {/* Toast Container to Display Notifications */}
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </>
   );

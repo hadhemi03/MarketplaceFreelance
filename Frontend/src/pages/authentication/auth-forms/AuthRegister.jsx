@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-
 // material-ui imports
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -29,7 +28,7 @@ import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 import axios from 'axios';
 
-import { toast, ToastContainer  } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom"; // To redirect
 
@@ -101,7 +100,7 @@ export default function AuthRegister() {
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     setLoading(true);
     setMessage(""); // Clear previous messages
-  
+
     const data = new FormData();
     if (file) data.append("file", file);
     data.append("username", values.username);
@@ -109,13 +108,13 @@ export default function AuthRegister() {
     data.append("password", values.password);
     data.append("country", values.country);
     data.append("role", values.role);
-  
+
     try {
       const res = await axios.post("http://localhost:5000/api/auth/register", data, {
         withCredentials: true,  // Include credentials (cookies, session)
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
+
       if (res.data && res.data.user) {
         localStorage.setItem("currentUser", JSON.stringify(res.data.user));
         // Show success toast
@@ -126,7 +125,7 @@ export default function AuthRegister() {
       }
     } catch (err) {
       console.error("Registration failed:", err.response);
-       toast.error(err.response?.data?.message || 'Registration failed, please try again.');
+      toast.error(err.response?.data?.message || 'Registration failed, please try again.');
     } finally {
       setLoading(false);
       setSubmitting(false);
@@ -154,184 +153,182 @@ export default function AuthRegister() {
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              {/* Username */}
-              <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="username-signup">Username*</InputLabel>
-                  <OutlinedInput
-                    id="username-signup"
-                    type="text"
-                    value={values.username}
-                    name="username"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    placeholder="Enter your username"
-                    fullWidth
-                    error={Boolean(touched.username && errors.username)}
-                  />
-                </Stack>
-                {touched.username && errors.username && (
-                  <FormHelperText error id="helper-text-username-signup">
-                    {errors.username}
-                  </FormHelperText>
-                )}
-              </Grid>
+            <Grid container spacing={3} justifyContent="center" alignItems="center">
+              <Grid item xs={12} sm={8} md={6} lg={4}>
+                <Stack spacing={3}>
+                  {/* Username */}
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="username-signup">Username*</InputLabel>
+                    <OutlinedInput
+                      id="username-signup"
+                      type="text"
+                      value={values.username}
+                      name="username"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      placeholder="Enter your username"
+                      fullWidth
+                      error={Boolean(touched.username && errors.username)}
+                    />
+                    {touched.username && errors.username && (
+                      <FormHelperText error id="helper-text-username-signup">
+                        {errors.username}
+                      </FormHelperText>
+                    )}
+                  </Stack>
 
-              {/* Email */}
-              <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="email-signup">Email Address*</InputLabel>
-                  <OutlinedInput
-                    fullWidth
-                    error={Boolean(touched.email && errors.email)}
-                    id="email-signup"
-                    type="email"
-                    value={values.email}
-                    name="email"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    placeholder="demo@company.com"
-                  />
-                </Stack>
-                {touched.email && errors.email && (
-                  <FormHelperText error id="helper-text-email-signup">
-                    {errors.email}
-                  </FormHelperText>
-                )}
-              </Grid>
+                  {/* Email */}
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="email-signup">Email Address*</InputLabel>
+                    <OutlinedInput
+                      fullWidth
+                      error={Boolean(touched.email && errors.email)}
+                      id="email-signup"
+                      type="email"
+                      value={values.email}
+                      name="email"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      placeholder="email"
+                    />
+                    {touched.email && errors.email && (
+                      <FormHelperText error id="helper-text-email-signup">
+                        {errors.email}
+                      </FormHelperText>
+                    )}
+                  </Stack>
 
-              {/* Password */}
-              <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="password-signup">Password</InputLabel>
-                  <OutlinedInput
-                    fullWidth
-                    error={Boolean(touched.password && errors.password)}
-                    id="password-signup"
-                    type={showPassword ? 'text' : 'password'}
-                    value={values.password}
-                    name="password"
-                    onBlur={handleBlur}
-                    onChange={(e) => {
-                      handleChange(e);
-                      changePassword(e.target.value);
-                    }}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                          color="secondary"
-                        >
-                          {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    placeholder="******"
-                  />
-                </Stack>
-                {touched.password && errors.password && (
-                  <FormHelperText error id="helper-text-password-signup">
-                    {errors.password}
-                  </FormHelperText>
-                )}
-              </Grid>
-
-              {/* Country */}
-              <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="country-signup">Country*</InputLabel>
-                  <OutlinedInput
-                    fullWidth
-                    error={Boolean(touched.country && errors.country)}
-                    id="country-signup"
-                    type="text"
-                    value={values.country}
-                    name="country"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    placeholder="Enter your country"
-                  />
-                </Stack>
-                {touched.country && errors.country && (
-                  <FormHelperText error id="helper-text-country-signup">
-                    {errors.country}
-                  </FormHelperText>
-                )}
-              </Grid>
-
-              {/* Role */}
-              <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="role-signup">Role*</InputLabel>
-                  <FormControl fullWidth error={Boolean(touched.role && errors.role)}>
-                    <Select
-                      value={values.role}  // Use values.role here
+                  {/* Password */}
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="password-signup">Password</InputLabel>
+                    <OutlinedInput
+                      fullWidth
+                      error={Boolean(touched.password && errors.password)}
+                      id="password-signup"
+                      type={showPassword ? 'text' : 'password'}
+                      value={values.password}
+                      name="password"
                       onBlur={handleBlur}
                       onChange={(e) => {
-                        handleChange(e);  // Update the form state with the new role
-                        handleRoleChange(e);  // You can also include any additional logic for the role change
+                        handleChange(e);
+                        changePassword(e.target.value);
                       }}
-                      name="role"
-                      id="role-signup"
-                      displayEmpty
-                      input={<OutlinedInput />}
-                    >
-                      <MenuItem value="client">Client</MenuItem>
-                      <MenuItem value="freelancer">Freelancer</MenuItem>
-                    </Select>
-                    {touched.role && errors.role && (
-                      <FormHelperText error>{errors.role}</FormHelperText>
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                            color="secondary"
+                          >
+                            {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      placeholder="******"
+                    />
+                    {touched.password && errors.password && (
+                      <FormHelperText error id="helper-text-password-signup">
+                        {errors.password}
+                      </FormHelperText>
                     )}
-                  </FormControl>
+                  </Stack>
+
+                  {/* Country */}
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="country-signup">Country*</InputLabel>
+                    <OutlinedInput
+                      fullWidth
+                      error={Boolean(touched.country && errors.country)}
+                      id="country-signup"
+                      type="text"
+                      value={values.country}
+                      name="country"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      placeholder="Enter your country"
+                    />
+                    {touched.country && errors.country && (
+                      <FormHelperText error id="helper-text-country-signup">
+                        {errors.country}
+                      </FormHelperText>
+                    )}
+                  </Stack>
+
+                  {/* Role */}
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="role-signup">Role*</InputLabel>
+                    <FormControl fullWidth error={Boolean(touched.role && errors.role)}>
+                      <Select
+                        value={values.role}
+                        onBlur={handleBlur}
+                        onChange={(e) => {
+                          handleChange(e);
+                          handleRoleChange(e);
+                        }}
+                        name="role"
+                        id="role-signup"
+                        displayEmpty
+                        input={<OutlinedInput />}
+                      >
+                        <MenuItem value="client">Client</MenuItem>
+                        <MenuItem value="freelancer">Freelancer</MenuItem>
+                      </Select>
+                      {touched.role && errors.role && (
+                        <FormHelperText error>{errors.role}</FormHelperText>
+                      )}
+                    </FormControl>
+                  </Stack>
+
+                  {/* Profile Image */}
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="profile-img-signup">Profile Picture</InputLabel>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{ display: 'block', width: '100%' }}
+                    />
+                    <Box
+                      sx={{
+                        border: '2px dashed #ccc',
+                        padding: 2,
+                        textAlign: 'center',
+                        backgroundImage: preview ? `url(${preview})` : 'url("/path-to-default-image.jpg")',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        height: 150,
+                        width: 150,
+                        borderRadius: '50%',
+                        marginTop: '10px',
+                      }}
+                    >
+                      {!preview && <Typography variant="body2" color="text.secondary">Profile Image</Typography>}
+                    </Box>
+                  </Stack>
+
+                  {/* Submit Button */}
+                  {errors.submit && (
+                    <Stack item xs={12}>
+                      <FormHelperText error>{errors.submit}</FormHelperText>
+                    </Stack>
+                  )}
+
+                  <AnimateButton>
+                    <Button
+                      disableElevation
+                      disabled={isSubmitting}
+                      fullWidth
+                      size="large"
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                    >
+                      Create Account
+                    </Button>
+                  </AnimateButton>
                 </Stack>
-              </Grid>
-
-              {/* Profile Image */}
-              <Grid item xs={12}>
-                <Stack spacing={1}>
-                  <InputLabel htmlFor="profile-img-signup">Profile Picture</InputLabel>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    style={{ display: 'block', width: '100%' }}
-                  />
-                  <Box
-                    sx={{
-                      border: '2px dashed #ccc',
-                      padding: 2,
-                      textAlign: 'center',
-                      backgroundImage: preview ? `url(${preview})` : 'url("/path-to-default-image.jpg")',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      height: 150,
-                      width: 150,
-                      borderRadius: '50%',
-                      marginTop: '10px',
-                    }}
-                  >
-                    {!preview && <Typography variant="body2" color="text.secondary">Profile Image</Typography>}
-                  </Box>
-                </Stack>
-              </Grid>
-
-              {/* Submit Button */}
-              {errors.submit && (
-                <Grid item xs={12}>
-                  <FormHelperText error>{errors.submit}</FormHelperText>
-                </Grid>
-              )}
-
-              <Grid item xs={12}>
-                <AnimateButton>
-                  <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                    Create Account
-                  </Button>
-                </AnimateButton>
               </Grid>
             </Grid>
           </form>
@@ -339,7 +336,7 @@ export default function AuthRegister() {
       </Formik>
 
       {/* Toast Container to Display Notifications */}
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </>
   );
 }

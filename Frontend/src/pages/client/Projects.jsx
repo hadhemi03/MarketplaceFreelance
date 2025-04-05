@@ -249,7 +249,6 @@ const Projects = () => {
 
   return (
     <Box sx={{ p: 3, display: 'flex', backgroundColor: '#f4f4f9' }}>
-      {/* Left Sidebar - Filters */}
       <Box
         sx={{
           width: 250,
@@ -263,7 +262,6 @@ const Projects = () => {
           p: 2,
         }}
       >
-        {/* Search by Project Name */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" fontWeight="bold" color="primary">Search by Project Name</Typography>
           <TextField
@@ -277,7 +275,6 @@ const Projects = () => {
           />
         </Box>
 
-        {/* Search by Skills */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" fontWeight="bold" color="primary">Search by Skills</Typography>
           <TextField
@@ -291,7 +288,6 @@ const Projects = () => {
           />
         </Box>
 
-        {/* Price Range Filter */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" fontWeight="bold" color="primary">Price Range</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -322,7 +318,6 @@ const Projects = () => {
           </Box>
         </Box>
 
-        {/* Category Filter */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" fontWeight="bold" color="primary">Category</Typography>
           <FormControl fullWidth variant="outlined">
@@ -347,7 +342,6 @@ const Projects = () => {
         </Box>
       </Box>
 
-      {/* Right Side - Project Feed */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography variant="h4" gutterBottom fontWeight={700} color="primary.main" sx={{ fontFamily: 'Roboto' }}>
           🧩 Project Feed

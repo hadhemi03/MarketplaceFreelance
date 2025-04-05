@@ -14,16 +14,18 @@ import AuthLogin from './auth-forms/AuthLogin';
 export default function Login() {
   return (
     <AuthWrapper>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} justifyContent="center">
         <Grid item xs={12}>
-          <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: { xs: -0.5, sm: 0.5 } }}>
-            <Typography variant="h3">Login</Typography>
+          <Stack direction="row" justifyContent="center" alignItems="center" spacing={15}>
+            <Typography variant="h3" align='center'>
+              Login
+            </Typography>
             <Typography component={Link} to="/register" variant="body1" sx={{ textDecoration: 'none' }} color="primary">
               Don&apos;t have an account?
             </Typography>
           </Stack>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={8} md={6} lg={4}>
           <AuthLogin />
         </Grid>
       </Grid>

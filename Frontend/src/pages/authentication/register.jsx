@@ -14,16 +14,16 @@ import AuthRegister from './auth-forms/AuthRegister';
 export default function Register() {
   return (
     <AuthWrapper>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: { xs: -0.5, sm: 0.5 } }}>
+      <Grid container spacing={3} justifyContent="center">
+              <Grid item xs={12}>
+                <Stack direction="row" justifyContent="center" alignItems="center" spacing={15}>
             <Typography variant="h3">Sign up</Typography>
             <Typography component={Link} to="/login" variant="body1" sx={{ textDecoration: 'none' }} color="primary">
               Already have an account?
             </Typography>
           </Stack>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={8} md={6} lg={4}>
           <AuthRegister />
         </Grid>
       </Grid>
