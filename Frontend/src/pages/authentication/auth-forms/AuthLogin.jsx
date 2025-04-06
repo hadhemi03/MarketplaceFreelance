@@ -61,11 +61,14 @@ export default function AuthLogin({ isDemo = false }) {
       console.log("Login Response:", response.data);
 
       // Store the JWT token in localStorage
-      localStorage.setItem('token', response.data.token);  // ✅ Store token
+      localStorage.setItem('token', response.data.token);  // Store token
 
       // Store the user in localStorage
       localStorage.setItem('currentUser', JSON.stringify(response.data.user));
       localStorage.setItem('userRole', response.data.user.role);
+      
+      // update the user state immediatelt
+      setUser(response.data.user);
 
       // Show success toast
       toast.success('Login successful!');
