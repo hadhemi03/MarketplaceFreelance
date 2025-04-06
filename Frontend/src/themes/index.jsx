@@ -14,44 +14,46 @@ import componentsOverride from './overrides';
 // ==============================|| DEFAULT THEME - MAIN  ||============================== //
 
 export default function ThemeCustomization({ children }) {
-  const theme = Palette('light', 'default');
+  const theme = useMemo(() => Palette('light', 'default'), []);
+const themeTypography = Typography(`'Public Sans', sans-serif`);
+const themeCustomShadows = useMemo(() => CustomShadows(theme), [theme]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const themeTypography = Typography(`'Public Sans', sans-serif`);
-  const themeCustomShadows = useMemo(() => CustomShadows(theme), [theme]);
-
-  const themeOptions = useMemo(
-    () => ({
-      breakpoints: {
-        values: {
-          xs: 0,
-          sm: 768,
-          md: 1024,
-          lg: 1266,
-          xl: 1440
-        }
+const themeOptions = useMemo(
+  () => ({
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 768,
+        md: 1024,
+        lg: 1266,
+        xl: 1440,
       },
-      direction: 'ltr',
-      mixins: {
-        toolbar: {
-          minHeight: 60,
-          paddingTop: 8,
-          paddingBottom: 8
-        }
+    },
+    direction: 'ltr',
+    mixins: {
+      toolbar: {
+        minHeight: 60,
+        paddingTop: 8,
+        paddingBottom: 8,
       },
-      palette: theme.palette,
-      customShadows: themeCustomShadows,
-      typography: themeTypography
-    }),
-    [theme, themeTypography, themeCustomShadows]
-  );
+    },
+    palette: theme.palette,
+    customShadows: themeCustomShadows,
+    typography: themeTypography,
+  }),
+  [theme, themeTypography, themeCustomShadows]
+);
 
-  const themes = createTheme(themeOptions);
-  themes.components = componentsOverride(themes);
+// Apply componentsOverride without directly mutating themes
+const finalTheme = createTheme({
+  ...themeOptions,
+  components: componentsOverride(createTheme(themeOptions)), // Apply override here
+});
+
 
   return (
     <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={themes}>
+      <ThemeProvider theme={finalTheme}>
         <CssBaseline />
         {children}
       </ThemeProvider>
@@ -60,5 +62,5 @@ export default function ThemeCustomization({ children }) {
 }
 
 ThemeCustomization.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
 };

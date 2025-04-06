@@ -1,4 +1,3 @@
-// third-party
 import { merge } from 'lodash';
 
 // project import
@@ -21,7 +20,9 @@ import Typography from './Typography';
 // ==============================|| OVERRIDES - MAIN ||============================== //
 
 export default function ComponentsOverrides(theme) {
+  // Make sure to create a new theme rather than mutating the existing one
   return merge(
+    {},
     Button(theme),
     Badge(theme),
     CardContent(),
