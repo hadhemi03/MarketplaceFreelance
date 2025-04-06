@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -28,7 +28,10 @@ import Transitions from 'components/@extended/Transitions';
 import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
-import avatar1 from 'assets/images/users/avatar-1.png';
+
+const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+const userName = currentUser?.username;
+const userImage = currentUser?.img;
 
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
@@ -50,6 +53,23 @@ function a11yProps(index) {
 
 export default function Profile() {
   const theme = useTheme();
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    return JSON.parse(localStorage.getItem('currentUser')); // Initial user data
+  });
+
+  useEffect(() => {
+    // This will ensure the component updates when localStorage changes
+    const handleStorageChange = () => {
+      setCurrentUser(JSON.parse(localStorage.getItem('currentUser')));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -89,9 +109,9 @@ export default function Profile() {
         onClick={handleToggle}
       >
         <Stack direction="row" spacing={1.25} alignItems="center" sx={{ p: 0.5 }}>
-          <Avatar alt="profile user" src={avatar1} size="sm" />
+          <Avatar alt={currentUser?.username} src={currentUser?.img} size="sm" />
           <Typography variant="subtitle1" sx={{ textTransform: 'capitalize' }}>
-            John Doe
+            {currentUser?.username}
           </Typography>
         </Stack>
       </ButtonBase>
@@ -122,53 +142,15 @@ export default function Profile() {
                     <Grid container justifyContent="space-between" alignItems="center">
                       <Grid item>
                         <Stack direction="row" spacing={1.25} alignItems="center">
-                          <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
+                          <Avatar alt={currentUser?.username} src={currentUser?.img} sx={{ width: 32, height: 32 }} />
                           <Stack>
-                            <Typography variant="h6">John Doe</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              UI/UX Designer
-                            </Typography>
+                            <Typography variant="h6">{currentUser?.username}</Typography>
                           </Stack>
                         </Stack>
-                      </Grid>
-                      <Grid item>
-                        <Tooltip title="Logout">
-                          <IconButton size="large" sx={{ color: 'text.primary' }}>
-                            <LogoutOutlined />
-                          </IconButton>
-                        </Tooltip>
                       </Grid>
                     </Grid>
                   </CardContent>
 
-                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
-                      <Tab
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          textTransform: 'capitalize'
-                        }}
-                        icon={<UserOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
-                        label="Profile"
-                        {...a11yProps(0)}
-                      />
-                      <Tab
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          textTransform: 'capitalize'
-                        }}
-                        icon={<SettingOutlined style={{ marginBottom: 0, marginRight: '10px' }} />}
-                        label="Setting"
-                        {...a11yProps(1)}
-                      />
-                    </Tabs>
-                  </Box>
                   <TabPanel value={value} index={0} dir={theme.direction}>
                     <ProfileTab />
                   </TabPanel>
