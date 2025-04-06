@@ -149,9 +149,11 @@ export default Projects;*/
 
 
 import { useEffect, useState } from 'react';
-import { Typography, Box, Card, CardContent, CardMedia, TextField, Button, Divider, Slider, FormControl, InputLabel, Select, MenuItem, Chip, Stack } from '@mui/material';
+import {
+  Typography, Box, Card, CardContent, CardMedia, TextField, Button, Divider,
+  Slider, FormControl, InputLabel, Select, MenuItem, Chip, Stack
+} from '@mui/material';
 import axios from 'axios';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 // Define your category options
 const categoryOptions = [
@@ -239,136 +241,118 @@ const Projects = () => {
     }
   };
 
-  // Create a custom MUI theme
-  const theme = createTheme({
-    palette: {
-      primary: {
-        main: '#1976d2',
-      },
-      background: {
-        default: '#f4f6f8',
-      },
-    },
-  });
-
   return (
-    <ThemeProvider theme={theme}>
-      <Box sx={{ p: 3, display: 'flex', backgroundColor: 'background.default' }}>
-        {/* Sidebar for Filters */}
-        <Box sx={{
-          width: 250,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          height: '100vh',
-          bgcolor: 'white',
-          boxShadow: 2,
-          borderRadius: 2,
-          p: 2,
-        }}>
-          {/* Search by Project Name */}
-          <Typography variant="h6" fontWeight="bold" color="primary.main">Search by Project Name</Typography>
-          <TextField
-            fullWidth
-            label="Search by Project Name"
-            variant="outlined"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Search by project name..."
-            sx={{ mb: 2 }}
-          />
-          {/* Price Range Slider */}
-          <Typography variant="h6" fontWeight="bold" color="primary.main">Price Range</Typography>
-          <Slider
-            value={priceRange}
-            onChange={(e, newValue) => setPriceRange(newValue)}
-            valueLabelDisplay="auto"
-            min={0}
-            max={10000}
-            sx={{ width: '100%', mb: 2 }}
-          />
-          {/* Category Filter */}
-          <Typography variant="h6" fontWeight="bold" color="primary.main">Category</Typography>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel shrink>Category</InputLabel>
-            <Select
-              value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
-              displayEmpty
-              notched
-              sx={{ height: '56px' }}
-            >
-              <MenuItem value=""><em>All Categories</em></MenuItem>
-              {categoryOptions.map(category => (
-                <MenuItem key={category} value={category}>{category}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-
-        {/* Project Feed */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Typography variant="h4" gutterBottom fontWeight={700} color="primary.main">🧩 Project Feed</Typography>
-          <Stack spacing={4} sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            {projects.map(project => (
-              <Card key={project._id} sx={{
-                p: 3,
-                width: '100%',
-                maxWidth: 800,
-                mx: 'auto',
-                boxShadow: 3,
-                borderRadius: 3,
-                transition: 'transform 0.3s',
-                '&:hover': { transform: 'scale(1.05)' }
-              }}>
-                {project.image && (
-                  <CardMedia
-                    component="img"
-                    height="300"
-                    image={`http://localhost:5000${project.image}`}
-                    alt={project.projectName}
-                    sx={{ borderRadius: 2 }}
-                  />
-                )}
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold">{project.projectName}</Typography>
-                  <Typography variant="body2" color="text.secondary">{project.description}</Typography>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                    <Chip label={`$${project.price}`} color="primary" />
-                    <Button variant="contained" color="primary">Bid Now</Button>
-                  </Box>
-                </CardContent>
-                {/* Comments Section */}
-                <Divider sx={{ mt: 2, mb: 1 }} />
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Add a comment"
-                  value={newComment[project._id] || ""}
-                  onChange={e => handleCommentChange(project._id, e.target.value)}
-                  sx={{ mb: 2 }}
-                />
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={() => handleCommentSubmit(project._id)}
-                >
-                  Submit Comment
-                </Button>
-                {comments[project._id] && comments[project._id].map(comment => (
-                  <Box key={comment._id} sx={{ mt: 2 }}>
-                    <Typography variant="body2" color="text.secondary">{comment.text}</Typography>
-                  </Box>
-                ))}
-              </Card>
+    <Box sx={{ p: 3, display: 'flex', backgroundColor: '#f4f6f8' }}>
+      {/* Sidebar for Filters */}
+      <Box sx={{
+        width: 250,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        height: '100vh',
+        bgcolor: 'white',
+        boxShadow: 2,
+        borderRadius: 2,
+        p: 2,
+      }}>
+        <Typography variant="h6" fontWeight="bold" sx={{ color: '#1976d2' }}>Search by Project Name</Typography>
+        <TextField
+          fullWidth
+          label="Search by Project Name"
+          variant="outlined"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="Search by project name..."
+          sx={{ mb: 2 }}
+        />
+        <Typography variant="h6" fontWeight="bold" sx={{ color: '#1976d2' }}>Price Range</Typography>
+        <Slider
+          value={priceRange}
+          onChange={(e, newValue) => setPriceRange(newValue)}
+          valueLabelDisplay="auto"
+          min={0}
+          max={10000}
+          sx={{ width: '100%', mb: 2 }}
+        />
+        <Typography variant="h6" fontWeight="bold" sx={{ color: '#1976d2' }}>Category</Typography>
+        <FormControl fullWidth variant="outlined">
+          <InputLabel shrink>Category</InputLabel>
+          <Select
+            value={selectedCategory}
+            onChange={e => setSelectedCategory(e.target.value)}
+            displayEmpty
+            notched
+            sx={{ height: '56px' }}
+          >
+            <MenuItem value=""><em>All Categories</em></MenuItem>
+            {categoryOptions.map(category => (
+              <MenuItem key={category} value={category}>{category}</MenuItem>
             ))}
-          </Stack>
-        </Box>
+          </Select>
+        </FormControl>
       </Box>
-    </ThemeProvider>
+
+      {/* Project Feed */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Typography variant="h4" gutterBottom fontWeight={700} sx={{ color: '#1976d2' }}>🧩 Project Feed</Typography>
+        <Stack spacing={4} sx={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          {projects.map(project => (
+            <Card key={project._id} sx={{
+              p: 3,
+              width: '100%',
+              maxWidth: 800,
+              mx: 'auto',
+              boxShadow: 3,
+              borderRadius: 3,
+              transition: 'transform 0.3s',
+              '&:hover': { transform: 'scale(1.05)' }
+            }}>
+              {project.image && (
+                <CardMedia
+                  component="img"
+                  height="300"
+                  image={`http://localhost:5000${project.image}`}
+                  alt={project.projectName}
+                  sx={{ borderRadius: 2 }}
+                />
+              )}
+              <CardContent>
+                <Typography variant="h6" fontWeight="bold">{project.projectName}</Typography>
+                <Typography variant="body2" color="text.secondary">{project.description}</Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                  <Chip label={`$${project.price}`} sx={{ backgroundColor: '#1976d2', color: '#fff' }} />
+                  <Button variant="contained" sx={{ backgroundColor: '#1976d2' }}>Bid Now</Button>
+                </Box>
+              </CardContent>
+              <Divider sx={{ mt: 2, mb: 1 }} />
+              <TextField
+                fullWidth
+                variant="outlined"
+                label="Add a comment"
+                value={newComment[project._id] || ""}
+                onChange={e => handleCommentChange(project._id, e.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => handleCommentSubmit(project._id)}
+                sx={{ backgroundColor: '#1976d2' }}
+              >
+                Submit Comment
+              </Button>
+              {comments[project._id] && comments[project._id].map(comment => (
+                <Box key={comment._id} sx={{ mt: 2 }}>
+                  <Typography variant="body2" color="text.secondary">{comment.text}</Typography>
+                </Box>
+              ))}
+            </Card>
+          ))}
+        </Stack>
+      </Box>
+    </Box>
   );
 };
 
 export default Projects;
-
 
