@@ -50,16 +50,25 @@ import Logo from 'components/logo/LogoMain';
 
 // Define menu items once and export them
 const role = localStorage.getItem('userRole'); // Retrieve the user's role
-
+//
 export const menuItems =
   role === 'client'
     ? [
         { id: 'Projects', label: 'Projects', path: '/free/client/projects' },
         { id: 'Freelancers', label: 'Freelancers', path: '/free/client/freelancers' },
         { id: 'ClientProjects', label: 'My Projects', path: '/free/client/my-projects' },
+        { id: 'Messages', label: 'Messages', path: '/free/client/messages' },
         { id: 'clientPayment', label: 'My Payments', path: '/free/client/payments' }
       ]
-    : [
+    : role === 'freelancer'
+    ? [
+        { id: 'FreelancerProjects', label: 'Projects', path: '/free/freelancer/projects' },
+        { id: 'MyProjectsFreelancer', label: 'My Projects', path: '/free/freelancer/my-projects' },
+        { id: 'Messages', label: 'Messages', path: '/free/freelancer/messages' },
+        { id: 'MyCalendar', label: 'My Calendar', path: '/free/freelancer/my-calendar' }
+      ]
+    :
+    [
         { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
         { id: 'pages', label: 'Pages', path: '/pages' },
         { id: 'utilities', label: 'Utilities', path: '/utilities' },

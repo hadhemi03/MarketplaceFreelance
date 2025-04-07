@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyAdmin, verifyClient, verifyClientOrAdmin, verifyToken } from "../utils/verifyToken.js";
-import { createProject, deleteProject, getAllProjects, getCategories, getClientProjects, getProjectById, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
+import { createProject, deleteProject, getAllProjects, getCategories, getClientProjects, getProjectById, makeDeal, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
 
 const router = express.Router();
 
@@ -17,6 +17,10 @@ router.get("/view-projects", verifyToken, getAllProjects);
 // Categories
 router.get("/get-categories", verifyToken, getCategories);
 
-router.get("/get-project/:projectId", verifyToken, getProjectById)
+router.get("/get-project/:projectId", verifyToken, getProjectById);
+
+
+// make a deal
+router.post('/make-deal', verifyToken, makeDeal)
 
 export default router;

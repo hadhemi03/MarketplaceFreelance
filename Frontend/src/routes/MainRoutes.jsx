@@ -131,6 +131,8 @@ import ClientDashboard from 'layout/Clientdashboard';
 import DashboardLayout from 'layout/Dashboard/index';
 import { element } from 'prop-types';
 import { Navigate } from 'react-router';
+import FreelancerDashboard from 'layout/FreelancerDashboard';
+import MyCalendar from 'pages/freelancer/MyCalendar';
 
 const Home = Loadable(lazy(() => import('pages/home/Home')));  // Home Page
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -146,16 +148,20 @@ const AuthLogin = Loadable(lazy(() => import('pages/authentication/login')));
 const AuthRegister = Loadable(lazy(() => import('pages/authentication/register')));
 
 // Pages du client
-const DashboardClient = Loadable(lazy(() => import('pages/client/DashboardClient')));      // with lazy loading react will only load the page when the user user needs it 
 const Projects = Loadable(lazy(() => import('pages/client/Projects')));
 const MyProjects = Loadable(lazy(() => import('pages/client/MyProjects')));
 const Freelancers = Loadable(lazy(() => import('pages/client/Freelancers')));
 const Payments = Loadable(lazy(() => import('pages/client/Payments')));
-const Messages = Loadable(lazy(() => import('pages/client/Messages')));
 const CreateProject = Loadable(lazy(() => import('pages/client/CreateProject')));
 const EditProject = Loadable(lazy(() => import('components/project/EditProject')));
 const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')));
 
+const Messages = Loadable(lazy(() => import('pages/messages/chatPage')));
+
+
+// Pages du freelancer
+const MyProjectsFreelancer = Loadable(lazy(() => import('pages/freelancer/MyProjects')));
+const Calendar = Loadable(lazy(() => import('pages/freelancer/MyCalendar')));
 
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -186,8 +192,21 @@ const MainRoutes = {
         { path: 'edit-project/:projectId', element: <EditProject /> },
         { path: 'projectDetails/:projectId', element: <ProjectDetails /> },
         { path: 'freelancers', element: <Freelancers /> },
-        { path: 'messages', element: <Messages /> },
         { path: 'payments', element: <Payments /> },
+        { path: 'messages', element: <Messages /> },
+
+      ]
+    },
+    {
+      path: 'freelancer',  // frelancer dashboard route
+      element: <FreelancerDashboard />,  // Main layout for freelancer routes
+      children: [
+        { path: 'projects', element: <Projects /> },
+        { path: 'my-projects', element: <MyProjectsFreelancer /> },
+        { path: 'my-calendar', element: <MyCalendar /> },
+        { path: 'messages', element: <Messages /> },
+
+        
       ]
     },
     {

@@ -95,7 +95,7 @@ const Projects = () => {
 
       setComments((prev) => ({
         ...prev,
-        [projectId]: [...(prev[projectId] || []), ...res.data],
+        [projectId]: res.data, 
       }));
     } catch (error) {
       console.error("Error fetching comments:", error);

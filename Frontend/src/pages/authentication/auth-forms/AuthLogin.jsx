@@ -66,7 +66,7 @@ export default function AuthLogin({ isDemo = false }) {
       // Store the user in localStorage
       localStorage.setItem('currentUser', JSON.stringify(response.data.user));
       localStorage.setItem('userRole', response.data.user.role);
-      
+
       // update the user state immediatelt
       setUser(response.data.user);
 
@@ -78,8 +78,10 @@ export default function AuthLogin({ isDemo = false }) {
         const userRole = localStorage.getItem('userRole');
         if (userRole === 'client') {
           navigate('/client/projects');
+        } else if (userRole === 'freelancer') {
+          navigate('/freelancer/projects');
         } else {
-          navigate('/dashboard/default');
+          navigate('/dashboard/default'); 
         }
       }, 300); // Short delay before redirect
 

@@ -303,6 +303,47 @@ export const getCategories = async (req, res, next) => {
     }
 };
 
+// client confirms that a freelancer is assigned to a project
+export const makeDeal = async (req, res) => {
+    try {
+      const { projectId, freelancerId } = req.body;
+  
+      const project = await Project.findById(projectId);
+      if (!project) return res.status(404).json({ message: "Project not found" });
+  
+      if (project.freelancerId) {
+        return res.status(400).json({ message: "This project already has a freelancer." });
+      }
+  
+      project.freelancerId = freelancerId;
+      project.status = "In Progress";
+  
+      await project.save();
+  
+      res.status(200).json({ message: "Deal confirmed", project });
+    } catch (err) {
+      res.status(500).json({ message: "Server error", error: err.message });
+    }
+};
+
+
+// show the freelancer all the projects they are currently working on
+// My projects freelancer
+export const getFreelancerProjects = async (req, res) => {
+    try {
+      const freelancerId = req.user.id;
+  
+      const projects = await Project.find({ freelancerId });
+  
+      res.status(200).json({ projects });
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching freelancer projects", error: err.message });
+    }
+  };
+  
+
+
+
 
 
 
