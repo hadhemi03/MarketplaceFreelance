@@ -1,12 +1,13 @@
 import express from "express";
 import { verifyToken } from "../utils/verifyToken.js";
-import { getConversationsForUser, getMessagesByProject, markMessagesAsSeen, sendMessage } from "../controllers/message.controller.js";
+import { getMessages, getUsersForSidebar, sendMessage, startConversation, uploadMessageImage } from "../controllers/message.controller.js";
 
 const router = express.Router();
 
-router.post("/send", verifyToken, sendMessage);
-router.get("/project/:projectId", verifyToken, getMessagesByProject);
-router.get("/conversations", verifyToken, getConversationsForUser);
-router.put("/seen/:projectId", verifyToken, markMessagesAsSeen)
+router.post("/users", verifyToken, getUsersForSidebar);
+router.get("/msg/:id", verifyToken, getMessages);
+router.put("/send/:id", verifyToken, uploadMessageImage, sendMessage);
+router.post("/start-conversation/:freelancerId", verifyToken, startConversation);
+
 
 export default router;

@@ -1,76 +1,108 @@
-import Project from "../models/Project.model.js";
+// controllers/message.controller.js
+
 import User from "../models/User.model.js";
 import Message from "../models/Message.model.js";
+import multer from "multer";
+import path from "path";
+import { getReceiverSocketId, io } from "../utils/socket.js";
 
+// Configuration de stockage pour les images
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Dossier où stocker les images
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Renommer l'image avec un timestamp
+  },
+});
 
+const upload = multer({ storage: storage });
+
+// Get all users for the sidebar
+export const getUsersForSidebar = async (req, res) => {
+  try {
+    const loggedInUserId = req.user._id;
+    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+    res.status(200).json(filteredUsers);
+  } catch (error) {
+    console.error("Error in getUsersForSidebar: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Get messages between two users
+export const getMessages = async (req, res) => {
+  try {
+    const { id: userToChatId } = req.params;
+    const myId = req.user._id;
+
+    const messages = await Message.find({
+      $or: [
+        { senderId: myId, receiverId: userToChatId },
+        { senderId: userToChatId, receiverId: myId },
+      ],
+    });
+
+    res.status(200).json(messages);
+  } catch (error) {
+    console.log("Error in getMessages controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Send message with an optional image using Multer
 export const sendMessage = async (req, res) => {
-    try {
-        const { receiverId, projectId, message, role } = req.body;
-        const senderId = req.user._id;
+  try {
+    const { message } = req.body;
+    const { id: receiverId } = req.params;
+    const senderId = req.user._id;
 
-        const newMessage = await Message.create({
-            senderId,
-            receiverId,
-            projectId,
-            message,
-            role,
-        });
-
-        res.status(201).json({ message: newMessage });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to send message", details: err.message });
+    let imageUrl;
+    if (req.file) {
+      imageUrl = `/uploads/${req.file.filename}`; // Image URL
     }
+
+    const newMessage = new Message({
+      senderId,
+      receiverId,
+      message,
+      image: imageUrl, // Set image URL if file is uploaded
+    });
+
+    await newMessage.save();
+
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    console.log("Error in sendMessage controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
+// Middleware to handle image upload with multer
+export const uploadMessageImage = upload.single("image");
 
-export const getMessagesByProject = async (req, res) => {
-    try {
-        const { projectId } = req.params;
 
-        const messages = await Message.find({ projectId })
-            .sort({ createdAt: 1 }) // Oldest to newest
-            .populate("senderId", "fullName role")
-            .populate("receiverId", "fullName role");
+export const startConversation = async (req, res) => { 
+  const { freelancerId } = req.params;
+  const { message } = req.body;
 
-        res.status(200).json({ messages });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch messages", details: err.message });
-    }
+  try {
+    const newConversation = new Message({
+      senderId: req.user.id,
+      receiverId: freelancerId,
+      messages: [{ senderId: req.user.id, message }],
+    });
+
+    await newConversation.save();
+    res.status(201).json(newConversation.messages[0]);  // Send back the first message
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error starting conversation');
+  }
+
 };
-
-
-// Fetch all the project conversations for a user
-export const getConversationsForUser = async (req, res) => {
-    try {
-        const userId = req.user._id;
-
-        const conversations = await Message.find({
-            $or: [{ senderId: userId }, { receiverId: userId }],
-        }).populate("projectId", "projectName");
-
-        res.status(200).json({ conversations });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to get conversations", details: err.message });
-    }
-};
-
-
-export const markMessagesAsSeen = async (req, res) => {
-    try {
-        const { projectId } = req.params;
-        const userId = req.user._id;
-
-        await Message.updateMany(
-            { receiverId: userId, projectId, seen: false },
-            { $set: { seen: true } }
-        );
-
-        res.status(200).json({ message: "Messages marked as seen" });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to update seen status", details: err.message });
-    }
-};
-
-
-
-

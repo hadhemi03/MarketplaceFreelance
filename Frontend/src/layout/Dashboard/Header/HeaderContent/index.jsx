@@ -57,14 +57,14 @@ export const menuItems =
         { id: 'Projects', label: 'Projects', path: '/free/client/projects' },
         { id: 'Freelancers', label: 'Freelancers', path: '/free/client/freelancers' },
         { id: 'ClientProjects', label: 'My Projects', path: '/free/client/my-projects' },
-        { id: 'Messages', label: 'Messages', path: '/free/client/messages' },
+        { id: 'Messages', label: 'Messages', path: '/free/client/messages/:freelancerId' },
         { id: 'clientPayment', label: 'My Payments', path: '/free/client/payments' }
       ]
     : role === 'freelancer'
     ? [
         { id: 'FreelancerProjects', label: 'Projects', path: '/free/freelancer/projects' },
         { id: 'MyProjectsFreelancer', label: 'My Projects', path: '/free/freelancer/my-projects' },
-        { id: 'Messages', label: 'Messages', path: '/free/freelancer/messages' },
+        { id: 'Messages', label: 'Messages', path: '/free/freelancer/messages/:freelancerId' },
         { id: 'MyCalendar', label: 'My Calendar', path: '/free/freelancer/my-calendar' }
       ]
     :

@@ -1,75 +1,24 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React from 'react'
+import { useChatStore } from 'store/useChatstore';
+import Sidebar from './messages/Sidebar';
+import NoChatSelected from './messages/NoChatSelected';
+import ChatContainer from './messages/ChatContainer';
 
-const ChatBox = ({ projectId, receiverId }) => {
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState("");
-    const currentUser = JSON.parse(localStorage.getItem("currentUser")); // adjust to your logic
-  
-    // Add a check if currentUser is null or undefined
-    if (!currentUser) {
-      return <div>Loading...</div>; // or handle it another way
-    }
-  
-    useEffect(() => {
-      const fetchMessages = async () => {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:5000/api/messages/project/${projectId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setMessages(res.data.messages);
-      };
-  
-      fetchMessages();
-    }, [projectId]);
-  
-    const handleSend = async () => {
-      const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/messages/send", {
-        receiverId,
-        projectId,
-        message: newMessage,
-        role: currentUser.role, // check if role is accessible
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-  
-      setNewMessage("");
-    };
-  
-    const handleMakeDeal = async () => {
-      const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/projects/make-deal/${projectId}`, {
-        freelancerId: receiverId,
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      alert("Project status is now In Progress.");
-    };
-  
-    return (
-      <div>
-        <div className="messages-box">
-          {messages.map((msg, i) => (
-            <div key={i} className={msg.senderId === currentUser._id ? "sent" : "received"}>
-              <p>{msg.message}</p>
-            </div>
-          ))}
+const ChatBox = () => {
+  const { selectedUser } = useChatStore();
+
+  return (
+    <div className="h-screen bg-base-200">
+      <div className="flex items-center justify-center pt-20 px-4">
+        <div className="bg-base-100 rounded-lg shadow-cl w-full max-w-6xl h-[calc(100vh-8rem)]">
+          <div className="flex h-full rounded-lg overflow-hidden">
+            <Sidebar />
+
+            {!selectedUser ? <NoChatSelected /> : <ChatContainer />}
+          </div>
         </div>
-  
-        <input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-        />
-        <button onClick={handleSend}>Send</button>
-  
-        {currentUser.role === "Client" && (
-          <button onClick={handleMakeDeal}>Make Deal</button>
-        )}
       </div>
-    );
-  };
-  
-  export default ChatBox;
-  
+    </div>
+  );
+};
+export default ChatBox

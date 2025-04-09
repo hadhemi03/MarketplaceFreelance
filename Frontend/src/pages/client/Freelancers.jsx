@@ -4,6 +4,7 @@ import {
   TextField, MenuItem
 } from "@mui/material";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";  // Add this import
 import Search from "layout/Dashboard/Header/HeaderContent/Search";
 
 const Freelancers = () => {
@@ -11,6 +12,8 @@ const Freelancers = () => {
   const [searchName, setSearchName] = useState("");
   const [searchSkill, setSearchSkill] = useState("");
   const [searchCountry, setSearchCountry] = useState("");
+
+  const navigate = useNavigate();  // Initialize navigate
 
   useEffect(() => {
     const fetchFreelancers = async () => {
@@ -31,6 +34,11 @@ const Freelancers = () => {
 
     fetchFreelancers();
   }, [searchName, searchSkill, searchCountry]);
+
+  const handleFreelancerClick = (freelancerId) => {
+    // Navigate to the chat page for the selected freelancer
+    navigate(`/messages/${freelancerId}`);
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -104,6 +112,7 @@ const Freelancers = () => {
                   transition: "transform 0.2s ease-in-out",
                   "&:hover": { transform: "scale(1.03)" },
                 }}
+                onClick={() => handleFreelancerClick(freelancer._id)} // Add click handler
               >
                 {/* Avatar + Name + Country */}
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
