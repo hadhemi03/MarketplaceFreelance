@@ -5,7 +5,7 @@ import authRoute from "./routes/auth.route.js";
 import projectRoute from "./routes/project.route.js";
 import userRoute from "./routes/user.route.js";
 import commentRoute from "./routes/comment.route.js";
-import messageRoute from "./routes/message.route.js";
+
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -41,7 +41,6 @@ app.use("/uploads", express.static("uploads"));  // Allow access to the 'uploads
   app.use("/api/auth", authRoute);
   app.use("/api/projects", projectRoute);
   app.use("/api/comments", commentRoute );
-  app.use("/api/messages", messageRoute);
   app.use("/api/users", userRoute);
   
   // Start server
