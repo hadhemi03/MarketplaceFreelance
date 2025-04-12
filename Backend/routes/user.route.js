@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyAdmin, verifyFreelancer, verifyToken } from "../utils/verifyToken.js";
-import { createUser, deleteUser, getAllFreelancers, getAllUsers, getCurrentUser, getFreelancerById, getUserById, updateUser, updateUserProfile } from "../controllers/user.controller.js";
+import { createUser, deleteUser, getAllFreelancers, getAllUsers, getCurrentUser, getFreelancerById, getUserById, getUsersWithChats, updateUser, updateUserProfile } from "../controllers/user.controller.js";
 
 const router = express.Router();
 
@@ -16,6 +16,8 @@ router.get("/get-freelancerByid/:freelancerId", verifyToken, getFreelancerById);
 router.get("/get-all-freelancers", verifyToken, getAllFreelancers);
 
 router.get("/get-current-user", verifyToken, getCurrentUser);
+
+router.get("/users-with-chat", verifyToken, getUsersWithChats);
 
 
 

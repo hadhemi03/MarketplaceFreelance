@@ -1,4 +1,5 @@
 import User from "../models/User.model.js";
+import Message from "../models/message.model.js";
 import { createError } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
@@ -224,3 +225,36 @@ export const getCurrentUser = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+
+// Controller to get users the current user has chatted with
+export const getUsersWithChats = async (req, res) => {
+    try {
+      const currentUserId = req.user._id;  // The current user's ID from the JWT token
+  
+      // Find all messages where the current user is either the sender or receiver
+      const messages = await Message.find({
+        $or: [
+          { senderId: currentUserId },
+          { receiverId: currentUserId }
+        ]
+      });
+  
+      // Extract unique user IDs (excluding the current user)
+      const userIds = [
+        ...new Set(
+          messages.map(msg => 
+            msg.senderId.toString() === currentUserId.toString() ? msg.receiverId : msg.senderId
+          )
+        )
+      ];
+  
+      // Populate user details (use User model to get user data)
+      const users = await User.find({ _id: { $in: userIds } });
+  
+      res.status(200).json(users);  // Send back the list of users with whom the current user has chatted
+    } catch (err) {
+      console.error("Error fetching users with chats:", err);
+      res.status(500).json({ message: "Error fetching users with chats" });
+    }
+  };

@@ -1,13 +1,14 @@
 // https://github.com/vitejs/vite/discussions/3448
 import path from 'path';
 import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react';
 import jsconfigPaths from 'vite-jsconfig-paths';
 
 // ----------------------------------------------------------------------
 
 export default defineConfig({
-  plugins: [react(), jsconfigPaths()],
+  plugins: [react(), jsconfigPaths(), tailwindcss()],
   // https://github.com/jpuri/react-draft-wysiwyg/issues/1317
   base: '/free', // accessing env variable is not possible here. So hard coding this.
   define: {

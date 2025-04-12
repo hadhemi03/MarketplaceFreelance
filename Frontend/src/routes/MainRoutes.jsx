@@ -194,6 +194,8 @@ const MainRoutes = {
         { path: 'freelancers', element: <Freelancers /> },
         { path: 'payments', element: <Payments /> },
         { path: 'messages', element: <Messages /> },
+        { path: 'messages/:userId', element: <Messages /> },
+
 
       ]
     },
@@ -205,6 +207,7 @@ const MainRoutes = {
         { path: 'my-projects', element: <MyProjectsFreelancer /> },
         { path: 'my-calendar', element: <MyCalendar /> },
         { path: 'messages', element: <Messages /> },
+        { path: 'messages/:userId', element: <Messages /> },
 
         
       ]
