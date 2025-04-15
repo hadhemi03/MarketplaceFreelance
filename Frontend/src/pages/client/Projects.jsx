@@ -46,7 +46,7 @@ const Projects = () => {
       try {
         const response = await axios.get("http://localhost:5000/api/projects/view-projects", {
           params: {
-            search: searchTerm,
+            search: searchName,
             minPrice: priceRange[0],
             maxPrice: priceRange[1],
             category: selectedCategory !== "" ? selectedCategory : undefined,
@@ -62,7 +62,7 @@ const Projects = () => {
     };
 
     fetchFilteredProjects();
-  }, [searchTerm, priceRange, selectedCategory, selectedSkills]);
+  }, [searchName, priceRange, selectedCategory, selectedSkills]);
 
   const handleCommentChange = (projectId, text) => {
     setNewComment((prev) => ({ ...prev, [projectId]: text }));
@@ -202,15 +202,6 @@ const Projects = () => {
                 '&:hover': { boxShadow: 6, backgroundColor: "#f9f9f9" }
               }}
             >
-              {project.image && (
-                <CardMedia
-                  component="img"
-                  height="300"
-                  image={`http://localhost:5000${project.image}`}
-                  alt={project.projectName}
-                  sx={{ borderRadius: 2, mb: 2 }}
-                />
-              )}
 
               <CardContent>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>{project.projectName}</Typography>

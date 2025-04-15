@@ -29,7 +29,6 @@ import '@fontsource/public-sans/700.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
-import './index.css';
 
 
 // project import

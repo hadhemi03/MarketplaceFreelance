@@ -36,7 +36,18 @@ export const createUser = async (req, res, next) => {
 // Update user details (Admin only)
 export const updateUser = async (req, res, next) => {
     const { userId } = req.params;
-    const { username, email, country, role, desc, occupation, skills } = req.body;
+    const { 
+        username, 
+        email, 
+        country, 
+        role, 
+        desc, 
+        occupation, 
+        skills, 
+        certificates, 
+        experiences, 
+        languages 
+    } = req.body;
 
     try {
         const user = await User.findById(userId);
@@ -51,6 +62,9 @@ export const updateUser = async (req, res, next) => {
         user.desc = desc || user.desc;
         user.occupation = occupation || user.occupation;
         user.skills = skills || user.skills;
+        user.certificates = certificates || user.certificates; // added
+        user.experiences = experiences || user.experiences; // added
+        user.languages = languages || user.languages; // added
 
         await user.save();
         res.status(200).json({ message: "User updated successfully", user });

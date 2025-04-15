@@ -56,6 +56,7 @@ export default function ProfileTab() {
     }
   };
 
+
   const handleListItemClick = (index, path) => {
     setSelectedIndex(index);
     if (path) navigate(path);
@@ -77,18 +78,13 @@ export default function ProfileTab() {
         <ListItemText primary="View Profile" />
       </ListItemButton>
 */}
-      <ListItemButton selected={selectedIndex === 3} onClick={(event) => handleListItemClick(event, 3, 'apps/profiles/account/personal')}>
+      <ListItemButton selected={selectedIndex === 3} onClick={() => handleListItemClick(3, '/freelancer/my-profile')}>
         <ListItemIcon>
           <ProfileOutlined />
         </ListItemIcon>
-        <ListItemText primary="Social Profile" />
+        <ListItemText primary="Profile" />
       </ListItemButton>
-      <ListItemButton selected={selectedIndex === 4} onClick={(event) => handleListItemClick(event, 4, '/apps/invoice/details/1')}>
-        <ListItemIcon>
-          <WalletOutlined />
-        </ListItemIcon>
-        <ListItemText primary="Billing" />
-      </ListItemButton>
+
       <ListItemButton selected={selectedIndex === 2} onClick={handleLogout}>
         <ListItemIcon>
           <LogoutOutlined />

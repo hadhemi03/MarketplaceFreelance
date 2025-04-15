@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import '../pages/messages/ChatPage.scss'
+import FreelancerModal from "./FreelancerModal";
+import { Plus } from "react-bootstrap-icons"
+import '../pages/messages/ChatPage.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Sidebar = ({ users }) => {
     const navigate = useNavigate();
     const role = localStorage.getItem('userRole'); 
+    const [showModal, setShowModal] = useState(false); // 🔹 Modal state
 
     const handleSelectUser = (userId) => {
         if (role === 'client') {
@@ -20,9 +23,18 @@ const Sidebar = ({ users }) => {
     return (
         <div className="col-5 px-0 bg-white">
             <div className="bg-white">
-                <div className="p-3 bg-light">
+                {/* 🔹 Top section with title and Plus icon */}
+                <div className="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
                     <h6 className="mb-0">Chats</h6>
+                    <Plus
+                        size={20}
+                        role="button"
+                        className="text-primary"
+                        onClick={() => setShowModal(true)}
+                    />
                 </div>
+
+                {/* 🔹 Chat user list */}
                 <div className="list-group list-group-flush overflow-auto" style={{ maxHeight: "80vh" }}>
                     {users.length === 0 ? (
                         <p className="text-center text-muted mt-4">No users to chat with</p>
@@ -47,10 +59,15 @@ const Sidebar = ({ users }) => {
                         ))
                     )}
                 </div>
+
+                {/* 🔹 Modal */}
+                {showModal && (
+                    <FreelancerModal onClose={() => setShowModal(false)} />
+                )}
             </div>
         </div>
-
     );
 };
+
 
 export default Sidebar;
