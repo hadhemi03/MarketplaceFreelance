@@ -74,6 +74,26 @@ const MyProjects = () => {
     setProjectToDelete(null);
   };
 
+  // ✅ New function to make a deal with a freelancer
+  const handleMakeDeal = async (projectId, freelancerId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:5000/api/projects/make-deal/${projectId}`,
+        { freelancerId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+      // Refresh the project list
+      fetchProjects();
+    } catch (err) {
+      console.error("Error making a deal:", err);
+      alert("Failed to make a deal. Please try again.");
+    }
+  };
+
   const columns = [
     { id: 'projectName', label: 'Project Name' },
     { id: 'category', label: 'Category' },
@@ -83,11 +103,23 @@ const MyProjects = () => {
       format: (value) => <StatusIndicator status={value} />,
     },
     {
+      id: 'freelancer',
+      label: 'Assigned To',
+      format: (value, row) =>
+        row.freelancerId && row.freelancerId.username ? (
+          <Typography>{row.freelancerId.username}</Typography>
+        ) : (
+          <Typography fontStyle="italic" color="text.secondary">
+            Not Assigned
+          </Typography>
+        ),
+    },
+    {
       id: 'price',
       label: 'Price',
       align: 'right',
       format: (value) => (
-        <NumericFormat value={value} displayType="text" thousandSeparator suffix="DT" />
+        <NumericFormat value={value} displayType="text" thousandSeparator suffix=" DT" />
       ),
     },
     {
@@ -115,6 +147,18 @@ const MyProjects = () => {
           >
             Delete
           </Button>
+
+          {/* ✅ Show Make a Deal button only when status is "Waiting" */}
+          {row.status === "Waiting" && (
+            <Button
+              variant="contained"
+              size="small"
+              color="success"
+              onClick={() => handleMakeDeal(row._id, row.freelancerId)}
+            >
+              Make a Deal
+            </Button>
+          )}
         </Box>
       ),
     },

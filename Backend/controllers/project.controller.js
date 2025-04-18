@@ -166,9 +166,9 @@ export const deleteProject = async (req, res, next) => {
         // Ensure only the client who created the project can delete it
         console.log("Checking ownership: project.clientId =", project.clientId, "req.user._id =", req.user._id);
         if (
-            req.user.role !== 'admin' && 
+            req.user.role !== 'admin' &&
             project.clientId.toString() !== req.user._id.toString()
-          ) {
+        ) {
             console.log("Unauthorized user:", req.user._id);
             return next(createError(403, "You are not authorized to delete this project."));
         }
@@ -214,7 +214,7 @@ export const getAllProjects = async (req, res, next) => {
                 projectName: { $regex: search, $options: "i" }
             });
         }
-        
+
         if (skill) {
             conditions.push({
                 skillsRequired: { $elemMatch: { $regex: skill, $options: "i" } }
@@ -285,7 +285,7 @@ export const getProjectById = async (req, res) => {
 // Get projects by client (Client only can see their own projects)
 export const getClientProjects = async (req, res, next) => {
     try {
-        const projects = await Project.find({ clientId: req.user._id });
+        const projects = await Project.find({ clientId: req.user._id }).populate("freelancerId", "username profileImage");
         res.status(200).json({ projects });
     } catch (err) {
         next(createError(500, "Server Error, could not fetch client projects."));
@@ -304,43 +304,62 @@ export const getCategories = async (req, res, next) => {
 };
 
 // client confirms that a freelancer is assigned to a project
-export const makeDeal = async (req, res) => {
+export const assignFreelancer = async (req, res) => {
     try {
-      const { projectId, freelancerId } = req.body;
-  
-      const project = await Project.findById(projectId);
-      if (!project) return res.status(404).json({ message: "Project not found" });
-  
-      if (project.freelancerId) {
-        return res.status(400).json({ message: "This project already has a freelancer." });
-      }
-  
-      project.freelancerId = freelancerId;
-      project.status = "In Progress";
-  
-      await project.save();
-  
-      res.status(200).json({ message: "Deal confirmed", project });
+        const { projectId } = req.params;
+        const { freelancerId } = req.body;
+
+        const project = await Project.findById(projectId);
+        if (!project) return res.status(404).json({ message: "Project not found" });
+
+        if (project.freelancerId) {
+            return res.status(400).json({ message: "This project already has a freelancer." });
+        }
+
+        project.freelancerId = freelancerId;
+        project.status = "In Progress";
+
+        await project.save();
+
+        res.status(200).json({ message: "Deal confirmed", project });
     } catch (err) {
-      res.status(500).json({ message: "Server error", error: err.message });
+        res.status(500).json({ message: "Server error", error: err.message });
     }
 };
+
+// Mark as completed
+export const completeProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const project = await Project.findById(projectId);
+        if (!project) return res.status(404).json({ message: "Project not found" });
+
+        project.status = "Completed";
+        await project.save();
+
+        res.status(200).json({ message: "Project marked as completed", project });
+    } catch (err) {
+        res.status(500).json({ message: "Server error", err });
+    }
+};
+
+
 
 
 // show the freelancer all the projects they are currently working on
 // My projects freelancer
 export const getFreelancerProjects = async (req, res) => {
     try {
-      const freelancerId = req.user.id;
-  
-      const projects = await Project.find({ freelancerId });
-  
-      res.status(200).json({ projects });
+        const freelancerId = req.user.id;
+
+        const projects = await Project.find({ freelancerId });
+
+        res.status(200).json({ projects });
     } catch (err) {
-      res.status(500).json({ message: "Error fetching freelancer projects", error: err.message });
+        res.status(500).json({ message: "Error fetching freelancer projects", error: err.message });
     }
-  };
-  
+};
+
 
 
 
