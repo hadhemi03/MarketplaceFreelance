@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyAdmin, verifyClient, verifyClientOrAdmin, verifyFreelancer, verifyToken } from "../utils/verifyToken.js";
-import { assignFreelancer, completeProject, createProject, deleteProject, getAllProjects, getCategories, getClientProjects, getProjectById, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
+import { assignFreelancer, completeProject, createProject, deleteProject, getAllProjects, getCategories, getClientProjects, getFreelancerProjects, getProjectById, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
 
 const router = express.Router();
 
@@ -24,5 +24,6 @@ router.get("/get-project/:projectId", verifyToken, getProjectById);
 router.put('/assign-freelancer/:projectId', verifyToken, verifyClient, assignFreelancer);
 router.put('/:projectId/complete', verifyToken, verifyFreelancer, completeProject);
 
+router.get('/freelancer-projects', verifyToken, verifyFreelancer, getFreelancerProjects)
 
 export default router;

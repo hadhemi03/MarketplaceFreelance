@@ -33,6 +33,8 @@ import 'react-toastify/dist/ReactToastify.css';
 // Utils for making requests (you may need to adjust the path based on your project)
 import newRequest from '../../../utils/newRequest.js';
 
+import { initSocket } from 'utils/Socket';
+
 export default function AuthLogin({ isDemo = false }) {
   const [showPassword, setShowPassword] = React.useState(false);
   const [user, setUser] = useState({ email: '', password: '' });
@@ -67,6 +69,11 @@ export default function AuthLogin({ isDemo = false }) {
       localStorage.setItem('currentUser', JSON.stringify(response.data.user));
       localStorage.setItem('userRole', response.data.user.role);
 
+      initSocket(response.data.token); 
+
+      setUser(response.data.user);
+      toast.success('Login successful!');
+
       // update the user state immediatelt
       setUser(response.data.user);
 
@@ -81,7 +88,7 @@ export default function AuthLogin({ isDemo = false }) {
         } else if (userRole === 'freelancer') {
           navigate('/freelancer/projects');
         } else {
-          navigate('/dashboard/default'); 
+          navigate('/dashboard/default');
         }
       }, 300); // Short delay before redirect
 

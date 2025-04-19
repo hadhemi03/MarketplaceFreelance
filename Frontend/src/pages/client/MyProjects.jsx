@@ -74,33 +74,22 @@ const MyProjects = () => {
     setProjectToDelete(null);
   };
 
-  // ✅ New function to make a deal with a freelancer
-  const handleMakeDeal = async (projectId, freelancerId) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:5000/api/projects/make-deal/${projectId}`,
-        { freelancerId },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        }
-      );
-      // Refresh the project list
-      fetchProjects();
-    } catch (err) {
-      console.error("Error making a deal:", err);
-      alert("Failed to make a deal. Please try again.");
-    }
+  // ✅ New navigation function for Make a Deal page
+  const navigateToMakeDealPage = (projectId, freelancerId) => {
+    navigate(`/client/make-deal/${projectId}`, {
+      state: { freelancerId },
+    });
   };
 
   const columns = [
     { id: 'projectName', label: 'Project Name' },
     { id: 'category', label: 'Category' },
     {
-      id: 'status',
-      label: 'Status',
-      format: (value) => <StatusIndicator status={value} />,
+      id: 'offerStatus',
+      label: 'Offer',
+      format: (value, row) => (
+        row.status === 'In Progress' ? 'Offer Accepted' : 'Pending'
+      )
     },
     {
       id: 'freelancer',
@@ -148,17 +137,18 @@ const MyProjects = () => {
             Delete
           </Button>
 
-          {/* ✅ Show Make a Deal button only when status is "Waiting" */}
+          {/* ✅ Navigate to Make Deal page if status is "Waiting" */}
           {row.status === "Waiting" && (
             <Button
               variant="contained"
               size="small"
               color="success"
-              onClick={() => handleMakeDeal(row._id, row.freelancerId)}
+              onClick={() => navigateToMakeDealPage(row._id, row.freelancerId?._id)}
             >
               Make a Deal
             </Button>
           )}
+
         </Box>
       ),
     },

@@ -15,6 +15,7 @@ import UserOutlined from '@ant-design/icons/UserOutlined';
 import WalletOutlined from '@ant-design/icons/WalletOutlined';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import { disconnectSocket } from 'utils/Socket';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
@@ -37,6 +38,8 @@ export default function ProfileTab() {
   // Handle logout
   const handleLogout = async () => {
     try {
+      disconnectSocket();
+
       // Clear the user data from localStorage
       localStorage.removeItem('currentUser');
       localStorage.removeItem('token');

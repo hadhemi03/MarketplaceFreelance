@@ -155,7 +155,7 @@ const Payments = Loadable(lazy(() => import('pages/client/Payments')));
 const CreateProject = Loadable(lazy(() => import('pages/client/CreateProject')));
 const EditProject = Loadable(lazy(() => import('components/project/EditProject')));
 const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')));
-
+const MakeDeal = Loadable(lazy(() => import('pages/client/MakeDeal')));
 const Messages = Loadable(lazy(() => import('pages/messages/chatPage')));
 
 
@@ -163,6 +163,10 @@ const Messages = Loadable(lazy(() => import('pages/messages/chatPage')));
 const MyProjectsFreelancer = Loadable(lazy(() => import('pages/freelancer/MyProjects')));
 const Calendar = Loadable(lazy(() => import('pages/freelancer/MyCalendar')));
 const Profile = Loadable(lazy(() => import('pages/freelancer/Profile')));
+const Offers = Loadable(lazy(() => import('pages/freelancer/Offers')));
+
+
+
 
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -196,6 +200,8 @@ const MainRoutes = {
         { path: 'payments', element: <Payments /> },
         { path: 'messages', element: <Messages /> },
         { path: 'messages/:userId', element: <Messages /> },
+        { path: 'make-deal/:projectId', element: <MakeDeal /> },
+
 
 
       ]
@@ -210,6 +216,8 @@ const MainRoutes = {
         { path: 'messages', element: <Messages /> },
         { path: 'messages/:userId', element: <Messages /> },
         { path: 'my-profile', element: <Profile /> },
+        { path: 'my-offers', element: <Offers /> },
+
 
 
         

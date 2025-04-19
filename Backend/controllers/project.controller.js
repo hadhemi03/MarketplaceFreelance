@@ -346,19 +346,26 @@ export const completeProject = async (req, res) => {
 
 
 
-// show the freelancer all the projects they are currently working on
-// My projects freelancer
+// Get all projects assigned to the logged-in freelancer
 export const getFreelancerProjects = async (req, res) => {
     try {
-        const freelancerId = req.user.id;
+        const freelancerId = req.user._id;
 
-        const projects = await Project.find({ freelancerId });
+        const projects = await Project.find({
+            freelancerId,
+            status: { $in: ["In Progress", "Completed"] }
+        })
+        .populate('clientId', 'username img')
+        .sort({ createdAt: -1 });
 
-        res.status(200).json({ projects });
+        res.status(200).json(projects);
     } catch (err) {
-        res.status(500).json({ message: "Error fetching freelancer projects", error: err.message });
+        console.error("Error in getFreelancerProjects:", err);
+        res.status(500).json({ message: "Server error" });
     }
 };
+
+
 
 
 
