@@ -238,6 +238,7 @@ export const getCurrentUser = async (req, res) => {
         console.error("Error during getCurrentUser:", error);  // Log the error
         res.status(500).json({ message: "Server error", error: error.message });
     }
+    
 };
 
 
