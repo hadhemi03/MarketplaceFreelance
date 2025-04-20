@@ -14,6 +14,7 @@ import {
   DialogTitle
 } from '@mui/material';
 import { useNavigate } from 'react-router';
+import EventIcon from '@mui/icons-material/Event'; // Calendar Icon
 
 const MyProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -79,6 +80,11 @@ const MyProjects = () => {
     navigate(`/client/make-deal/${projectId}`, {
       state: { freelancerId },
     });
+  };
+
+  // ✅ Navigate to Shared Calendar page for the project
+  const navigateToSharedCalendar = (projectId) => {
+    navigate(`/client/my-calendar/${projectId}`);
   };
 
   const columns = [
@@ -149,6 +155,17 @@ const MyProjects = () => {
             </Button>
           )}
 
+          {/* ✅ Calendar icon to navigate to the shared calendar */}
+          <Button
+            variant="outlined"
+            size="small"
+            color="primary"
+            onClick={() => navigateToSharedCalendar(row._id)}
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
+            <EventIcon sx={{ marginRight: '4px' }} />
+            Calendar
+          </Button>
         </Box>
       ),
     },

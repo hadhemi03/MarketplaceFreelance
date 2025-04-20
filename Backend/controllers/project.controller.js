@@ -272,6 +272,10 @@ export const getProjectById = async (req, res) => {
         if (!project) {
             return res.status(404).json({ message: "Project not found" });
         }
+        // Check if user is client or freelancer involved in the project
+        if (project.clientId !== req.user.id && project.freelancerId !== req.user.id) {
+            return res.status(403).json({ msg: "Unauthorized" });
+        }
 
         res.status(200).json(project);  // get project 
     } catch (err) {
@@ -345,7 +349,6 @@ export const completeProject = async (req, res) => {
 
 
 
-
 // Get all projects assigned to the logged-in freelancer
 export const getFreelancerProjects = async (req, res) => {
     try {
@@ -355,8 +358,8 @@ export const getFreelancerProjects = async (req, res) => {
             freelancerId,
             status: { $in: ["In Progress", "Completed"] }
         })
-        .populate('clientId', 'username img')
-        .sort({ createdAt: -1 });
+            .populate('clientId', 'username img')
+            .sort({ createdAt: -1 });
 
         res.status(200).json(projects);
     } catch (err) {
@@ -365,8 +368,132 @@ export const getFreelancerProjects = async (req, res) => {
     }
 };
 
+// shared calendar
+export const addTaskToCalendar = async (req, res) => {
+    const { title, description, date } = req.body;
+    const { projectId } = req.params;
+    const userId = req.user._id;
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+
+    // Only client or freelancer can add tasks
+    if (![project.clientId.toString(), project.freelancerId.toString()].includes(userId)) {
+        return res.status(403).json({ msg: 'Not authorized' });
+    }
+
+    const newTask = {
+        title,
+        description,
+        date: new Date(date), // Ensure date is valid
+        completed: false,
+        createdBy: userId,
+    };
+
+    project.sharedCalendar.push(newTask);
+    await project.save();
+
+    res.status(201).json(project.sharedCalendar); // Return updated tasks
+};
 
 
+export const taskCompleted = async (req, res) => {
+    const { projectId, taskId } = req.params;
+    const userId = req.user._id;
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+
+    const task = project.sharedCalendar.id(taskId);
+    if (!task) return res.status(404).json({ msg: 'Task not found' });
+
+    if (![project.clientId.toString(), project.freelancerId.toString()].includes(userId)) {
+        return res.status(403).json({ msg: 'Not authorized' });
+    }
+
+    task.completed = true;
+    await project.save();
+
+    res.status(200).json(task);
+};
+
+export const fetchTasksForProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+
+        // Log to verify projectId and project fetching
+        console.log('Fetching project with ID:', projectId);
+
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.status(404).json({ msg: 'Project not found' });
+        }
+
+        // Log the sharedCalendar content
+        console.log('Project sharedCalendar:', project.sharedCalendar);
+
+        // Only return the sharedCalendar tasks
+        const tasks = project.sharedCalendar || [];
+        
+        // Log the tasks being returned
+        console.log('Fetched tasks:', tasks);
+
+        res.status(200).json(tasks);
+    } catch (error) {
+        console.error('Error fetching tasks for project:', error);
+        return res.status(500).json({ msg: 'Server error while fetching tasks.' });
+    }
+};
+
+
+export const deleteTaskFromCalendar = async (req, res) => {
+    const { projectId, taskId } = req.params;
+  
+    // Check if the user is authenticated
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: 'Unauthorized: Missing user info' });
+    }
+  
+    const userId = req.user._id;
+  
+    // Find the project
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+  
+    // Find the task in the sharedCalendar array
+    const taskIndex = project.sharedCalendar.findIndex(task => task._id.toString() === taskId);
+  
+    if (taskIndex === -1) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+  
+    // Get the task using the index
+    const task = project.sharedCalendar[taskIndex];
+  
+    // Log the task for debugging purposes
+    console.log('Task found:', task);
+  
+    // Check if `createdBy` exists on the task object
+    if (!task.createdBy) {
+      return res.status(400).json({ message: 'Task does not have a creator' });
+    }
+  
+    // Check if the task was created by the current user
+    if (task.createdBy.toString() !== userId.toString()) {
+      return res.status(403).json({ message: 'Not authorized to delete this task' });
+    }
+  
+    // Remove the task from the sharedCalendar array
+    project.sharedCalendar.splice(taskIndex, 1); // This removes the task from the array
+  
+    // Save the project with the updated sharedCalendar
+    await project.save();
+  
+    res.status(200).json({ msg: 'Task deleted successfully', tasks: project.sharedCalendar });
+  };
+  
+  
+  
 
 
 

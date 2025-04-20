@@ -4,13 +4,18 @@ import {
   Box,
   Typography,
   CircularProgress,
+  Button
 } from '@mui/material';
 import DataTable from 'pages/dashboard/DataTable'; // assuming same DataTable component is used
+import EventIcon from '@mui/icons-material/Event';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 
 const FreelancerMyProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate(); // Initialize navigate from useNavigate
 
   const fetchFreelancerProjects = async () => {
     try {
@@ -32,6 +37,11 @@ const FreelancerMyProjects = () => {
     fetchFreelancerProjects();
   }, []);
 
+  const navigateToSharedCalendar = (projectId) => {
+    // Use the navigate function to go to the shared calendar page
+    navigate(`/freelancer/my-calendar/${projectId}`);
+  };
+
   const columns = [
     { id: 'projectName', label: 'Project Name' },
     {
@@ -50,9 +60,7 @@ const FreelancerMyProjects = () => {
       id: 'status',
       label: 'Status',
       format: (value) => (
-        <Typography>
-          {value}
-        </Typography>
+        <Typography>{value}</Typography>
       ),
     },
     {
@@ -66,6 +74,25 @@ const FreelancerMyProjects = () => {
       id: 'createdAt',
       label: 'Created At',
       format: (value) => new Date(value).toLocaleDateString(),
+    },
+    {
+      id: 'calendar',
+      label: 'Calendar',
+      format: (value, row) => (
+        // Check if both clientId and freelancerId are available
+        row.clientId && row.freelancerId ? (
+          <Button
+            variant="outlined"
+            size="small"
+            color="primary"
+            onClick={() => navigateToSharedCalendar(row._id)}
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
+            <EventIcon sx={{ marginRight: '4px' }} />
+            Calendar
+          </Button>
+        ) : null
+      ),
     },
   ];
 

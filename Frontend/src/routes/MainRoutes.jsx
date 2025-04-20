@@ -161,7 +161,7 @@ const Messages = Loadable(lazy(() => import('pages/messages/chatPage')));
 
 // Pages du freelancer
 const MyProjectsFreelancer = Loadable(lazy(() => import('pages/freelancer/MyProjects')));
-const Calendar = Loadable(lazy(() => import('pages/freelancer/MyCalendar')));
+const CalendarPage = Loadable(lazy(() => import('pages/freelancer/MyCalendar')));
 const Profile = Loadable(lazy(() => import('pages/freelancer/Profile')));
 const Offers = Loadable(lazy(() => import('pages/freelancer/Offers')));
 
@@ -201,6 +201,8 @@ const MainRoutes = {
         { path: 'messages', element: <Messages /> },
         { path: 'messages/:userId', element: <Messages /> },
         { path: 'make-deal/:projectId', element: <MakeDeal /> },
+        { path: 'my-calendar/:projectId', element: <CalendarPage /> },
+
 
 
 
@@ -212,7 +214,7 @@ const MainRoutes = {
       children: [
         { path: 'projects', element: <Projects /> },
         { path: 'my-projects', element: <MyProjectsFreelancer /> },
-        { path: 'my-calendar', element: <MyCalendar /> },
+        { path: 'my-calendar/:projectId', element: <CalendarPage /> },
         { path: 'messages', element: <Messages /> },
         { path: 'messages/:userId', element: <Messages /> },
         { path: 'my-profile', element: <Profile /> },
