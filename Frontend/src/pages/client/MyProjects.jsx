@@ -155,17 +155,19 @@ const MyProjects = () => {
             </Button>
           )}
 
-          {/* ✅ Calendar icon to navigate to the shared calendar */}
-          <Button
-            variant="outlined"
-            size="small"
-            color="primary"
-            onClick={() => navigateToSharedCalendar(row._id)}
-            sx={{ display: 'flex', alignItems: 'center' }}
-          >
-            <EventIcon sx={{ marginRight: '4px' }} />
-            Calendar
-          </Button>
+          {/* ✅ Only show Calendar button when the deal has been made (status is "In Progress") */}
+          {row.status === "In Progress" && (
+            <Button
+              variant="outlined"
+              size="small"
+              color="primary"
+              onClick={() => navigateToSharedCalendar(row._id)}
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
+              <EventIcon sx={{ marginRight: '4px' }} />
+              Calendar
+            </Button>
+          )}
         </Box>
       ),
     },

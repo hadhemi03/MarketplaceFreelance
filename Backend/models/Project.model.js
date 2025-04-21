@@ -74,7 +74,6 @@ const ProjectSchema = new mongoose.Schema(
               date: Date,
               createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
               completed: { type: Boolean, default: false },
-              createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
             }
           ]
 

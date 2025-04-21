@@ -65,7 +65,7 @@ export const menuItems =
         { id: 'FreelancerProjects', label: 'Projects', path: '/free/freelancer/projects' },
         { id: 'MyProjectsFreelancer', label: 'My Projects', path: '/free/freelancer/my-projects' },
         { id: 'Messages', label: 'Messages', path: '/free/freelancer/messages' },
-        { id: 'MyCalendar', label: 'My Calendar', path: '/free/freelancer/my-calendar' },
+        { id: 'MyCalendar', label: 'My Calendar', path: '/free/freelancer/freelancer-calendar' },
         { id: 'MyOffers', label: 'My Offers', path: '/free/freelancer/my-offers' },
 
       ]

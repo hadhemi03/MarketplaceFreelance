@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyAdmin, verifyClient, verifyClientOrAdmin, verifyFreelancer, verifyToken } from "../utils/verifyToken.js";
-import { addTaskToCalendar, assignFreelancer, completeProject, createProject, deleteProject, deleteTaskFromCalendar, fetchTasksForProject, getAllProjects, getCategories, getClientProjects, getFreelancerProjects, getProjectById, taskCompleted, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
+import { addTaskToCalendar, assignFreelancer, completeProject, createProject, deleteProject, deleteTaskFromCalendar, fetchTasksForProject, getAllFreelancerTasks, getAllProjects, getCategories, getClientProjects, getFreelancerProjects, getProjectById, taskCompleted, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
 
 const router = express.Router();
 
@@ -29,6 +29,6 @@ router.post('/:projectId/add-task', verifyToken, addTaskToCalendar);
 router.put('/:projectId/calendar/:taskId/complete', verifyToken, taskCompleted);
 router.get('/:projectId/tasks', verifyToken, fetchTasksForProject);
 router.delete('/:projectId/calendar/:taskId/delete', verifyToken, deleteTaskFromCalendar);
-
+router.get('/calendar/freelancer', verifyToken, verifyFreelancer, getAllFreelancerTasks)
 
 export default router;
