@@ -167,6 +167,12 @@ const Profile = Loadable(lazy(() => import('pages/freelancer/Profile')));
 const Offers = Loadable(lazy(() => import('pages/freelancer/Offers')));
 
 
+// Pages d'Admin
+const CRUDClients = Loadable(lazy(() => import('pages/admin/Clients')));
+const CRUDFreelancers = Loadable(lazy(() => import('pages/admin/Freelancers')));
+
+
+
 
 
 
@@ -231,25 +237,26 @@ const MainRoutes = {
       path: 'dashboard',  // Admin dashboard route
       element: <DashboardLayout />,  // Main layout for admin routes
       children: [
-        { path: 'default', element: <DashboardDefault /> },  // Admin's default dashboard page
+        { path: 'default', element: <DashboardDefault /> }, 
+        {
+          path: 'sample-page',  // Sample page route
+          element: <SamplePage />
+        },
+        {
+          path: 'shadow',  // Shadow page route
+          element: <Shadow />
+        },
+        {
+          path: 'crudclients',  
+          element: <CRUDClients />
+        },
+        {
+          path: 'crudfreelancers', 
+          element: <CRUDFreelancers />
+        }
       ]
     },
-    {
-      path: 'color',  // Color page route
-      element: <Color />
-    },
-    {
-      path: 'typography',  // Typography page route
-      element: <Typography />
-    },
-    {
-      path: 'sample-page',  // Sample page route
-      element: <SamplePage />
-    },
-    {
-      path: 'shadow',  // Shadow page route
-      element: <Shadow />
-    }
+    
   ]
 };
 

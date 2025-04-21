@@ -33,6 +33,65 @@ export const createUser = async (req, res, next) => {
     }
 };
 
+export const addFreelancer = async (req, res, next) => {
+    const { username, email } = req.body;
+
+    if (!username || !email ) {
+        return next(createError(400, "All fields are required."));
+    }
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return next(createError(400, "User already exists with this email."));
+        }
+
+        const newUser = new User({
+            username,
+            email,
+            password: 'default123', 
+            country: 'unknown',     
+            role: 'freelancer',
+        });
+
+        await newUser.save();
+
+        res.status(201).json({ message: "User created successfully", user: newUser });
+    } catch (err) {
+        next(createError(500, "Server Error, could not create user."));
+    }
+};
+
+export const addClient = async (req, res, next) => {
+    const { username, email } = req.body;
+
+    if (!username || !email ) {
+        return next(createError(400, "All fields are required."));
+    }
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return next(createError(400, "User already exists with this email."));
+        }
+
+        const newUser = new User({
+            username,
+            email,
+            password: 'default123', 
+            country: 'unknown',    
+            role : "client",
+        });
+
+        await newUser.save();
+
+        res.status(201).json({ message: "User created successfully", user: newUser });
+    } catch (err) {
+        next(createError(500, "Server Error, could not create user."));
+    }
+};
+
+
 // Update user details (Admin only)
 export const updateUser = async (req, res, next) => {
     const { userId } = req.params;
@@ -72,6 +131,48 @@ export const updateUser = async (req, res, next) => {
         next(createError(500, "Server Error, could not update user."));
     }
 };
+
+export const updateFreelancer = async (req, res, next) => {
+    const { userId } = req.params;
+    const { username, email } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user || user.role !== 'freelancer') {
+            return next(createError(404, "Freelancer not found."));
+        }
+
+        user.username = username || user.username;
+        user.email = email || user.email;
+
+        await user.save();
+        res.status(200).json({ message: "Freelancer updated successfully", user });
+    } catch (err) {
+        next(createError(500, "Server Error, could not update freelancer."));
+    }
+};
+
+export const updateClient = async (req, res, next) => {
+    const { userId } = req.params;
+    const { username, email } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user || user.role !== 'client') {
+            return next(createError(404, "Client not found."));
+        }
+
+        user.username = username || user.username;
+        user.email = email || user.email;
+
+        await user.save();
+        res.status(200).json({ message: "Client updated successfully", user });
+    } catch (err) {
+        next(createError(500, "Server Error, could not update client."));
+    }
+};
+
+
 
 // Delete a user (Admin only)
 export const deleteUser = async (req, res, next) => {
@@ -115,6 +216,26 @@ export const getAllUsers = async (req, res, next) => {
         next(createError(500, "Server Error, could not fetch users."));
     }
 };
+
+export const getAllClients = async (req, res, next) => {
+    const { name, country } = req.query;
+    const query = { role: "client" };
+
+    if (name) {
+        query.username = { $regex: name, $options: "i" };
+    }
+    if (country) {
+        query.country = { $regex: country, $options: "i" };
+    }
+
+    try {
+        const clients = await User.find(query).select("-password");
+        res.status(200).json({ clients });
+    } catch (err) {
+        next(createError(500, "Server Error, could not fetch clients."));
+    }
+};
+
 
 // Update user profile (he is the only one that can update his profile)
 export const updateUserProfile = async (req, res, next) => {
@@ -211,6 +332,8 @@ export const getAllFreelancers = async (req, res, next) => {
         next(createError(500, "Server Error, could not fetch freelancers."));
     }
 };
+
+
 
 export const getCurrentUser = async (req, res) => {
     try {

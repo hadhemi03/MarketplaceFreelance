@@ -23,6 +23,10 @@ export default function DashboardLayout() {
   const { menuMasterLoading } = useGetMenuMaster();
   const downXL = useMediaQuery((theme) => theme.breakpoints.down('xl'));
 
+  // Assuming you are storing user info in localStorage
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const isAdmin = currentUser?.role === 'admin';  // Check if the user is admin
+
   useEffect(() => {
     handlerDrawerOpen(!downXL);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -30,10 +34,15 @@ export default function DashboardLayout() {
 
   if (menuMasterLoading) return <Loader />;
 
+  // If the user is not admin, redirect them
+  if (!isAdmin) {
+    return <Navigate to="/" />;  // Redirect non-admin users
+  }
+
   return (
     <Box sx={{ display: 'flex', width: '100%' }}>
       <Header />
-      {/*<Drawer />*/}   {/** Sidebar */}
+      {isAdmin && <Drawer />}  {/* Only show Drawer if user is admin */}
       <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
         <Toolbar />
         <Breadcrumbs navigation={navigation} title />

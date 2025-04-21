@@ -70,12 +70,7 @@ export const menuItems =
 
       ]
     :
-    [
-        { id: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-        { id: 'pages', label: 'Pages', path: '/pages' },
-        { id: 'utilities', label: 'Utilities', path: '/utilities' },
-        { id: 'support', label: 'Support', path: '/support' }
-      ];
+    [ ];
 
 // ==============================|| HEADER - CONTENT ||============================== //
 
@@ -84,11 +79,12 @@ const HeaderContent = () => {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-      {/* Logo on the left */}
+    {/* Logo on the left - Hidden if role is admin */}
+    {role !== 'admin' && (
       <Box sx={{ flex: 0 }}>
         <Logo />
       </Box>
-
+    )}
       {/* Menu Items in the center, spread evenly */}
       <Box sx={{ display: 'flex', justifyContent: 'center', flex: 1 }}>
         {menuItems.map((item) => (
