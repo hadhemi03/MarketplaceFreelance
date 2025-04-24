@@ -19,7 +19,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-// Create a new project (Client only)
 export const createProject = async (req, res, next) => {
     try {
         console.log("User from JWT:", req.user);
@@ -80,7 +79,6 @@ export const uploadProjectImage = upload.single("image");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Update an existing project (Client only)
 // delete the old img from uploads and replace it with the new image 
 export const updateProject = async (req, res, next) => {
     const { projectId } = req.params;

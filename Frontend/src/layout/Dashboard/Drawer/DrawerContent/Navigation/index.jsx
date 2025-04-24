@@ -37,13 +37,13 @@ import NavGroup from './NavGroup';
 
 import dashboard from '../../../../../menu-items/dashboard';
 import users from '../../../../../menu-items/users';
-import support from '../../../../../menu-items/support';
+import Projects from 'menu-items/projects';
 
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
 
 export default function Navigation() {
   const menuItems = {
-    items: [dashboard, users, support]
+    items: [dashboard, users, Projects]
   };
   const navGroups = menuItems.items.map((item) => {
     return (

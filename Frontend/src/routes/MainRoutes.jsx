@@ -170,6 +170,8 @@ const Offers = Loadable(lazy(() => import('pages/freelancer/Offers')));
 // Pages d'Admin
 const CRUDClients = Loadable(lazy(() => import('pages/admin/Clients')));
 const CRUDFreelancers = Loadable(lazy(() => import('pages/admin/Freelancers')));
+const CRUDProjects = Loadable(lazy(() => import('pages/admin/Projects')));
+const CRUDComments = Loadable(lazy(() => import('pages/admin/Comments')));
 
 
 
@@ -253,6 +255,14 @@ const MainRoutes = {
         {
           path: 'crudfreelancers', 
           element: <CRUDFreelancers />
+        },
+        {
+          path: 'crudprojects',  
+          element: <CRUDProjects />
+        },
+        {
+          path: 'crudcomments',  
+          element: <CRUDComments />
         }
       ]
     },

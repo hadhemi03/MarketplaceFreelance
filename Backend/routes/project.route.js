@@ -5,11 +5,11 @@ import { addTaskToCalendar, assignFreelancer, completeProject, createProject, de
 const router = express.Router();
 
 
-//Clients Routes
-router.post("/create-project", verifyToken, verifyClient, uploadProjectImage, createProject);   // verifyToken to verify that the user is authentificated
-router.put("/update-project/:projectId", verifyToken, verifyClient, uploadProjectImage, updateProject);
+//Clients and admin Routes
+router.post("/create-project", verifyToken, verifyClientOrAdmin, uploadProjectImage, createProject);   // verifyToken to verify that the user is authentificated
+router.put("/update-project/:projectId", verifyToken, verifyClientOrAdmin, uploadProjectImage, updateProject);
 router.delete("/delete-project/:projectId", verifyToken, verifyClientOrAdmin, deleteProject);
-router.get("/myprojects", verifyToken, verifyClient, getClientProjects);
+router.get("/myprojects", verifyToken, verifyClientOrAdmin, getClientProjects);
 
 // All Users (Freelancers & Clients) can view projects
 router.get("/view-projects", verifyToken, getAllProjects);
