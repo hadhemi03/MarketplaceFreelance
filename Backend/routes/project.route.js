@@ -11,7 +11,7 @@ router.put("/update-project/:projectId", verifyToken, verifyClientOrAdmin, uploa
 router.delete("/delete-project/:projectId", verifyToken, verifyClientOrAdmin, deleteProject);
 router.get("/myprojects", verifyToken, verifyClientOrAdmin, getClientProjects);
 
-// All Users (Freelancers & Clients) can view projects
+// All Users can view projects
 router.get("/view-projects", verifyToken, getAllProjects);
 
 // Categories

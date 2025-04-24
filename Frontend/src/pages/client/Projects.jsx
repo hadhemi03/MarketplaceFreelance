@@ -4,6 +4,8 @@ import {
   TextField, Button, Divider, Slider, FormControl, Select, MenuItem
 } from "@mui/material";
 import axios from "axios";
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 const categoryOptions = [
   "Graphics & Designs", "Digital Marketing", "Writing & Translation", "Video & Animation",
@@ -12,6 +14,7 @@ const categoryOptions = [
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [comments, setComments] = useState({});
   const [newComment, setNewComment] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +28,20 @@ const Projects = () => {
   const toggleComments = (id) => {
     setShowComments(prev => ({ ...prev, [id]: !prev[id] }));
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/users/get-current-user", {
+          withCredentials: true,
+        });
+        setCurrentUser(res.data); // e.g., { _id: '...', name: '...' }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -95,12 +112,32 @@ const Projects = () => {
 
       setComments((prev) => ({
         ...prev,
-        [projectId]: res.data, 
+        [projectId]: res.data,
       }));
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
   };
+
+  const handleDeleteComment = async (commentId, projectId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:5000/api/comments/delete-comment/${commentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+
+      setComments((prev) => ({
+        ...prev,
+        [projectId]: prev[projectId].filter(comment => comment._id !== commentId)
+      }));
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
 
   return (
     <Box sx={{ p: 3, display: 'flex', backgroundColor: '#f0f2f5' }}>
@@ -244,7 +281,7 @@ const Projects = () => {
 
                   <Stack spacing={1} mt={1}>
                     {comments[project._id]?.map((comment) => (
-                      <Stack key={comment._id} direction="row" spacing={2}>
+                      <Stack key={comment._id} direction="row" spacing={2} alignItems="flex-start">
                         <Box sx={{
                           bgcolor: "#1976d2",
                           color: "white",
@@ -258,15 +295,24 @@ const Projects = () => {
                         }}>
                           {comment.userName?.charAt(0).toUpperCase()}
                         </Box>
+
                         <Box sx={{ bgcolor: "#f5f5f5", p: 2, borderRadius: 2, flexGrow: 1 }}>
                           <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
                           <Typography variant="caption" color="text.secondary">
                             {new Date(comment.createdAt).toLocaleString()}
                           </Typography>
-                          <Typography variant="body2">{comment.text}</Typography>
+                          <Typography variant="body2" sx={{ mt: 1 }}>{comment.text}</Typography>
                         </Box>
+
+                        {currentUser && comment.userId === currentUser._id && (
+                          <Button onClick={() => handleDeleteComment(comment._id, project._id)}>
+                            <DeleteIcon sx={{ color: "red" }} />
+                          </Button>
+                        )}
                       </Stack>
                     ))}
+
+
                   </Stack>
                 </Box>
 

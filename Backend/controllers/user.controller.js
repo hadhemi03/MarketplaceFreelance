@@ -36,7 +36,7 @@ export const createUser = async (req, res, next) => {
 export const addFreelancer = async (req, res, next) => {
     const { username, email } = req.body;
 
-    if (!username || !email ) {
+    if (!username || !email) {
         return next(createError(400, "All fields are required."));
     }
 
@@ -49,8 +49,8 @@ export const addFreelancer = async (req, res, next) => {
         const newUser = new User({
             username,
             email,
-            password: 'default123', 
-            country: 'unknown',     
+            password: 'default123',
+            country: 'unknown',
             role: 'freelancer',
         });
 
@@ -65,7 +65,7 @@ export const addFreelancer = async (req, res, next) => {
 export const addClient = async (req, res, next) => {
     const { username, email } = req.body;
 
-    if (!username || !email ) {
+    if (!username || !email) {
         return next(createError(400, "All fields are required."));
     }
 
@@ -78,9 +78,9 @@ export const addClient = async (req, res, next) => {
         const newUser = new User({
             username,
             email,
-            password: 'default123', 
-            country: 'unknown',    
-            role : "client",
+            password: 'default123',
+            country: 'unknown',
+            role: "client",
         });
 
         await newUser.save();
@@ -95,17 +95,17 @@ export const addClient = async (req, res, next) => {
 // Update user details (Admin only)
 export const updateUser = async (req, res, next) => {
     const { userId } = req.params;
-    const { 
-        username, 
-        email, 
-        country, 
-        role, 
-        desc, 
-        occupation, 
-        skills, 
-        certificates, 
-        experiences, 
-        languages 
+    const {
+        username,
+        email,
+        country,
+        role,
+        desc,
+        occupation,
+        skills,
+        certificates,
+        experiences,
+        languages
     } = req.body;
 
     try {
@@ -121,9 +121,9 @@ export const updateUser = async (req, res, next) => {
         user.desc = desc || user.desc;
         user.occupation = occupation || user.occupation;
         user.skills = skills || user.skills;
-        user.certificates = certificates || user.certificates; // added
-        user.experiences = experiences || user.experiences; // added
-        user.languages = languages || user.languages; // added
+        user.certificates = certificates || user.certificates;
+        user.experiences = experiences || user.experiences;
+        user.languages = languages || user.languages;
 
         await user.save();
         res.status(200).json({ message: "User updated successfully", user });
@@ -264,7 +264,19 @@ export const updateUserProfile = async (req, res, next) => {
         if (req.body.education !== undefined) updateData.education = req.body.education;
         if (req.body.certificates !== undefined) updateData.certificates = req.body.certificates;
         if (req.body.languages !== undefined) updateData.languages = req.body.languages;
-        if (req.body.experiences !== undefined) updateData.experiences = req.body.experiences;
+        if (req.body.experiences !== undefined) {
+            const exp = req.body.experiences;
+            
+            // Check if the experiences field is an array and not empty
+            if (Array.isArray(exp) && exp.length > 0) {
+                updateData.experiences = exp;
+            } else {
+                console.error("Invalid experiences array data:", exp);
+            }
+        }
+        
+        
+        
         if (req.body.posts !== undefined) updateData.posts = req.body.posts;
 
         console.log("Updating with data:", updateData); // Debugging log
@@ -361,38 +373,38 @@ export const getCurrentUser = async (req, res) => {
         console.error("Error during getCurrentUser:", error);  // Log the error
         res.status(500).json({ message: "Server error", error: error.message });
     }
-    
+
 };
 
 
 // Controller to get users the current user has chatted with
 export const getUsersWithChats = async (req, res) => {
     try {
-      const currentUserId = req.user._id;  // The current user's ID from the JWT token
-  
-      // Find all messages where the current user is either the sender or receiver
-      const messages = await Message.find({
-        $or: [
-          { senderId: currentUserId },
-          { receiverId: currentUserId }
-        ]
-      });
-  
-      // Extract unique user IDs (excluding the current user)
-      const userIds = [
-        ...new Set(
-          messages.map(msg => 
-            msg.senderId.toString() === currentUserId.toString() ? msg.receiverId : msg.senderId
-          )
-        )
-      ];
-  
-      // Populate user details (use User model to get user data)
-      const users = await User.find({ _id: { $in: userIds } });
-  
-      res.status(200).json(users);  // Send back the list of users with whom the current user has chatted
+        const currentUserId = req.user._id;  // The current user's ID from the JWT token
+
+        // Find all messages where the current user is either the sender or receiver
+        const messages = await Message.find({
+            $or: [
+                { senderId: currentUserId },
+                { receiverId: currentUserId }
+            ]
+        });
+
+        // Extract unique user IDs (excluding the current user)
+        const userIds = [
+            ...new Set(
+                messages.map(msg =>
+                    msg.senderId.toString() === currentUserId.toString() ? msg.receiverId : msg.senderId
+                )
+            )
+        ];
+
+        // Populate user details (use User model to get user data)
+        const users = await User.find({ _id: { $in: userIds } });
+
+        res.status(200).json(users);  // Send back the list of users with whom the current user has chatted
     } catch (err) {
-      console.error("Error fetching users with chats:", err);
-      res.status(500).json({ message: "Error fetching users with chats" });
+        console.error("Error fetching users with chats:", err);
+        res.status(500).json({ message: "Error fetching users with chats" });
     }
-  };
+};

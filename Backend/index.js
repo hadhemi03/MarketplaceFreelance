@@ -8,6 +8,7 @@ import commentRoute from "./routes/comment.route.js";
 import messageRoute from "./routes/message.route.js";
 import chatRoute from "./routes/chat.route.js";
 import offerRoute from "./routes/offer.route.js";
+import ratingRoute from "./routes/rating.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import http from "http";
@@ -54,6 +55,7 @@ app.use("/api/comments", commentRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/chats", chatRoute);
 app.use("/api/offers", offerRoute);
+app.use("/api/ratings", ratingRoute);
 app.use("/api/users", userRoute);
 
 // Socket.io connections

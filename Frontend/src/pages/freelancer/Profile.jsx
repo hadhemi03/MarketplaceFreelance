@@ -4,8 +4,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { useParams } from 'react-router';
 
 const Profile = () => {
+    const { id } = useParams();
     const [user, setUser] = useState({});
     const [editMode, setEditMode] = useState(false);
     const [formData, setFormData] = useState({
@@ -19,17 +22,32 @@ const Profile = () => {
         experiences: '',
         languages: ''
     });
+    const [averageRating, setAverageRating] = useState(0);
+    const [rating, setRating] = useState(0);
 
     // Fetch current user data
     useEffect(() => {
-        const fetchCurrentUser = async () => {
+        const fetchProfile = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const res = await axios.get("http://localhost:5000/api/users/get-current-user", {
-                    headers: { Authorization: `Bearer ${token}` },
-                    withCredentials: true,
-                });
-                setUser(res.data);
+                let res;
+                const token = localStorage.getItem("token");  // Get token from localStorage
+                
+                if (id) {
+                    // Fetch freelancer data
+                    res = await axios.get(`http://localhost:5000/api/users/get-freelancerByid/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` },  // Add the token in the headers
+                        withCredentials: true
+                    });
+                    setUser(res.data.freelancer);
+                } else {
+                    // Fetch current user data
+                    res = await axios.get("http://localhost:5000/api/users/get-current-user", {
+                        headers: { Authorization: `Bearer ${token}` },  // Add the token in the headers
+                        withCredentials: true
+                    });
+                    setUser(res.data);
+                }
+        
                 setFormData({
                     username: res.data.username || '',
                     email: res.data.email || '',
@@ -42,13 +60,61 @@ const Profile = () => {
                     languages: res.data.languages.join(", ") || ''
                 });
             } catch (err) {
-                console.error(err);
+                console.error("Error fetching profile:", err);
             }
         };
-        fetchCurrentUser();
-    }, []);
+        
+        fetchProfile();
+    }, [id]); // Re-run when `id` changes
+    
+    useEffect(() => {
+        const fetchRating = async () => {
+            try {
+                if (user._id) {
+                    const token = localStorage.getItem("token");
+                    const res = await axios.get(`http://localhost:5000/api/ratings/avg/${user._id}`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                        withCredentials: true,
+                    });
+                    const avgRating = res.data.averageRating || 0;
+                    setAverageRating(avgRating);
+                    // Save average rating in localStorage
+                    localStorage.setItem('averageRating', avgRating);
+                }
+            } catch (err) {
+                console.error("Error fetching average rating:", err);
+            }
+        };
+        if (user._id) {
+            fetchRating();
+        }
+    }, [user._id]); // Only refetch if user._id changes
+    
+    useEffect(() => {
+        const savedRatings = JSON.parse(localStorage.getItem('ratings')) || {};
+        if (user._id && savedRatings[user._id]) {
+            setRating(Number(savedRatings[user._id]));
+        }
+    }, [user._id]);
+    
+    
+    const renderStars = (rating) => {
+        const fullStars = Math.floor(rating);
+        const halfStar = rating % 1 >= 0.5;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        return (
+            <>
+                {[...Array(fullStars)].map((_, i) => (
+                    <i key={`full-${i}`} className="fas fa-star text-warning"></i>
+                ))}
+                {halfStar && <i className="fas fa-star-half-alt text-warning"></i>}
+                {[...Array(emptyStars)].map((_, i) => (
+                    <i key={`empty-${i}`} className="far fa-star text-warning"></i>
+                ))}
+            </>
+        );
+    };
 
-    // Handle input change
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({
@@ -57,35 +123,109 @@ const Profile = () => {
         });
     };
 
-    // Handle form submit for updating user profile
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            await axios.put(`http://localhost:5000/api/users/update-user/${user._id}`, formData, {
+    
+            const updatedFormData = {
+                ...formData,
+                skills: formData.skills.split(",").map(skill => skill.trim()),
+                certificates: formData.certificates.split(",").map(cert => cert.trim()),
+                experiences: formData.experiences.split(",").map(exp => exp.trim()),
+                languages: formData.languages.split(",").map(lang => lang.trim())
+            };
+    
+            const res = await axios.put("http://localhost:5000/api/users/update-userProfile", updatedFormData, {
                 headers: { Authorization: `Bearer ${token}` },
                 withCredentials: true,
             });
-            setEditMode(false); // Switch back to view mode after submission
-            setUser({ ...user, ...formData }); // Update user state with the new form data
+    
+            setUser(res.data);
+            setEditMode(false);
+    
+            setFormData({
+                username: res.data.username,
+                email: res.data.email,
+                country: res.data.country,
+                desc: res.data.desc,
+                occupation: res.data.occupation,
+                skills: res.data.skills.join(", "),
+                certificates: res.data.certificates.join(", "),
+                experiences: res.data.experiences.join(", "),
+                languages: res.data.languages.join(", ")
+            });
+    
         } catch (err) {
             console.error("Error updating user:", err);
         }
     };
 
+    const handleRatingSubmit = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await axios.post(
+                `http://localhost:5000/api/ratings/rate/${user._id}`,
+                { stars: rating },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                    withCredentials: true,
+                }
+            );
+    
+            alert("Rating submitted successfully!");
+    
+            const updatedRatings = JSON.parse(localStorage.getItem('ratings')) || {};
+            const updatedAverageRatings = JSON.parse(localStorage.getItem('averageRatings')) || {};
+    
+            updatedRatings[user._id] = rating;
+            updatedAverageRatings[user._id] = res.data.averageStars;
+    
+            localStorage.setItem('ratings', JSON.stringify(updatedRatings));
+            localStorage.setItem('averageRatings', JSON.stringify(updatedAverageRatings));
+    
+            setAverageRating(res.data.averageStars);
+    
+        } catch (err) {
+            console.error("Error submitting rating:", err);
+            alert("There was an issue submitting your rating.");
+        }
+    };
+    
+    
+
+    useEffect(() => {
+        const savedAverageRatings = JSON.parse(localStorage.getItem('averageRatings')) || {};
+        if (user._id && savedAverageRatings[user._id]) {
+            setAverageRating(Number(savedAverageRatings[user._id]));
+        }
+    }, [user._id]);
+    
+    
+
+    const handleRatingChange = (newRating) => {
+        setRating(newRating);
+    };
+    
     return (
         <section className="section about-section gray-bg" id="about">
             <div className="container">
+                {console.log("Rendering the Edit button")}
+
                 {/* Edit Button */}
-                <div className="d-flex justify-content-end">
+                <div className="button-container">
                     <button
                         className="btn btn-light"
-                        onClick={() => setEditMode(!editMode)}
+                        onClick={() => {
+                            setEditMode(!editMode);
+                            console.log("Edit Mode Toggled:", !editMode);
+                        }}
                         title="Edit Profile"
                     >
-                        <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />
+                        <FontAwesomeIcon icon={faPencilAlt} />
                     </button>
                 </div>
+
 
                 {/* Profile Content */}
                 <div className="row align-items-center flex-row-reverse">
@@ -197,6 +337,26 @@ const Profile = () => {
                                 <>
                                     <h3 className="dark-color">{user.username}</h3>
                                     <h6 className="theme-color lead">{user.occupation}</h6>
+                                    <div className="mb-3">
+                                        {renderStars(rating)}
+                                        <span className="ms-2 text-muted">({rating.toFixed(1)} / 5)</span>
+                                    </div>
+                                    {/* Rating Section */}
+                                    <div className="rating-section">
+                                        <h5>Rate this Freelancer</h5>
+                                        <div className="stars">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <i
+                                                    key={star}
+                                                    className={`fa-star ${star <= rating ? 'fas' : 'far'}`}
+                                                    onClick={() => handleRatingChange(star)}
+                                                />
+                                            ))}
+                                        </div>
+                                        <button onClick={handleRatingSubmit} className="btn btn-primary">
+                                            Submit Rating
+                                        </button>
+                                    </div>
                                     <p>{user.desc}</p>
                                     <div className="row about-list">
                                         <div className="col-md-6">
@@ -254,34 +414,7 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-                <div className="counter">
-                    <div className="row">
-                        <div className="col-6 col-lg-3">
-                            <div className="count-data text-center">
-                                <h6 className="count h2" data-to="500" data-speed="500">500</h6>
-                                <p className="m-0px font-w-600">Happy Clients</p>
-                            </div>
-                        </div>
-                        <div className="col-6 col-lg-3">
-                            <div className="count-data text-center">
-                                <h6 className="count h2" data-to="150" data-speed="150">150</h6>
-                                <p className="m-0px font-w-600">Project Completed</p>
-                            </div>
-                        </div>
-                        <div className="col-6 col-lg-3">
-                            <div className="count-data text-center">
-                                <h6 className="count h2" data-to="850" data-speed="850">850</h6>
-                                <p className="m-0px font-w-600">Photo Capture</p>
-                            </div>
-                        </div>
-                        <div className="col-6 col-lg-3">
-                            <div className="count-data text-center">
-                                <h6 className="count h2" data-to="190" data-speed="190">190</h6>
-                                <p className="m-0px font-w-600">Telephonic Talk</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </section>
     );

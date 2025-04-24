@@ -16,13 +16,14 @@ import {
 
 const AdminComments = () => {
   const [comments, setComments] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [newComment, setNewComment] = useState({ content: '', projectId: '' });
+  const [newComment, setNewComment] = useState({ text: '', projectId: '' });
 
   const token = localStorage.getItem("token");
 
@@ -42,14 +43,28 @@ const AdminComments = () => {
     }
   };
 
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/projects/view-projects", {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+      setProjects(res.data.projects || []);
+    } catch (err) {
+      console.error("Error fetching projects:", err);
+    }
+  };
+
+
   useEffect(() => {
     fetchComments();
+    fetchProjects();
   }, []);
 
   // Handle adding a comment
   const handleAddComment = async () => {
     try {
-      await axios.post("http://localhost:5000/api/comments/add-comment", newComment, {
+      await axios.post(`http://localhost:5000/api/comments/add-comment/${newComment.projectId}`, newComment, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
@@ -150,15 +165,28 @@ const AdminComments = () => {
             fullWidth
             margin="dense"
             value={newComment.content}
-            onChange={(e) => setNewComment({ ...newComment, content: e.target.value })}
+            onChange={(e) => setNewComment({ ...newComment, text: e.target.value })}
           />
           <TextField
-            label="Project ID"
+            select
+            label="Select Project"
             fullWidth
             margin="dense"
+            SelectProps={{ native: true }}
             value={newComment.projectId}
             onChange={(e) => setNewComment({ ...newComment, projectId: e.target.value })}
-          />
+          >
+            <option value="">-- Select a project --</option>
+            {Array.isArray(projects) && projects.length > 0 ? (
+              projects.map((project) => (
+                <option key={project._id} value={project._id}>
+                  {project.projectName}
+                </option>
+              ))
+            ) : (
+              <option disabled>No projects found</option>
+            )}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setAddDialogOpen(false)}>Cancel</Button>

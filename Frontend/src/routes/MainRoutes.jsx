@@ -211,6 +211,8 @@ const MainRoutes = {
         { path: 'messages/:userId', element: <Messages /> },
         { path: 'make-deal/:projectId', element: <MakeDeal /> },
         { path: 'my-calendar/:projectId', element: <CalendarPage /> },
+        { path: 'freelancers/my-profile/:id', element: <Profile /> },
+
 
 
 

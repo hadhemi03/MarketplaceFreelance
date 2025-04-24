@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import FreelancerModal from "./FreelancerModal";
-import { Plus } from "react-bootstrap-icons"
 import '../pages/messages/ChatPage.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -25,13 +23,7 @@ const Sidebar = ({ users }) => {
             <div className="bg-white">
                 {/* 🔹 Top section with title and Plus icon */}
                 <div className="d-flex justify-content-between align-items-center p-3 border-bottom bg-light">
-                    <h6 className="mb-0">Chats</h6>
-                    <Plus
-                        size={20}
-                        role="button"
-                        className="text-primary"
-                        onClick={() => setShowModal(true)}
-                    />
+                    <h6 className="mb-0">Chats</h6>  
                 </div>
 
                 {/* 🔹 Chat user list */}
@@ -60,10 +52,6 @@ const Sidebar = ({ users }) => {
                     )}
                 </div>
 
-                {/* 🔹 Modal */}
-                {showModal && (
-                    <FreelancerModal onClose={() => setShowModal(false)} />
-                )}
             </div>
         </div>
     );
