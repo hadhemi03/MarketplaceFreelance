@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import {
   Grid, Typography, Card, CardContent, Avatar, Box, Stack, Chip,
-  TextField, MenuItem
+  TextField, MenuItem, IconButton
 } from "@mui/material";
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate for programmatic navigation
 import Search from "layout/Dashboard/Header/HeaderContent/Search";
+import MessageIcon from "@mui/icons-material/Message";
 
 const Freelancers = () => {
   const [freelancers, setFreelancers] = useState([]);
   const [searchName, setSearchName] = useState("");
   const [searchSkill, setSearchSkill] = useState("");
   const [searchCountry, setSearchCountry] = useState("");
+  const navigate = useNavigate(); // Hook to navigate programmatically
 
   useEffect(() => {
     const fetchFreelancers = async () => {
@@ -93,6 +96,7 @@ const Freelancers = () => {
 
           return (
             <Grid item xs={12} sm={6} md={4} key={freelancer._id}>
+              {/* Card with Link to freelancer's profile */}
               <Card
                 sx={{
                   height: "100%",
@@ -102,8 +106,9 @@ const Freelancers = () => {
                   borderRadius: 3,
                   boxShadow: 3,
                   transition: "transform 0.2s ease-in-out",
-                  "&:hover": { transform: "scale(1.03)" },
+                  "&:hover": { transform: "scale(1.03)", cursor: "pointer" },
                 }}
+                onClick={() => navigate(`/client/freelancers/my-profile/${freelancer._id}`)} // ✅ navigate to profile
               >
                 {/* Avatar + Name + Country */}
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -149,7 +154,20 @@ const Freelancers = () => {
                     ))}
                   </Stack>
                 )}
+
+                {/* Message Icon Button */}
+                <IconButton
+                  color="primary"
+                  sx={{ alignSelf: "flex-end" }}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevents the Link from being triggered
+                    navigate(`/client/messages/${freelancer._id}`); // Navigate to chat page
+                  }}
+                >
+                  <MessageIcon />
+                </IconButton>
               </Card>
+
             </Grid>
           );
         })}

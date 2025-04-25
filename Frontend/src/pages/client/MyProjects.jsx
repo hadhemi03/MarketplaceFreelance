@@ -14,6 +14,7 @@ import {
   DialogTitle
 } from '@mui/material';
 import { useNavigate } from 'react-router';
+import EventIcon from '@mui/icons-material/Event'; // Calendar Icon
 
 const MyProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -74,20 +75,46 @@ const MyProjects = () => {
     setProjectToDelete(null);
   };
 
+  // ✅ New navigation function for Make a Deal page
+  const navigateToMakeDealPage = (projectId, freelancerId) => {
+    navigate(`/client/make-deal/${projectId}`, {
+      state: { freelancerId },
+    });
+  };
+
+  // ✅ Navigate to Shared Calendar page for the project
+  const navigateToSharedCalendar = (projectId) => {
+    navigate(`/client/my-calendar/${projectId}`);
+  };
+
   const columns = [
     { id: 'projectName', label: 'Project Name' },
     { id: 'category', label: 'Category' },
     {
-      id: 'status',
-      label: 'Status',
-      format: (value) => <StatusIndicator status={value} />,
+      id: 'offerStatus',
+      label: 'Offer',
+      format: (value, row) => (
+        row.status === 'In Progress' ? 'Offer Accepted' : 'Pending'
+      )
+    },
+    {
+      id: 'freelancer',
+      label: 'Assigned To',
+      format: (value, row) =>
+        row.freelancerId && row.freelancerId.username ? (
+          <Typography>{row.freelancerId.username}</Typography>
+        ) : (
+          <Typography fontStyle="italic" color="text.secondary">
+            Not Assigned
+          </Typography>
+        ),
     },
     {
       id: 'price',
       label: 'Price',
       align: 'right',
       format: (value) => (
-        <NumericFormat value={value} displayType="text" thousandSeparator suffix="DT" />
+        <NumericFormat value={value} displayType="text" thousandSeparator suffix=" DT" />
       ),
     },
     {
@@ -115,6 +142,32 @@ const MyProjects = () => {
           >
             Delete
           </Button>
+
+          {/* ✅ Navigate to Make Deal page if status is "Waiting" */}
+          {row.status === "Waiting" && (
+            <Button
+              variant="contained"
+              size="small"
+              color="success"
+              onClick={() => navigateToMakeDealPage(row._id, row.freelancerId?._id)}
+            >
+              Make a Deal
+            </Button>
+          )}
+
+          {/* ✅ Only show Calendar button when the deal has been made (status is "In Progress") */}
+          {row.status === "In Progress" && (
+            <Button
+              variant="outlined"
+              size="small"
+              color="primary"
+              onClick={() => navigateToSharedCalendar(row._id)}
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
+              <EventIcon sx={{ marginRight: '4px' }} />
+              Calendar
+            </Button>
+          )}
         </Box>
       ),
     },

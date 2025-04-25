@@ -19,7 +19,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-// Create a new project (Client only)
 export const createProject = async (req, res, next) => {
     try {
         console.log("User from JWT:", req.user);
@@ -80,7 +79,6 @@ export const uploadProjectImage = upload.single("image");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Update an existing project (Client only)
 // delete the old img from uploads and replace it with the new image 
 export const updateProject = async (req, res, next) => {
     const { projectId } = req.params;
@@ -166,9 +164,9 @@ export const deleteProject = async (req, res, next) => {
         // Ensure only the client who created the project can delete it
         console.log("Checking ownership: project.clientId =", project.clientId, "req.user._id =", req.user._id);
         if (
-            req.user.role !== 'admin' && 
+            req.user.role !== 'admin' &&
             project.clientId.toString() !== req.user._id.toString()
-          ) {
+        ) {
             console.log("Unauthorized user:", req.user._id);
             return next(createError(403, "You are not authorized to delete this project."));
         }
@@ -214,7 +212,7 @@ export const getAllProjects = async (req, res, next) => {
                 projectName: { $regex: search, $options: "i" }
             });
         }
-        
+
         if (skill) {
             conditions.push({
                 skillsRequired: { $elemMatch: { $regex: skill, $options: "i" } }
@@ -273,6 +271,7 @@ export const getProjectById = async (req, res) => {
             return res.status(404).json({ message: "Project not found" });
         }
 
+
         res.status(200).json(project);  // get project 
     } catch (err) {
         console.error("Error fetching project:", err);
@@ -285,7 +284,7 @@ export const getProjectById = async (req, res) => {
 // Get projects by client (Client only can see their own projects)
 export const getClientProjects = async (req, res, next) => {
     try {
-        const projects = await Project.find({ clientId: req.user._id });
+        const projects = await Project.find({ clientId: req.user._id }).populate("freelancerId", "username profileImage");
         res.status(200).json({ projects });
     } catch (err) {
         next(createError(500, "Server Error, could not fetch client projects."));
@@ -304,43 +303,217 @@ export const getCategories = async (req, res, next) => {
 };
 
 // client confirms that a freelancer is assigned to a project
-export const makeDeal = async (req, res) => {
+export const assignFreelancer = async (req, res) => {
     try {
-      const { projectId, freelancerId } = req.body;
-  
-      const project = await Project.findById(projectId);
-      if (!project) return res.status(404).json({ message: "Project not found" });
-  
-      if (project.freelancerId) {
-        return res.status(400).json({ message: "This project already has a freelancer." });
-      }
-  
-      project.freelancerId = freelancerId;
-      project.status = "In Progress";
-  
-      await project.save();
-  
-      res.status(200).json({ message: "Deal confirmed", project });
+        const { projectId } = req.params;
+        const { freelancerId } = req.body;
+
+        const project = await Project.findById(projectId);
+        if (!project) return res.status(404).json({ message: "Project not found" });
+
+        if (project.freelancerId) {
+            return res.status(400).json({ message: "This project already has a freelancer." });
+        }
+
+        project.freelancerId = freelancerId;
+        project.status = "In Progress";
+
+        await project.save();
+
+        res.status(200).json({ message: "Deal confirmed", project });
     } catch (err) {
-      res.status(500).json({ message: "Server error", error: err.message });
+        res.status(500).json({ message: "Server error", error: err.message });
+    }
+};
+
+// Mark as completed
+export const completeProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const project = await Project.findById(projectId);
+        if (!project) return res.status(404).json({ message: "Project not found" });
+
+        project.status = "Completed";
+        await project.save();
+
+        res.status(200).json({ message: "Project marked as completed", project });
+    } catch (err) {
+        res.status(500).json({ message: "Server error", err });
     }
 };
 
 
-// show the freelancer all the projects they are currently working on
-// My projects freelancer
+
+// Get all projects assigned to the logged-in freelancer
 export const getFreelancerProjects = async (req, res) => {
     try {
-      const freelancerId = req.user.id;
-  
-      const projects = await Project.find({ freelancerId });
-  
-      res.status(200).json({ projects });
+        const freelancerId = req.user._id;
+
+        const projects = await Project.find({
+            freelancerId,
+            status: { $in: ["In Progress", "Completed"] }
+        })
+            .populate('clientId', 'username img')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(projects);
     } catch (err) {
-      res.status(500).json({ message: "Error fetching freelancer projects", error: err.message });
+        console.error("Error in getFreelancerProjects:", err);
+        res.status(500).json({ message: "Server error" });
     }
-  };
-  
+};
+
+// shared calendar
+export const addTaskToCalendar = async (req, res) => {
+    const { title, description, date } = req.body;
+    const { projectId } = req.params;
+    const userId = req.user._id;
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+
+    // Only client or freelancer can add tasks
+    if (![project.clientId.toString(), project.freelancerId.toString()].includes(userId)) {
+        return res.status(403).json({ msg: 'Not authorized' });
+    }
+
+    const newTask = {
+        title,
+        description,
+        date: new Date(date), // Ensure date is valid
+        completed: false,
+        createdBy: userId,
+    };
+
+    project.sharedCalendar.push(newTask);
+    await project.save();
+
+    res.status(201).json(project.sharedCalendar); // Return updated tasks
+};
+
+
+export const taskCompleted = async (req, res) => {
+    const { projectId, taskId } = req.params;
+    const userId = req.user._id;
+
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+
+    const task = project.sharedCalendar.id(taskId);
+    if (!task) return res.status(404).json({ msg: 'Task not found' });
+
+    if (![project.clientId.toString(), project.freelancerId.toString()].includes(userId)) {
+        return res.status(403).json({ msg: 'Not authorized' });
+    }
+
+    task.completed = true;
+    await project.save();
+
+    res.status(200).json(task);
+};
+
+export const fetchTasksForProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+
+        // Log to verify projectId and project fetching
+        console.log('Fetching project with ID:', projectId);
+
+        const project = await Project.findById(projectId);
+        if (!project) {
+            return res.status(404).json({ msg: 'Project not found' });
+        }
+
+        // Log the sharedCalendar content
+        console.log('Project sharedCalendar:', project.sharedCalendar);
+
+        // Only return the sharedCalendar tasks
+        const tasks = project.sharedCalendar || [];
+
+        // Log the tasks being returned
+        console.log('Fetched tasks:', tasks);
+
+        res.status(200).json(tasks);
+    } catch (error) {
+        console.error('Error fetching tasks for project:', error);
+        return res.status(500).json({ msg: 'Server error while fetching tasks.' });
+    }
+};
+
+
+export const deleteTaskFromCalendar = async (req, res) => {
+    const { projectId, taskId } = req.params;
+
+    // Check if the user is authenticated
+    if (!req.user || !req.user._id) {
+        return res.status(401).json({ message: 'Unauthorized: Missing user info' });
+    }
+
+    const userId = req.user._id;
+
+    // Find the project
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ msg: 'Project not found' });
+
+    // Find the task in the sharedCalendar array
+    const taskIndex = project.sharedCalendar.findIndex(task => task._id.toString() === taskId);
+
+    if (taskIndex === -1) {
+        return res.status(404).json({ message: 'Task not found' });
+    }
+
+    // Get the task using the index
+    const task = project.sharedCalendar[taskIndex];
+
+    // Log the task for debugging purposes
+    console.log('Task found:', task);
+
+    // Check if `createdBy` exists on the task object
+    if (!task.createdBy) {
+        return res.status(400).json({ message: 'Task does not have a creator' });
+    }
+
+    // Check if the task was created by the current user
+    if (task.createdBy.toString() !== userId.toString()) {
+        return res.status(403).json({ message: 'Not authorized to delete this task' });
+    }
+
+    // Remove the task from the sharedCalendar array
+    project.sharedCalendar.splice(taskIndex, 1); // This removes the task from the array
+
+    // Save the project with the updated sharedCalendar
+    await project.save();
+
+    res.status(200).json({ msg: 'Task deleted successfully', tasks: project.sharedCalendar });
+};
+
+
+export const getAllFreelancerTasks = async (req, res) => {
+    try {
+        const freelancerId = req.user._id; // assuming JWT middleware adds this
+
+        // 1. Find all projects assigned to the freelancer
+        const projects = await Project.find({ freelancerId });
+
+        // 2. Flatten tasks with project name
+        const allTasks = projects.flatMap(project =>
+            project.sharedCalendar.map(task => ({
+                ...task._doc, // include all fields of the task
+                projectId: project._id,
+                projectTitle: project.projectName,
+            }))
+        );
+
+        res.status(200).json(allTasks);
+    } catch (error) {
+        console.error('Error fetching tasks for freelancer:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+
 
 
 

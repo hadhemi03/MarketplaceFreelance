@@ -1,4 +1,4 @@
-// assets
+/*// assets
 import { LoginOutlined, ProfileOutlined } from '@ant-design/icons';
 
 // icons
@@ -11,16 +11,16 @@ const icons = {
 
 const pages = {
   id: 'authentication',
-  title: 'Authentication',
+  title: 'Users',
   type: 'group',
   children: [
     {
-      id: 'login1',
-      title: 'Login',
+      id: 'crudclients',
+      title: 'Clients',
       type: 'item',
-      url: '/login',
+      url: '/crudclients',
       icon: icons.LoginOutlined,
-      target: true
+
     },
     {
       id: 'register1',
@@ -33,4 +33,4 @@ const pages = {
   ]
 };
 
-export default pages;
+export default pages;*/

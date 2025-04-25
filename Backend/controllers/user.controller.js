@@ -1,4 +1,5 @@
 import User from "../models/User.model.js";
+import Message from "../models/message.model.js";
 import { createError } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
@@ -32,10 +33,80 @@ export const createUser = async (req, res, next) => {
     }
 };
 
+export const addFreelancer = async (req, res, next) => {
+    const { username, email } = req.body;
+
+    if (!username || !email) {
+        return next(createError(400, "All fields are required."));
+    }
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return next(createError(400, "User already exists with this email."));
+        }
+
+        const newUser = new User({
+            username,
+            email,
+            password: 'default123',
+            country: 'unknown',
+            role: 'freelancer',
+        });
+
+        await newUser.save();
+
+        res.status(201).json({ message: "User created successfully", user: newUser });
+    } catch (err) {
+        next(createError(500, "Server Error, could not create user."));
+    }
+};
+
+export const addClient = async (req, res, next) => {
+    const { username, email } = req.body;
+
+    if (!username || !email) {
+        return next(createError(400, "All fields are required."));
+    }
+
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return next(createError(400, "User already exists with this email."));
+        }
+
+        const newUser = new User({
+            username,
+            email,
+            password: 'default123',
+            country: 'unknown',
+            role: "client",
+        });
+
+        await newUser.save();
+
+        res.status(201).json({ message: "User created successfully", user: newUser });
+    } catch (err) {
+        next(createError(500, "Server Error, could not create user."));
+    }
+};
+
+
 // Update user details (Admin only)
 export const updateUser = async (req, res, next) => {
     const { userId } = req.params;
-    const { username, email, country, role, desc, occupation, skills } = req.body;
+    const {
+        username,
+        email,
+        country,
+        role,
+        desc,
+        occupation,
+        skills,
+        certificates,
+        experiences,
+        languages
+    } = req.body;
 
     try {
         const user = await User.findById(userId);
@@ -50,6 +121,9 @@ export const updateUser = async (req, res, next) => {
         user.desc = desc || user.desc;
         user.occupation = occupation || user.occupation;
         user.skills = skills || user.skills;
+        user.certificates = certificates || user.certificates;
+        user.experiences = experiences || user.experiences;
+        user.languages = languages || user.languages;
 
         await user.save();
         res.status(200).json({ message: "User updated successfully", user });
@@ -57,6 +131,48 @@ export const updateUser = async (req, res, next) => {
         next(createError(500, "Server Error, could not update user."));
     }
 };
+
+export const updateFreelancer = async (req, res, next) => {
+    const { userId } = req.params;
+    const { username, email } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user || user.role !== 'freelancer') {
+            return next(createError(404, "Freelancer not found."));
+        }
+
+        user.username = username || user.username;
+        user.email = email || user.email;
+
+        await user.save();
+        res.status(200).json({ message: "Freelancer updated successfully", user });
+    } catch (err) {
+        next(createError(500, "Server Error, could not update freelancer."));
+    }
+};
+
+export const updateClient = async (req, res, next) => {
+    const { userId } = req.params;
+    const { username, email } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user || user.role !== 'client') {
+            return next(createError(404, "Client not found."));
+        }
+
+        user.username = username || user.username;
+        user.email = email || user.email;
+
+        await user.save();
+        res.status(200).json({ message: "Client updated successfully", user });
+    } catch (err) {
+        next(createError(500, "Server Error, could not update client."));
+    }
+};
+
+
 
 // Delete a user (Admin only)
 export const deleteUser = async (req, res, next) => {
@@ -101,6 +217,26 @@ export const getAllUsers = async (req, res, next) => {
     }
 };
 
+export const getAllClients = async (req, res, next) => {
+    const { name, country } = req.query;
+    const query = { role: "client" };
+
+    if (name) {
+        query.username = { $regex: name, $options: "i" };
+    }
+    if (country) {
+        query.country = { $regex: country, $options: "i" };
+    }
+
+    try {
+        const clients = await User.find(query).select("-password");
+        res.status(200).json({ clients });
+    } catch (err) {
+        next(createError(500, "Server Error, could not fetch clients."));
+    }
+};
+
+
 // Update user profile (he is the only one that can update his profile)
 export const updateUserProfile = async (req, res, next) => {
     console.log("Request User Object:", req.user); // Debugging log
@@ -128,7 +264,19 @@ export const updateUserProfile = async (req, res, next) => {
         if (req.body.education !== undefined) updateData.education = req.body.education;
         if (req.body.certificates !== undefined) updateData.certificates = req.body.certificates;
         if (req.body.languages !== undefined) updateData.languages = req.body.languages;
-        if (req.body.experiences !== undefined) updateData.experiences = req.body.experiences;
+        if (req.body.experiences !== undefined) {
+            const exp = req.body.experiences;
+            
+            // Check if the experiences field is an array and not empty
+            if (Array.isArray(exp) && exp.length > 0) {
+                updateData.experiences = exp;
+            } else {
+                console.error("Invalid experiences array data:", exp);
+            }
+        }
+        
+        
+        
         if (req.body.posts !== undefined) updateData.posts = req.body.posts;
 
         console.log("Updating with data:", updateData); // Debugging log
@@ -197,6 +345,8 @@ export const getAllFreelancers = async (req, res, next) => {
     }
 };
 
+
+
 export const getCurrentUser = async (req, res) => {
     try {
         const token = req.cookies.access_token;
@@ -222,5 +372,39 @@ export const getCurrentUser = async (req, res) => {
     } catch (error) {
         console.error("Error during getCurrentUser:", error);  // Log the error
         res.status(500).json({ message: "Server error", error: error.message });
+    }
+
+};
+
+
+// Controller to get users the current user has chatted with
+export const getUsersWithChats = async (req, res) => {
+    try {
+        const currentUserId = req.user._id;  // The current user's ID from the JWT token
+
+        // Find all messages where the current user is either the sender or receiver
+        const messages = await Message.find({
+            $or: [
+                { senderId: currentUserId },
+                { receiverId: currentUserId }
+            ]
+        });
+
+        // Extract unique user IDs (excluding the current user)
+        const userIds = [
+            ...new Set(
+                messages.map(msg =>
+                    msg.senderId.toString() === currentUserId.toString() ? msg.receiverId : msg.senderId
+                )
+            )
+        ];
+
+        // Populate user details (use User model to get user data)
+        const users = await User.find({ _id: { $in: userIds } });
+
+        res.status(200).json(users);  // Send back the list of users with whom the current user has chatted
+    } catch (err) {
+        console.error("Error fetching users with chats:", err);
+        res.status(500).json({ message: "Error fetching users with chats" });
     }
 };

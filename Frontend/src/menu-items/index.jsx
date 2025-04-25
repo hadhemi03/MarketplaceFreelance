@@ -17,11 +17,7 @@ import clientPayment from './payments';*/
 export default menuItems;*/
 
 /*const getMenuItems = (role) => {
-  if (role === 'client') {
-    return {
-      items: [ clientdashboard, clientExplore, clientActivity, clientPayment]
-    };
-  } else {
+  if (role === 'admin') {
     return {
       items: [dashboard, pages, utilities, support]
     };

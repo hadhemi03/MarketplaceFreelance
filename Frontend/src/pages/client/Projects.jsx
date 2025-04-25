@@ -4,6 +4,8 @@ import {
   TextField, Button, Divider, Slider, FormControl, Select, MenuItem
 } from "@mui/material";
 import axios from "axios";
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 const categoryOptions = [
   "Graphics & Designs", "Digital Marketing", "Writing & Translation", "Video & Animation",
@@ -12,6 +14,7 @@ const categoryOptions = [
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [comments, setComments] = useState({});
   const [newComment, setNewComment] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +28,24 @@ const Projects = () => {
   const toggleComments = (id) => {
     setShowComments(prev => ({ ...prev, [id]: !prev[id] }));
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/users/get-current-user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+        
+        setCurrentUser(res.data); // e.g., { _id: '...', name: '...' }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -46,7 +67,7 @@ const Projects = () => {
       try {
         const response = await axios.get("http://localhost:5000/api/projects/view-projects", {
           params: {
-            search: searchTerm,
+            search: searchName,
             minPrice: priceRange[0],
             maxPrice: priceRange[1],
             category: selectedCategory !== "" ? selectedCategory : undefined,
@@ -62,7 +83,7 @@ const Projects = () => {
     };
 
     fetchFilteredProjects();
-  }, [searchTerm, priceRange, selectedCategory, selectedSkills]);
+  }, [searchName, priceRange, selectedCategory, selectedSkills]);
 
   const handleCommentChange = (projectId, text) => {
     setNewComment((prev) => ({ ...prev, [projectId]: text }));
@@ -95,12 +116,32 @@ const Projects = () => {
 
       setComments((prev) => ({
         ...prev,
-        [projectId]: res.data, 
+        [projectId]: res.data,
       }));
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
   };
+
+  const handleDeleteComment = async (commentId, projectId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:5000/api/comments/delete-comment/${commentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+
+      setComments((prev) => ({
+        ...prev,
+        [projectId]: prev[projectId].filter(comment => comment._id !== commentId)
+      }));
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
 
   return (
     <Box sx={{ p: 3, display: 'flex', backgroundColor: '#f0f2f5' }}>
@@ -202,15 +243,6 @@ const Projects = () => {
                 '&:hover': { boxShadow: 6, backgroundColor: "#f9f9f9" }
               }}
             >
-              {project.image && (
-                <CardMedia
-                  component="img"
-                  height="300"
-                  image={`http://localhost:5000${project.image}`}
-                  alt={project.projectName}
-                  sx={{ borderRadius: 2, mb: 2 }}
-                />
-              )}
 
               <CardContent>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>{project.projectName}</Typography>
@@ -253,29 +285,55 @@ const Projects = () => {
 
                   <Stack spacing={1} mt={1}>
                     {comments[project._id]?.map((comment) => (
-                      <Stack key={comment._id} direction="row" spacing={2}>
-                        <Box sx={{
-                          bgcolor: "#1976d2",
-                          color: "white",
-                          width: 36,
-                          height: 36,
-                          borderRadius: "50%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                        }}>
-                          {comment.userName?.charAt(0).toUpperCase()}
-                        </Box>
-                        <Box sx={{ bgcolor: "#f5f5f5", p: 2, borderRadius: 2, flexGrow: 1 }}>
-                          <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(comment.createdAt).toLocaleString()}
-                          </Typography>
-                          <Typography variant="body2">{comment.text}</Typography>
-                        </Box>
-                      </Stack>
+                      <Stack key={comment._id} direction="row" spacing={2} alignItems="flex-start">
+                      <Box sx={{
+                        bgcolor: "#1976d2",
+                        color: "white",
+                        width: 36,
+                        height: 36,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}>
+                        {comment.userName?.charAt(0).toUpperCase()}
+                      </Box>
+                    
+                      <Box sx={{
+                        bgcolor: "#f5f5f5",
+                        p: 2,
+                        borderRadius: 2,
+                        flexGrow: 1,
+                        position: "relative",
+                      }}>
+                        <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {new Date(comment.createdAt).toLocaleString()}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          {comment.text}
+                        </Typography>
+                    
+                        {currentUser?._id === comment.userId && (
+                          <DeleteIcon
+                            onClick={() => handleDeleteComment(comment._id, project._id)}
+                            sx={{
+                              color: 'error.main',
+                              cursor: 'pointer',
+                              position: 'absolute',
+                              top: 8,
+                              right: 8,
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </Stack>
+                    
                     ))}
+
+
+
                   </Stack>
                 </Box>
 

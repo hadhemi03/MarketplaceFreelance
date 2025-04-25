@@ -155,13 +155,27 @@ const Payments = Loadable(lazy(() => import('pages/client/Payments')));
 const CreateProject = Loadable(lazy(() => import('pages/client/CreateProject')));
 const EditProject = Loadable(lazy(() => import('components/project/EditProject')));
 const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')));
-
+const MakeDeal = Loadable(lazy(() => import('pages/client/MakeDeal')));
 const Messages = Loadable(lazy(() => import('pages/messages/chatPage')));
 
 
 // Pages du freelancer
 const MyProjectsFreelancer = Loadable(lazy(() => import('pages/freelancer/MyProjects')));
-const Calendar = Loadable(lazy(() => import('pages/freelancer/MyCalendar')));
+const CalendarPage = Loadable(lazy(() => import('pages/freelancer/MyCalendar')));
+const FreelancerCalendar = Loadable(lazy(() => import('pages/freelancer/FreelancerCalendar')));
+const Profile = Loadable(lazy(() => import('pages/freelancer/Profile')));
+const Offers = Loadable(lazy(() => import('pages/freelancer/Offers')));
+
+
+// Pages d'Admin
+const CRUDClients = Loadable(lazy(() => import('pages/admin/Clients')));
+const CRUDFreelancers = Loadable(lazy(() => import('pages/admin/Freelancers')));
+const CRUDProjects = Loadable(lazy(() => import('pages/admin/Projects')));
+const CRUDComments = Loadable(lazy(() => import('pages/admin/Comments')));
+
+
+
+
 
 
 // ==============================|| MAIN ROUTING ||============================== //
@@ -194,6 +208,14 @@ const MainRoutes = {
         { path: 'freelancers', element: <Freelancers /> },
         { path: 'payments', element: <Payments /> },
         { path: 'messages', element: <Messages /> },
+        { path: 'messages/:userId', element: <Messages /> },
+        { path: 'make-deal/:projectId', element: <MakeDeal /> },
+        { path: 'my-calendar/:projectId', element: <CalendarPage /> },
+        { path: 'freelancers/my-profile/:id', element: <Profile /> },
+
+
+
+
 
       ]
     },
@@ -203,8 +225,14 @@ const MainRoutes = {
       children: [
         { path: 'projects', element: <Projects /> },
         { path: 'my-projects', element: <MyProjectsFreelancer /> },
-        { path: 'my-calendar', element: <MyCalendar /> },
+        { path: 'my-calendar/:projectId', element: <CalendarPage /> },
+        { path: 'freelancer-calendar', element: <FreelancerCalendar /> },
         { path: 'messages', element: <Messages /> },
+        { path: 'messages/:userId', element: <Messages /> },
+        { path: 'my-profile', element: <Profile /> },
+        { path: 'my-offers', element: <Offers /> },
+
+
 
         
       ]
@@ -213,25 +241,34 @@ const MainRoutes = {
       path: 'dashboard',  // Admin dashboard route
       element: <DashboardLayout />,  // Main layout for admin routes
       children: [
-        { path: 'default', element: <DashboardDefault /> },  // Admin's default dashboard page
+        { path: 'default', element: <DashboardDefault /> }, 
+        {
+          path: 'sample-page',  // Sample page route
+          element: <SamplePage />
+        },
+        {
+          path: 'shadow',  // Shadow page route
+          element: <Shadow />
+        },
+        {
+          path: 'crudclients',  
+          element: <CRUDClients />
+        },
+        {
+          path: 'crudfreelancers', 
+          element: <CRUDFreelancers />
+        },
+        {
+          path: 'crudprojects',  
+          element: <CRUDProjects />
+        },
+        {
+          path: 'crudcomments',  
+          element: <CRUDComments />
+        }
       ]
     },
-    {
-      path: 'color',  // Color page route
-      element: <Color />
-    },
-    {
-      path: 'typography',  // Typography page route
-      element: <Typography />
-    },
-    {
-      path: 'sample-page',  // Sample page route
-      element: <SamplePage />
-    },
-    {
-      path: 'shadow',  // Shadow page route
-      element: <Shadow />
-    }
+    
   ]
 };
 

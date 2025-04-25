@@ -66,7 +66,16 @@ const ProjectSchema = new mongoose.Schema(
         image: {
             type: String, // URL de l'image
             default: "",  // Optionnel si le client ne met pas d’image
-        }
+        }, 
+        sharedCalendar: [
+            {
+              title: String,
+              description: String,
+              date: Date,
+              createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+              completed: { type: Boolean, default: false },
+            }
+          ]
 
 
     },

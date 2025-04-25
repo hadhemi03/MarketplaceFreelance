@@ -10,12 +10,12 @@ const icons = {
 // ==============================|| MENU ITEMS - SAMPLE PAGE & DOCUMENTATION ||============================== //
 
 const support = {
-  id: 'support',
-  title: 'Support',
+  id: 'projects',
+  title: 'Projects',
   type: 'group',
   children: [
     {
-      id: 'sample-page',
+      id: 'Projects',
       title: 'Sample Page',
       type: 'item',
       url: '/sample-page',

@@ -15,6 +15,7 @@ import UserOutlined from '@ant-design/icons/UserOutlined';
 import WalletOutlined from '@ant-design/icons/WalletOutlined';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import { disconnectSocket } from 'utils/Socket';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
@@ -37,6 +38,8 @@ export default function ProfileTab() {
   // Handle logout
   const handleLogout = async () => {
     try {
+      disconnectSocket();
+
       // Clear the user data from localStorage
       localStorage.removeItem('currentUser');
       localStorage.removeItem('token');
@@ -55,6 +58,7 @@ export default function ProfileTab() {
       console.error('Logout failed:', error);
     }
   };
+
 
   const handleListItemClick = (index, path) => {
     setSelectedIndex(index);
@@ -77,18 +81,13 @@ export default function ProfileTab() {
         <ListItemText primary="View Profile" />
       </ListItemButton>
 */}
-      <ListItemButton selected={selectedIndex === 3} onClick={(event) => handleListItemClick(event, 3, 'apps/profiles/account/personal')}>
+      <ListItemButton selected={selectedIndex === 3} onClick={() => handleListItemClick(3, '/freelancer/my-profile')}>
         <ListItemIcon>
           <ProfileOutlined />
         </ListItemIcon>
-        <ListItemText primary="Social Profile" />
+        <ListItemText primary="Profile" />
       </ListItemButton>
-      <ListItemButton selected={selectedIndex === 4} onClick={(event) => handleListItemClick(event, 4, '/apps/invoice/details/1')}>
-        <ListItemIcon>
-          <WalletOutlined />
-        </ListItemIcon>
-        <ListItemText primary="Billing" />
-      </ListItemButton>
+
       <ListItemButton selected={selectedIndex === 2} onClick={handleLogout}>
         <ListItemIcon>
           <LogoutOutlined />
