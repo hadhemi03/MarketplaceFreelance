@@ -33,8 +33,12 @@ const Projects = () => {
     const fetchUser = async () => {
       try {
         const res = await axios.get("http://localhost:5000/api/users/get-current-user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           withCredentials: true,
         });
+        
         setCurrentUser(res.data); // e.g., { _id: '...', name: '...' }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -282,35 +286,52 @@ const Projects = () => {
                   <Stack spacing={1} mt={1}>
                     {comments[project._id]?.map((comment) => (
                       <Stack key={comment._id} direction="row" spacing={2} alignItems="flex-start">
-                        <Box sx={{
-                          bgcolor: "#1976d2",
-                          color: "white",
-                          width: 36,
-                          height: 36,
-                          borderRadius: "50%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: "bold",
-                        }}>
-                          {comment.userName?.charAt(0).toUpperCase()}
-                        </Box>
-
-                        <Box sx={{ bgcolor: "#f5f5f5", p: 2, borderRadius: 2, flexGrow: 1 }}>
-                          <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(comment.createdAt).toLocaleString()}
-                          </Typography>
-                          <Typography variant="body2" sx={{ mt: 1 }}>{comment.text}</Typography>
-                        </Box>
-
-                        {currentUser && comment.userId === currentUser._id && (
-                          <Button onClick={() => handleDeleteComment(comment._id, project._id)}>
-                            <DeleteIcon sx={{ color: "red" }} />
-                          </Button>
+                      <Box sx={{
+                        bgcolor: "#1976d2",
+                        color: "white",
+                        width: 36,
+                        height: 36,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                      }}>
+                        {comment.userName?.charAt(0).toUpperCase()}
+                      </Box>
+                    
+                      <Box sx={{
+                        bgcolor: "#f5f5f5",
+                        p: 2,
+                        borderRadius: 2,
+                        flexGrow: 1,
+                        position: "relative",
+                      }}>
+                        <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {new Date(comment.createdAt).toLocaleString()}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          {comment.text}
+                        </Typography>
+                    
+                        {currentUser?._id === comment.userId && (
+                          <DeleteIcon
+                            onClick={() => handleDeleteComment(comment._id, project._id)}
+                            sx={{
+                              color: 'error.main',
+                              cursor: 'pointer',
+                              position: 'absolute',
+                              top: 8,
+                              right: 8,
+                            }}
+                          />
                         )}
-                      </Stack>
+                      </Box>
+                    </Stack>
+                    
                     ))}
+
 
 
                   </Stack>

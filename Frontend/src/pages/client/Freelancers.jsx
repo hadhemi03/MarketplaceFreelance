@@ -168,7 +168,6 @@ const Freelancers = () => {
                 </IconButton>
               </Card>
 
-
             </Grid>
           );
         })}
