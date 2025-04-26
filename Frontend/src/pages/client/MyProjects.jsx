@@ -155,6 +155,18 @@ const MyProjects = () => {
             </Button>
           )}
 
+          {/* ✅ Add Pay Now button when deal is made and price is available */}
+        {row.status === "In Progress" && row.freelancerId && row.price && (
+          <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={() => navigate(`/client/payments/${row.freelancerId?._id}/${row._id}/${row.price}`)}
+          >
+            Pay Now
+          </Button>
+        )}
+
           {/* ✅ Only show Calendar button when the deal has been made (status is "In Progress") */}
           {row.status === "In Progress" && (
             <Button

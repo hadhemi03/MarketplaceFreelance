@@ -152,6 +152,8 @@ const Projects = Loadable(lazy(() => import('pages/client/Projects')));
 const MyProjects = Loadable(lazy(() => import('pages/client/MyProjects')));
 const Freelancers = Loadable(lazy(() => import('pages/client/Freelancers')));
 const Payments = Loadable(lazy(() => import('pages/client/Payments')));
+const MyPayments = Loadable(lazy(() => import('pages/client/MyPayments')));
+const PaymentSuccess = Loadable(lazy(() => import('pages/client/PaymentSucess')));
 const CreateProject = Loadable(lazy(() => import('pages/client/CreateProject')));
 const EditProject = Loadable(lazy(() => import('components/project/EditProject')));
 const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')));
@@ -206,7 +208,9 @@ const MainRoutes = {
         { path: 'edit-project/:projectId', element: <EditProject /> },
         { path: 'projectDetails/:projectId', element: <ProjectDetails /> },
         { path: 'freelancers', element: <Freelancers /> },
-        { path: 'payments', element: <Payments /> },
+        { path: 'my-payments', element: <MyPayments /> },
+        { path: 'payments/:freelancerId/:projectId/:price', element: <Payments /> },
+        { path: 'payments/success', element: <PaymentSuccess /> },
         { path: 'messages', element: <Messages /> },
         { path: 'messages/:userId', element: <Messages /> },
         { path: 'make-deal/:projectId', element: <MakeDeal /> },

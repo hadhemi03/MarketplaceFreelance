@@ -58,7 +58,7 @@ export const menuItems =
         { id: 'Freelancers', label: 'Freelancers', path: '/free/client/freelancers' },
         { id: 'ClientProjects', label: 'My Projects', path: '/free/client/my-projects' },
         { id: 'Messages', label: 'Messages', path: '/free/client/messages' },
-        { id: 'clientPayment', label: 'My Payments', path: '/free/client/payments' }
+        { id: 'clientPayment', label: 'My Payments', path: '/free/client/my-payments' }
       ]
     : role === 'freelancer'
     ? [
