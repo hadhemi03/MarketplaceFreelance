@@ -167,6 +167,8 @@ const CalendarPage = Loadable(lazy(() => import('pages/freelancer/MyCalendar')))
 const FreelancerCalendar = Loadable(lazy(() => import('pages/freelancer/FreelancerCalendar')));
 const Profile = Loadable(lazy(() => import('pages/freelancer/Profile')));
 const Offers = Loadable(lazy(() => import('pages/freelancer/Offers')));
+const FreelancerPayments = Loadable(lazy(() => import('pages/freelancer/MyPayments')));
+
 
 
 // Pages d'Admin
@@ -174,6 +176,8 @@ const CRUDClients = Loadable(lazy(() => import('pages/admin/Clients')));
 const CRUDFreelancers = Loadable(lazy(() => import('pages/admin/Freelancers')));
 const CRUDProjects = Loadable(lazy(() => import('pages/admin/Projects')));
 const CRUDComments = Loadable(lazy(() => import('pages/admin/Comments')));
+const ViewPayments = Loadable(lazy(() => import('pages/admin//Payments')));
+
 
 
 
@@ -235,10 +239,9 @@ const MainRoutes = {
         { path: 'messages/:userId', element: <Messages /> },
         { path: 'my-profile', element: <Profile /> },
         { path: 'my-offers', element: <Offers /> },
+        { path: 'my-payments-freelancer', element: <FreelancerPayments /> },
 
-
-
-        
+     
       ]
     },
     {
@@ -269,6 +272,10 @@ const MainRoutes = {
         {
           path: 'crudcomments',  
           element: <CRUDComments />
+        },
+        {
+          path: 'viewpayments',  
+          element: <ViewPayments />
         }
       ]
     },

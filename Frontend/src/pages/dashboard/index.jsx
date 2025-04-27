@@ -1,258 +1,209 @@
-// material-ui
-import Avatar from '@mui/material/Avatar';
-import AvatarGroup from '@mui/material/AvatarGroup';
-import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
-import List from '@mui/material/List';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import ListItemText from '@mui/material/ListItemText';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Bar, Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend } from 'chart.js';
 
-// project import
-import MainCard from 'components/MainCard';
-import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
-import MonthlyBarChart from './MonthlyBarChart';
-import ReportAreaChart from './ReportAreaChart';
-import UniqueVisitorCard from './UniqueVisitorCard';
-import SaleReportCard from './SaleReportCard';
-import OrdersTable from './OrdersTable';
+// Register necessary chart elements
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,  // For Pie chart
+  Title,
+  Tooltip,
+  Legend
+);
 
-// assets
-import GiftOutlined from '@ant-design/icons/GiftOutlined';
-import MessageOutlined from '@ant-design/icons/MessageOutlined';
-import SettingOutlined from '@ant-design/icons/SettingOutlined';
-import avatar1 from 'assets/images/users/avatar-1.png';
-import avatar2 from 'assets/images/users/avatar-2.png';
-import avatar3 from 'assets/images/users/avatar-3.png';
-import avatar4 from 'assets/images/users/avatar-4.png';
-import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
-import { useMediaQuery } from '@mui/system';
-import { useEffect } from 'react';
+const DashboardDefault = () => {
+  const [analytics, setAnalytics] = useState(null);
 
-// avatar style
-const avatarSX = {
-  width: 36,
-  height: 36,
-  fontSize: '1rem'
-};
-
-// action style
-const actionSX = {
-  mt: 0.75,
-  ml: 1,
-  top: 'auto',
-  right: 'auto',
-  alignSelf: 'flex-start',
-  transform: 'none'
-};
-
-// ==============================|| DASHBOARD - DEFAULT ||============================== //
-
-export default function DashboardDefault() {
-  const { menuMasterLoading } = useGetMenuMaster();
-  const downXL = useMediaQuery((theme) => theme.breakpoints.down('xl'));
-
+  // Fetch analytics data from the backend
   useEffect(() => {
-    handlerDrawerOpen(!downXL);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [downXL]);
+    const fetchAnalytics = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/dashboard/analytics', {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        setAnalytics(response.data);
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+      }
+    };
+    fetchAnalytics();
+  }, []);
 
-  if (menuMasterLoading) return <Loader />;
+  if (!analytics) {
+    return <div>Loading...</div>;
+  }
+
+  // Monthly Growth (Bar Chart)
+  const monthlyGrowthData = {
+    labels: analytics.monthlyGrowth.map((_, index) => `Month ${index + 1}`),
+    datasets: [
+      {
+        label: 'Monthly Payments (DT)',
+        data: analytics.monthlyGrowth,
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 2,
+        hoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
+        hoverBorderColor: 'rgba(75, 192, 192, 1)',
+      },
+    ],
+  };
+
+  // Projects by Status (Pie Chart)
+  const projectsStatusData = {
+    labels: ['Waiting', 'In Progress', 'Completed'],
+    datasets: [
+      {
+        data: [
+          analytics.projectsByStatus.Waiting,
+          analytics.projectsByStatus['In Progress'],
+          analytics.projectsByStatus.Completed,
+        ],
+        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+        hoverBackgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)'],
+        hoverBorderColor: 'rgba(0, 0, 0, 0.1)',
+      },
+    ],
+  };
+
   return (
-    <Grid container rowSpacing={4.5} columnSpacing={2.75}>
-      {/* row 1 */}
-      <Grid item xs={12} sx={{ mb: -2.25 }}>
-        <Typography variant="h5">Dashboard</Typography>
-      </Grid>
-      <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Total Page Views" count="4,42,236" percentage={59.3} extra="35,000" />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Total Users" count="78,250" percentage={70.5} extra="8,900" />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Total Order" count="18,800" percentage={27.4} isLoss color="warning" extra="1,943" />
-      </Grid>
-      <Grid item xs={12} sm={6} md={4} lg={3}>
-        <AnalyticEcommerce title="Total Sales" count="$35,078" percentage={27.4} isLoss color="warning" extra="$20,395" />
-      </Grid>
+    <div className="container-fluid p-5 bg-light">
 
-      <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} />
+      <div className="row">
+  {/* Total Clients */}
+  <div className="col-md-3 mb-4">
+    <div className="card shadow-lg border-0 rounded-3" style={{ backgroundColor: '#f8d7da' }}>
+      <div className="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 className="card-title text-dark">Total Clients</h5>
+          <p className="card-text fs-3 text-dark">{analytics.totalClients}</p>
+        </div>
+        <div>
+          <i className="fas fa-users fa-3x text-danger"></i> {/* Icon */}
+        </div>
+      </div>
+    </div>
+  </div>
 
-      {/* row 2 */}
-      {/*<Grid item xs={12} md={7} lg={8}>
-        <UniqueVisitorCard />
-      </Grid>
-      <Grid item xs={12} md={5} lg={4}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Income Overview</Typography>
-          </Grid>
-          <Grid item />
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <Box sx={{ p: 3, pb: 0 }}>
-            <Stack spacing={2}>
-              <Typography variant="h6" color="text.secondary">
-                This Week Statistics
-              </Typography>
-              <Typography variant="h3">$7,650</Typography>
-            </Stack>
-          </Box>
-          <MonthlyBarChart />
-        </MainCard>
-      </Grid>*/}
+  {/* Total Freelancers */}
+  <div className="col-md-3 mb-4">
+    <div className="card shadow-lg border-0 rounded-3" style={{ backgroundColor: '#d1ecf1' }}>
+      <div className="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 className="card-title text-dark">Total Freelancers</h5>
+          <p className="card-text fs-3 text-dark">{analytics.totalFreelancers}</p>
+        </div>
+        <div>
+          <i className="fas fa-chalkboard-teacher fa-3x text-info"></i> {/* Icon */}
+        </div>
+      </div>
+    </div>
+  </div>
 
-      {/* row 3 */}
-      {/*<Grid item xs={12} md={7} lg={8}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Recent Orders</Typography>
-          </Grid>
-          <Grid item />
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <OrdersTable />
-        </MainCard>
-      </Grid>
-      <Grid item xs={12} md={5} lg={4}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Analytics Report</Typography>
-          </Grid>
-          <Grid item />
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <List sx={{ p: 0, '& .MuiListItemButton-root': { py: 2 } }}>
-            <ListItemButton divider>
-              <ListItemText primary="Company Finance Growth" />
-              <Typography variant="h5">+45.14%</Typography>
-            </ListItemButton>
-            <ListItemButton divider>
-              <ListItemText primary="Company Expenses Ratio" />
-              <Typography variant="h5">0.58%</Typography>
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="Business Risk Cases" />
-              <Typography variant="h5">Low</Typography>
-            </ListItemButton>
-          </List>
-          {<ReportAreaChart />}
-        </MainCard>
-      </Grid>*/}
+  {/* Total Projects */}
+  <div className="col-md-3 mb-4">
+    <div className="card shadow-lg border-0 rounded-3" style={{ backgroundColor: '#d4edda' }}>
+      <div className="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 className="card-title text-dark">Total Projects</h5>
+          <p className="card-text fs-3 text-dark">{analytics.totalProjects}</p>
+        </div>
+        <div>
+          <i className="fas fa-briefcase fa-3x text-success"></i> {/* Icon */}
+        </div>
+      </div>
+    </div>
+  </div>
 
-      {/* row 4 */}
-      {/*<Grid item xs={12} md={7} lg={8}>
-        <SaleReportCard />
-      </Grid>
-      <Grid item xs={12} md={5} lg={4}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Transaction History</Typography>
-          </Grid>
-          <Grid item />
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <List
-            component="nav"
-            sx={{
-              px: 0,
-              py: 0,
-              '& .MuiListItemButton-root': {
-                py: 1.5,
-                '& .MuiAvatar-root': avatarSX,
-                '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' }
-              }
-            }}
-          >
-            <ListItemButton divider>
-              <ListItemAvatar>
-                <Avatar sx={{ color: 'success.main', bgcolor: 'success.lighter' }}>
-                  <GiftOutlined />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={<Typography variant="subtitle1">Order #002434</Typography>} secondary="Today, 2:00 AM" />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                  <Typography variant="subtitle1" noWrap>
-                    + $1,430
-                  </Typography>
-                  <Typography variant="h6" color="secondary" noWrap>
-                    78%
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItemButton>
-            <ListItemButton divider>
-              <ListItemAvatar>
-                <Avatar sx={{ color: 'primary.main', bgcolor: 'primary.lighter' }}>
-                  <MessageOutlined />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={<Typography variant="subtitle1">Order #984947</Typography>} secondary="5 August, 1:45 PM" />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                  <Typography variant="subtitle1" noWrap>
-                    + $302
-                  </Typography>
-                  <Typography variant="h6" color="secondary" noWrap>
-                    8%
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Avatar sx={{ color: 'error.main', bgcolor: 'error.lighter' }}>
-                  <SettingOutlined />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={<Typography variant="subtitle1">Order #988784</Typography>} secondary="7 hours ago" />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                  <Typography variant="subtitle1" noWrap>
-                    + $682
-                  </Typography>
-                  <Typography variant="h6" color="secondary" noWrap>
-                    16%
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItemButton>
-          </List>
-        </MainCard>
-        <MainCard sx={{ mt: 2 }}>
-          <Stack spacing={3}>
-            <Grid container justifyContent="space-between" alignItems="center">
-              <Grid item>
-                <Stack>
-                  <Typography variant="h5" noWrap>
-                    Help & Support Chat
-                  </Typography>
-                  <Typography variant="caption" color="secondary" noWrap>
-                    Typical replay within 5 min
-                  </Typography>
-                </Stack>
-              </Grid>
-              <Grid item>
-                <AvatarGroup sx={{ '& .MuiAvatar-root': { width: 32, height: 32 } }}>
-                  <Avatar alt="Remy Sharp" src={avatar1} />
-                  <Avatar alt="Travis Howard" src={avatar2} />
-                  <Avatar alt="Cindy Baker" src={avatar3} />
-                  <Avatar alt="Agnes Walker" src={avatar4} />
-                </AvatarGroup>
-              </Grid>
-            </Grid>
-            <Button size="small" variant="contained" sx={{ textTransform: 'capitalize' }}>
-              Need Help?
-            </Button>
-          </Stack>
-        </MainCard>
-      </Grid>*/}
-    </Grid>
+  {/* Total Payments */}
+  <div className="col-md-3 mb-4">
+    <div className="card shadow-lg border-0 rounded-3" style={{ backgroundColor: '#fff3cd' }}>
+      <div className="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 className="card-title text-dark">Total Payments</h5>
+          <p className="card-text fs-3 text-dark">{analytics.totalPayments} DT</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <div className="row">
+        {/* Monthly Growth Bar Chart */}
+        <div className="col-md-6 mb-4 d-flex">
+          <div className="card shadow-lg border-0 w-100">
+            <div className="card-body d-flex flex-column">
+              <div className="chart-container flex-grow-1">
+                <Bar
+                  data={monthlyGrowthData}
+                  options={{
+                    responsive: true,
+                    animation: { duration: 1500 },
+                    maintainAspectRatio: false,
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: 'Monthly Growth in Payments',
+                        font: { size: 16 },
+                      },
+                    },
+                    scales: {
+                      x: {
+                        grid: { display: false },
+                      },
+                      y: {
+                        beginAtZero: true,
+                        grid: { color: '#eee' },
+                      },
+                    },
+                  }}
+                  height={250} // Set a consistent height for both charts
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Projects Status Pie Chart */}
+        <div className="col-md-6 mb-4 d-flex">
+          <div className="card shadow-lg border-0 w-100">
+            <div className="card-body d-flex flex-column">
+              <div className="chart-container flex-grow-1">
+                <Pie
+                  data={projectsStatusData}
+                  options={{
+                    responsive: true,
+                    animation: { duration: 1500 },
+                    maintainAspectRatio: false,
+                    plugins: {
+                      title: {
+                        display: true,
+                        text: 'Projects by Status',
+                        font: { size: 16 },
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function (tooltipItem) {
+                            return `${tooltipItem.label}: ${tooltipItem.raw} projects`;
+                          },
+                        },
+                      },
+                    },
+                  }}
+                  height={250} // Set a consistent height for both charts
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
-}
+};
+
+export default DashboardDefault;

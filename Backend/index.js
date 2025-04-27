@@ -10,6 +10,7 @@ import chatRoute from "./routes/chat.route.js";
 import offerRoute from "./routes/offer.route.js";
 import ratingRoute from "./routes/rating.route.js";
 import paymentRoute from "./routes/payment.route.js";
+import dashboardRoute from "./routes/dashboard.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import http from "http";
@@ -59,6 +60,8 @@ app.use("/api/offers", offerRoute);
 app.use("/api/ratings", ratingRoute);
 app.use("/api/payments", paymentRoute);
 app.use("/api/users", userRoute);
+app.use("/api/dashboard", dashboardRoute);
+
 
 // Socket.io connections
 let users = []; // Array to hold connected users

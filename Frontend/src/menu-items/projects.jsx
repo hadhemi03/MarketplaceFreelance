@@ -8,7 +8,8 @@ import {
   LoadingOutlined,
   UserOutlined,
   ProfileOutlined,
-  CommentOutlined
+  CommentOutlined,
+  CreditCardOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -21,7 +22,8 @@ const icons = {
   AppstoreAddOutlined,
   UserOutlined,
   ProfileOutlined,
-  CommentOutlined
+  CommentOutlined,
+  CreditCardOutlined
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -44,6 +46,13 @@ const Projects = {
       type: 'item',
       url: 'crudcomments',
       icon: icons.CommentOutlined
+    },
+    {
+      id: 'viewpayments',
+      title: 'Payments',
+      type: 'item',
+      url: 'viewpayments',
+      icon: icons.CreditCardOutlined
     }
   ]
 };

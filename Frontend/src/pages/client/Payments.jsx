@@ -73,7 +73,7 @@ const CheckoutForm = ({ freelancerId, projectId, price }) => {
         const response = await axios.post(
           'http://localhost:5000/api/payments/create-payment-intent',
           {
-            price: Math.round(price * 100), // price in cents
+            price: Math.round(price * 1000), 
             clientId,
             freelancerId,
             projectId,

@@ -113,14 +113,76 @@ export const savePayment = async (req, res) => {
 
 // Get all payments (for admin)
 export const getAllPayments = async (req, res) => {
-    try {
-        const payments = await Payment.find().populate('clientId freelancerId projectId');
-        res.status(200).json(payments);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Failed to fetch payments' });
-    }
+  try {
+      const { startDate, endDate } = req.query;
+
+      const matchStage = {};
+
+      if (startDate || endDate) {
+          matchStage.createdAt = {};
+          if (startDate) matchStage.createdAt.$gte = new Date(startDate);
+          if (endDate) matchStage.createdAt.$lte = new Date(endDate);
+      }
+
+      const payments = await Payment.aggregate([
+          {
+              $lookup: {
+                  from: 'users',
+                  localField: 'clientId',
+                  foreignField: '_id',
+                  as: 'client'
+              }
+          },
+          { $unwind: { path: '$client', preserveNullAndEmptyArrays: true } },
+          {
+              $lookup: {
+                  from: 'users',
+                  localField: 'freelancerId',
+                  foreignField: '_id',
+                  as: 'freelancer'
+              }
+          },
+          { $unwind: { path: '$freelancer', preserveNullAndEmptyArrays: true } },
+          {
+              $lookup: {
+                  from: 'projects',
+                  localField: 'projectId',
+                  foreignField: '_id',
+                  as: 'project'
+              }
+          },
+          { $unwind: { path: '$project', preserveNullAndEmptyArrays: true } },
+
+          {
+              $match: matchStage  // 👉 Only date filters
+          },
+
+          {
+              $project: {
+                  _id: 1,
+                  amount: 1,
+                  createdAt: 1,
+                  'client._id': 1,
+                  'client.username': 1,
+                  'freelancer._id': 1,
+                  'freelancer.username': 1,
+                  'project._id': 1,
+                  'project.projectName': 1
+              }
+          },
+          { $sort: { createdAt: -1 } }
+      ]);
+
+      res.status(200).json(payments);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Failed to fetch payments' });
+  }
 };
+
+
+
+
 
 // Get all payments for a client
 export const getClientPayments = async (req, res) => {
