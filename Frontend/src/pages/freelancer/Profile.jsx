@@ -130,37 +130,44 @@ const Profile = () => {
     
             const updatedFormData = {
                 ...formData,
+                // Ensure skills, certificates, experiences, languages are sent as arrays
                 skills: formData.skills.split(",").map(skill => skill.trim()),
                 certificates: formData.certificates.split(",").map(cert => cert.trim()),
                 experiences: formData.experiences.split(",").map(exp => exp.trim()),
                 languages: formData.languages.split(",").map(lang => lang.trim())
             };
     
+            // Send the updated data to the backend
             const res = await axios.put("http://localhost:5000/api/users/update-userProfile", updatedFormData, {
                 headers: { Authorization: `Bearer ${token}` },
                 withCredentials: true,
             });
     
-            setUser(res.data);
-            setEditMode(false);
+            if (res.data) {
+                console.log("Profile updated successfully:", res.data);
+                setUser(res.data);  // Update the user state with the response data
+                setEditMode(false);  // Exit edit mode
     
-            setFormData({
-                username: res.data.username,
-                email: res.data.email,
-                country: res.data.country,
-                desc: res.data.desc,
-                occupation: res.data.occupation,
-                skills: res.data.skills.join(", "),
-                certificates: res.data.certificates.join(", "),
-                experiences: res.data.experiences.join(", "),
-                languages: res.data.languages.join(", ")
-            });
-    
+                // Update formData with the newly updated user data
+                setFormData({
+                    username: res.data.username,
+                    email: res.data.email,
+                    country: res.data.country,
+                    desc: res.data.desc,
+                    occupation: res.data.occupation,
+                    skills: res.data.skills.join(", "),
+                    certificates: res.data.certificates.join(", "),
+                    experiences: res.data.experiences.join(", "),
+                    languages: res.data.languages.join(", ")
+                });
+            } else {
+                console.error("Failed to update the profile. No response data.");
+            }
         } catch (err) {
-            console.error("Error updating user:", err);
+            console.error("Error updating profile:", err);
         }
     };
-
+    
     const handleRatingSubmit = async () => {
         try {
             const token = localStorage.getItem("token");

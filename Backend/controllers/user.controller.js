@@ -238,67 +238,37 @@ export const getAllClients = async (req, res, next) => {
 
 
 // Update user profile (he is the only one that can update his profile)
-export const updateUserProfile = async (req, res, next) => {
-    console.log("Request User Object:", req.user); // Debugging log
-
-    if (!req.user || !req.user._id) {
-        console.error("Unauthorized access: No User ID found in token!");
-        return next(createError(401, "Unauthorized access! No User ID found."));
-    }
-
+export const updateUserProfile = async (req, res) => {
+    const userId = req.user._id;
+    const updateData = req.body;
+  
+    // Remove any fields that are not present in the updateData (e.g., empty fields)
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === '' || updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+  
     try {
-        console.log("🔎 Searching user with ID:", req.user._id);
-        const user = await User.findById(req.user._id);
-
-        if (!user) {
-            console.error("User not found in database");
-            return next(createError(404, "User not found."));
-        }
-
-
-        const updateData = {}; // Object to store only valid fields
-
-        // Only update fields if they are provided in the request
-        if (req.body.occupation !== undefined) updateData.occupation = req.body.occupation;
-        if (req.body.skills !== undefined) updateData.skills = req.body.skills;
-        if (req.body.education !== undefined) updateData.education = req.body.education;
-        if (req.body.certificates !== undefined) updateData.certificates = req.body.certificates;
-        if (req.body.languages !== undefined) updateData.languages = req.body.languages;
-        if (req.body.experiences !== undefined) {
-            const exp = req.body.experiences;
-            
-            // Check if the experiences field is an array and not empty
-            if (Array.isArray(exp) && exp.length > 0) {
-                updateData.experiences = exp;
-            } else {
-                console.error("Invalid experiences array data:", exp);
-            }
-        }
-        
-        
-        
-        if (req.body.posts !== undefined) updateData.posts = req.body.posts;
-
-        console.log("Updating with data:", updateData); // Debugging log
-
-        // Update only the valid fields
-        Object.assign(user, updateData);
-
-        console.log("Saving updated profile...");
-        await user.save(); // This is where validation happens
-
-        console.log("Profile updated successfully!");
-        res.status(200).json({ message: "Profile updated successfully", user });
+      // Find the user by ID and update only the fields that are provided
+      const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+        new: true, // Return the updated document
+        runValidators: true, // Ensure validation still runs
+      });
+  
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.status(200).json(updatedUser);
     } catch (err) {
-        console.error("Error updating profile:", err);
-
-        if (err.name === "ValidationError") {
-            return next(createError(400, "Validation failed: " + err.message));
-        }
-
-        next(createError(500, "Server Error, could not update profile."));
+      console.error(err);
+      res.status(400).json({ message: err.message });
     }
-};
+  };
+  
+
+
 
 
 

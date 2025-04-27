@@ -138,19 +138,7 @@ export default function Profile() {
             <Paper sx={{ boxShadow: theme.customShadows.z1, width: 290, minWidth: 240, maxWidth: { xs: 250, md: 290 } }}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MainCard elevation={0} border={false} content={false}>
-                  <CardContent sx={{ px: 2.5, pt: 3 }}>
-                    {/*<Grid container justifyContent="space-between" alignItems="center">
-                      <Grid item>
-                        <Stack direction="row" spacing={1.25} alignItems="center">
-                          <Avatar alt={currentUser?.username} src={`http://localhost:5000${currentUser.img}`} sx={{ width: 32, height: 32 }} />
-                          <Stack>
-                            <Typography variant="h6">{currentUser?.username}</Typography>
-                          </Stack>
-                        </Stack>
-                      </Grid>
-                    </Grid>*/}
-                  </CardContent>
-
+                  
                   <TabPanel value={value} index={0} dir={theme.direction}>
                     <ProfileTab />
                   </TabPanel>

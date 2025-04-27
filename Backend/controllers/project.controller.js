@@ -1,4 +1,5 @@
 import Project from "../models/Project.model.js";
+import Notification from "../models/Project.model.js";
 import { createError } from "../utils/error.js";
 import User from "../models/User.model.js";
 import multer from "multer";
@@ -66,6 +67,14 @@ export const createProject = async (req, res, next) => {
         });
 
         await newProject.save();
+
+        await Notification.create({
+            userId: req.user._id,
+            type: 'new_project',
+            message: `Your project "${newProject.projectName}" was successfully created.`,
+            projectId: newProject._id,
+        });
+
         res.status(201).json({ message: "Project created successfully", project: newProject });
     } catch (err) {
         console.error("Error:", err);
@@ -336,6 +345,23 @@ export const completeProject = async (req, res) => {
         project.status = "Completed";
         await project.save();
 
+        const notifications = [
+            {
+                userId: project.clientId,
+                type: "project_completed",
+                message: `Your project "${project.projectName}" has been marked as completed.`,
+                projectId: project._id,
+            },
+            {
+                userId: project.freelancerId,
+                type: "project_completed",
+                message: `The project "${project.projectName}" you worked on has been marked as completed.`,
+                projectId: project._id,
+            }
+        ];
+
+        await Notification.insertMany(notifications);
+
         res.status(200).json({ message: "Project marked as completed", project });
     } catch (err) {
         res.status(500).json({ message: "Server error", err });
@@ -388,6 +414,16 @@ export const addTaskToCalendar = async (req, res) => {
     project.sharedCalendar.push(newTask);
     await project.save();
 
+    // Create a notification for the other user (not the one who added the task)
+    const notifyUserId = project.clientId.toString() === userId.toString() ? project.freelancerId : project.clientId;
+
+    await Notification.create({
+        userId: notifyUserId,
+        type: "task_added",
+        message: `A new task "${title}" has been added to the project "${project.projectName}".`,
+        projectId: project._id,
+    });
+
     res.status(201).json(project.sharedCalendar); // Return updated tasks
 };
 
@@ -408,6 +444,23 @@ export const taskCompleted = async (req, res) => {
 
     task.completed = true;
     await project.save();
+
+    const notifications = [
+        {
+            userId: project.clientId,
+            type: "project_completed",
+            message: `Your project "${project.projectName}" has been marked as completed.`,
+            projectId: project._id,
+        },
+        {
+            userId: project.freelancerId,
+            type: "project_completed",
+            message: `The project "${project.projectName}" you worked on has been marked as completed.`,
+            projectId: project._id,
+        }
+    ];
+
+    await Notification.insertMany(notifications);
 
     res.status(200).json(task);
 };

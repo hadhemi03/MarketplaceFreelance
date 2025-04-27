@@ -11,8 +11,6 @@ import ListItemText from '@mui/material/ListItemText';
 import EditOutlined from '@ant-design/icons/EditOutlined';
 import ProfileOutlined from '@ant-design/icons/ProfileOutlined';
 import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
-import UserOutlined from '@ant-design/icons/UserOutlined';
-import WalletOutlined from '@ant-design/icons/WalletOutlined';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { disconnectSocket } from 'utils/Socket';
@@ -59,34 +57,25 @@ export default function ProfileTab() {
     }
   };
 
-
   const handleListItemClick = (index, path) => {
     setSelectedIndex(index);
     if (path) navigate(path);
   };
 
+  // Check if the current user has the role of 'freelancer'
+  const userRole = currentUser?.role; // Assuming user role is stored as 'role' in the currentUser object
 
   return (
     <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32 } }}>
-      {/*<ListItemButton selected={selectedIndex === 0} onClick={(event) => handleListItemClick(event, 0, '/apps/profiles/user/personal')}>
-        <ListItemIcon>
-          <EditOutlined />
-        </ListItemIcon>
-        <ListItemText primary="Edit Profile" />
-      </ListItemButton>
-      <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1, '/apps/profiles/account/basic')}>
-        <ListItemIcon>
-          <UserOutlined />
-        </ListItemIcon>
-        <ListItemText primary="View Profile" />
-      </ListItemButton>
-*/}
-      <ListItemButton selected={selectedIndex === 3} onClick={() => handleListItemClick(3, '/freelancer/my-profile')}>
-        <ListItemIcon>
-          <ProfileOutlined />
-        </ListItemIcon>
-        <ListItemText primary="Profile" />
-      </ListItemButton>
+      {/* Conditionally render the Profile button based on user role */}
+      {userRole === 'freelancer' && (
+        <ListItemButton selected={selectedIndex === 3} onClick={() => handleListItemClick(3, '/freelancer/my-profile')}>
+          <ListItemIcon>
+            <ProfileOutlined />
+          </ListItemIcon>
+          <ListItemText primary="Profile" />
+        </ListItemButton>
+      )}
 
       <ListItemButton selected={selectedIndex === 2} onClick={handleLogout}>
         <ListItemIcon>

@@ -11,6 +11,7 @@ import offerRoute from "./routes/offer.route.js";
 import ratingRoute from "./routes/rating.route.js";
 import paymentRoute from "./routes/payment.route.js";
 import dashboardRoute from "./routes/dashboard.route.js";
+import notifRoute from "./routes/notification.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import http from "http";
@@ -61,6 +62,8 @@ app.use("/api/ratings", ratingRoute);
 app.use("/api/payments", paymentRoute);
 app.use("/api/users", userRoute);
 app.use("/api/dashboard", dashboardRoute);
+app.use("/api/notifications", notifRoute);
+
 
 
 // Socket.io connections
