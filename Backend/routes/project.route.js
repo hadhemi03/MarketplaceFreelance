@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyAdmin, verifyClient, verifyClientOrAdmin, verifyFreelancer, verifyToken } from "../utils/verifyToken.js";
-import { addTaskToCalendar, assignFreelancer, completeProject, createProject, deleteProject, deleteTaskFromCalendar, fetchTasksForProject, getAllFreelancerTasks, getAllProjects, getCategories, getClientProjects, getFreelancerProjects, getProjectById, taskCompleted, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
+import { addTaskToCalendar, assignFreelancer, completeProject, createProject, deleteProject, deleteTaskFromCalendar, fetchTasksForProject, getAllFreelancerTasks, getAllProjects, getCategories, getClientProjects, getFreelancerProjects, getProjectById, getProjectsByCategory, taskCompleted, updateProject, uploadProjectImage } from "../controllers/project.controller.js";
 
 const router = express.Router();
 
@@ -13,6 +13,7 @@ router.get("/myprojects", verifyToken, verifyClientOrAdmin, getClientProjects);
 
 // All Users can view projects
 router.get("/view-projects", verifyToken, getAllProjects);
+router.get("/category", getProjectsByCategory);
 
 // Categories
 router.get("/get-categories", verifyToken, getCategories);

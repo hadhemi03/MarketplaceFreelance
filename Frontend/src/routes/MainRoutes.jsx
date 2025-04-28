@@ -133,6 +133,8 @@ import { element } from 'prop-types';
 import { Navigate } from 'react-router';
 import FreelancerDashboard from 'layout/FreelancerDashboard';
 import MyCalendar from 'pages/freelancer/MyCalendar';
+import VisitorProjects from 'components/catCard/VisitorProjects';
+
 
 const Home = Loadable(lazy(() => import('pages/home/Home')));  // Home Page
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -155,7 +157,7 @@ const Payments = Loadable(lazy(() => import('pages/client/Payments')));
 const MyPayments = Loadable(lazy(() => import('pages/client/MyPayments')));
 const PaymentSuccess = Loadable(lazy(() => import('pages/client/PaymentSucess')));
 const CreateProject = Loadable(lazy(() => import('pages/client/CreateProject')));
-const EditProject = Loadable(lazy(() => import('components/project/EditProject')));
+const EditProject = Loadable(lazy(() => import('pages/client/EditProject')));
 const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')));
 const MakeDeal = Loadable(lazy(() => import('pages/client/MakeDeal')));
 const Messages = Loadable(lazy(() => import('pages/messages/chatPage')));
@@ -193,6 +195,10 @@ const MainRoutes = {
     {
       path: '/', // Root path - Home page
       element: <Home />  // Home Page
+    },
+    {
+      path: '/projects', 
+      element: <VisitorProjects />  
     },
     {
       path: 'login',  // Login route

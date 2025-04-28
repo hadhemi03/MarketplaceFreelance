@@ -206,7 +206,7 @@ export const deleteProject = async (req, res, next) => {
 
 
 
-// Get all projects (Freelancers and Clients )
+// Get all projects 
 export const getAllProjects = async (req, res, next) => {
     const { search, minPrice, maxPrice, category, skill } = req.query;
 
@@ -266,6 +266,32 @@ export const getAllProjects = async (req, res, next) => {
         res.status(200).json({ projects: projectsWithDT });
     } catch (err) {
         next(createError(500, "Server Error, could not fetch projects."));
+    }
+};
+
+// for visitor
+export const getProjectsByCategory = async (req, res, next) => {
+    const { category } = req.query;
+
+    try {
+        if (!category) {
+            return next(createError(400, "Category is required."));
+        }
+
+        const projects = await Project.find({ category: decodeURIComponent(category) });
+
+        const projectsWithDT = projects.map(project => ({
+            ...project.toObject(),
+            price: project.price,
+            currency: 'DT',
+            skillsRequired: Array.isArray(project.skillsRequired)
+                ? project.skillsRequired
+                : JSON.parse(project.skillsRequired || '[]')
+        }));
+
+        res.status(200).json({ projects: projectsWithDT });
+    } catch (err) {
+        next(createError(500, "Server Error, could not fetch projects by category."));
     }
 };
 

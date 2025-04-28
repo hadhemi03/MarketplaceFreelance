@@ -1,23 +1,41 @@
-import React from 'react'
-import "./Home.scss"
+import React, { useRef } from 'react';
+import "./Home.scss";
 import Featured from '../../components/featured/Featured.jsx';
 import Slide from "../../components/Slide/Slide.jsx";
 import { cards } from "../../data";
 import CatCard from '../../components/catCard/CatCard.jsx';
-import Navbar from 'components/navbar/Navbar';
+import Navbar from 'components/navbar/Navbar'; // Make sure the import is correct
 import checkICon from "../../assets/images/icons/check.png";
+import contactUs from "../../assets/images/icons/contactus.jpg";
 
 const Home = () => {
+  const slideRef = useRef(null);
+  const contactUsRef = useRef(null);
+
+  const scrollToSlide = () => {
+    if (slideRef.current) {
+      slideRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const scrollToContactUs = () => {
+    contactUsRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className='home'>
-      <Navbar />
-      <Featured />
-      <Slide slidesToShow={5} arrowsScroll={3} >
-        {cards.map((card) => (
-          <CatCard card={card} key={card.id} />
-        ))}
+      {/* Pass the scroll function to Navbar */}
+      <Navbar onExploreClick={scrollToSlide} onContactUsClick={scrollToContactUs} />
 
-      </Slide>
+      <Featured />
+
+      <div ref={slideRef}>
+        <Slide slidesToShow={5} arrowsScroll={3}>
+          {cards.map((card) => (
+            <CatCard card={card} key={card.id} />
+          ))}
+        </Slide>
+      </div>
 
       <div className="features">
         <div className="container">
@@ -31,7 +49,7 @@ const Home = () => {
               Browse a curated selection of top talent, ready to bring your ideas to life.
             </p>
             <div className="title">
-              <img src={checkICon}  alt="" />
+              <img src={checkICon} alt="" />
               Seamless collaboration, effortless communication
             </div>
             <p>
@@ -45,7 +63,7 @@ const Home = () => {
               Your funds are held safely and only released when you’re satisfied with the work.
             </p>
             <div className="title">
-              <img src={checkICon}  alt="" />
+              <img src={checkICon} alt="" />
               Ratings that build trust
             </div>
             <p>
@@ -53,53 +71,53 @@ const Home = () => {
             </p>
           </div>
           <div className="item">
-            <img src="https://square-dz-static.s3.amazonaws.com/media/blog/freelance_small_very.jpg"  />
+            <img src="https://square-dz-static.s3.amazonaws.com/media/blog/freelance_small_very.jpg" />
           </div>
         </div>
       </div>
-      
-      
 
-      <div className="features dark">
+      {/* Contact Us Section */}
+      <div className="features dark contact-us" ref={contactUsRef}>
         <div className="container">
           <div className="item">
             <h1>
-              CollabWork <i>business</i>
+              Get in Touch with <i>CollabWork</i>
             </h1>
-            <h1>
-              A tailored solution designed for teams and businesses.
-            </h1>
+            <h2>
+              We're here to help with any questions, inquiries, or support you need.
+            </h2>
             <p>
-              Upgrade to a seamless experience with powerful tools and benefits, dedicated to growing your business.
+              Our team is ready to assist you with any of your questions, concerns, or feedback. Whether you're looking to partner with us, need support, or just want to say hello, feel free to reach out!
             </p>
-            <div className="title">
-              <img src={checkICon}  alt="" />
-              Connect to freelancers with proven business experience
-            </div>
 
-            <div className="title">
-              <img src={checkICon} alt="" />
-              Get personalized matching with the right talent through our dedicated support.
-            </div>
+            <div className="contact-info">
+              <div className="title">
+                <img src={checkICon} alt="" />
+                <strong>Phone:</strong> +123 456 7890
+              </div>
 
-            <div className="title">
-              <img src={checkICon}  alt="" />
-              Enhance collaboration & productivity with an all-in-one workspace for managing projects efficiently.            </div>
-            <button>Explore CollabWork Business</button>
+              <div className="title">
+                <img src={checkICon} alt="" />
+                <strong>Email:</strong> support@collabwork.com
+              </div>
+
+              <div className="title">
+                <img src={checkICon} alt="" />
+                <strong>Address:</strong> 123 Business St, City, Country
+              </div>
+            </div>
           </div>
+
           <div className="item">
             <img
-              src="https://fiverr-res.cloudinary.com/q_auto,f_auto,w_870,dpr_2.0/v1/attachments/generic_asset/asset/d9c17ceebda44764b591a8074a898e63-1599597624768/business-desktop-870-x2.png"
-              alt=""
+              src={contactUs}
+              alt="Contact Us"
             />
           </div>
         </div>
       </div>
-
-
-
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

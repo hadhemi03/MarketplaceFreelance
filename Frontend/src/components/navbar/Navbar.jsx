@@ -3,9 +3,8 @@ import "./Navbar.scss";
 import { Link, useLocation } from 'react-router-dom';
 import Logo from 'components/logo/LogoMain';
 
-const Navbar = () => {
+const Navbar = ({ onExploreClick, onContactUsClick  }) => {
   const [active, setActive] = useState(false);
-  const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
 
   const isActive = () => {
@@ -27,9 +26,15 @@ const Navbar = () => {
         </div>
 
         <div className="links">
-          <span>CollabWork Business</span>
-          <span>Explore</span>
-          <span>Become a Client</span>
+         
+          <span onClick={onExploreClick} className="explore-button">
+            Explore
+          </span>
+
+          <span onClick={onContactUsClick} className="contact-us-button">
+            Contact Us
+          </span>
+
 
           <Link className="link" to="/login"><button className="nav-button">Login</button></Link>
           <Link className="link" to="/register"><button className="nav-button">Register</button></Link>
