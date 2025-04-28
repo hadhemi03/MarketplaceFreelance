@@ -4,6 +4,7 @@ import moment from 'moment';
 import axios from 'axios';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useParams } from 'react-router';
+import './CalendarStyles.scss';
 
 const localizer = momentLocalizer(moment);
 

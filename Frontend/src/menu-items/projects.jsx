@@ -1,12 +1,5 @@
 // assets
 import {
-  AppstoreAddOutlined,
-  AntDesignOutlined,
-  BarcodeOutlined,
-  BgColorsOutlined,
-  FontSizeOutlined,
-  LoadingOutlined,
-  UserOutlined,
   ProfileOutlined,
   CommentOutlined,
   CreditCardOutlined
@@ -14,13 +7,6 @@ import {
 
 // icons
 const icons = {
-  FontSizeOutlined,
-  BgColorsOutlined,
-  BarcodeOutlined,
-  AntDesignOutlined,
-  LoadingOutlined,
-  AppstoreAddOutlined,
-  UserOutlined,
   ProfileOutlined,
   CommentOutlined,
   CreditCardOutlined
