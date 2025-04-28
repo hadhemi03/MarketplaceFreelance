@@ -133,6 +133,8 @@ import { element } from 'prop-types';
 import { Navigate } from 'react-router';
 import FreelancerDashboard from 'layout/FreelancerDashboard';
 import MyCalendar from 'pages/freelancer/MyCalendar';
+import VisitorProjects from 'components/catCard/VisitorProjects';
+
 
 const Home = Loadable(lazy(() => import('pages/home/Home')));  // Home Page
 const Color = Loadable(lazy(() => import('pages/component-overview/color')));
@@ -152,8 +154,10 @@ const Projects = Loadable(lazy(() => import('pages/client/Projects')));
 const MyProjects = Loadable(lazy(() => import('pages/client/MyProjects')));
 const Freelancers = Loadable(lazy(() => import('pages/client/Freelancers')));
 const Payments = Loadable(lazy(() => import('pages/client/Payments')));
+const MyPayments = Loadable(lazy(() => import('pages/client/MyPayments')));
+const PaymentSuccess = Loadable(lazy(() => import('pages/client/PaymentSucess')));
 const CreateProject = Loadable(lazy(() => import('pages/client/CreateProject')));
-const EditProject = Loadable(lazy(() => import('components/project/EditProject')));
+const EditProject = Loadable(lazy(() => import('pages/client/EditProject')));
 const ProjectDetails = Loadable(lazy(() => import('pages/client/ProjectDetails')));
 const MakeDeal = Loadable(lazy(() => import('pages/client/MakeDeal')));
 const Messages = Loadable(lazy(() => import('pages/messages/chatPage')));
@@ -165,6 +169,8 @@ const CalendarPage = Loadable(lazy(() => import('pages/freelancer/MyCalendar')))
 const FreelancerCalendar = Loadable(lazy(() => import('pages/freelancer/FreelancerCalendar')));
 const Profile = Loadable(lazy(() => import('pages/freelancer/Profile')));
 const Offers = Loadable(lazy(() => import('pages/freelancer/Offers')));
+const FreelancerPayments = Loadable(lazy(() => import('pages/freelancer/MyPayments')));
+
 
 
 // Pages d'Admin
@@ -172,6 +178,8 @@ const CRUDClients = Loadable(lazy(() => import('pages/admin/Clients')));
 const CRUDFreelancers = Loadable(lazy(() => import('pages/admin/Freelancers')));
 const CRUDProjects = Loadable(lazy(() => import('pages/admin/Projects')));
 const CRUDComments = Loadable(lazy(() => import('pages/admin/Comments')));
+const ViewPayments = Loadable(lazy(() => import('pages/admin//Payments')));
+
 
 
 
@@ -187,6 +195,10 @@ const MainRoutes = {
     {
       path: '/', // Root path - Home page
       element: <Home />  // Home Page
+    },
+    {
+      path: '/projects', 
+      element: <VisitorProjects />  
     },
     {
       path: 'login',  // Login route
@@ -206,7 +218,9 @@ const MainRoutes = {
         { path: 'edit-project/:projectId', element: <EditProject /> },
         { path: 'projectDetails/:projectId', element: <ProjectDetails /> },
         { path: 'freelancers', element: <Freelancers /> },
-        { path: 'payments', element: <Payments /> },
+        { path: 'my-payments', element: <MyPayments /> },
+        { path: 'payments/:freelancerId/:projectId/:price', element: <Payments /> },
+        { path: 'payments/success', element: <PaymentSuccess /> },
         { path: 'messages', element: <Messages /> },
         { path: 'messages/:userId', element: <Messages /> },
         { path: 'make-deal/:projectId', element: <MakeDeal /> },
@@ -231,10 +245,9 @@ const MainRoutes = {
         { path: 'messages/:userId', element: <Messages /> },
         { path: 'my-profile', element: <Profile /> },
         { path: 'my-offers', element: <Offers /> },
+        { path: 'my-payments-freelancer', element: <FreelancerPayments /> },
 
-
-
-        
+     
       ]
     },
     {
@@ -265,6 +278,10 @@ const MainRoutes = {
         {
           path: 'crudcomments',  
           element: <CRUDComments />
+        },
+        {
+          path: 'viewpayments',  
+          element: <ViewPayments />
         }
       ]
     },

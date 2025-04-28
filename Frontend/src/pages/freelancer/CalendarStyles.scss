@@ -1,0 +1,48 @@
+
+.rbc-calendar {
+    background-color: #f0f8ff; /* Light blue background */
+  }
+  
+  .rbc-toolbar {
+    background-color: #00509d; /* Indigo toolbar */
+    color: white;
+    padding: 10px;
+    font-weight: bold;
+  }
+  
+  .rbc-toolbar button {
+    background-color: white;
+    color: #4f46e5;
+    border: none;
+    padding: 5px 10px;
+    margin: 0 5px;
+    border-radius: 5px;
+  }
+  
+  .rbc-toolbar button.rbc-active {
+    background-color: #00509d;
+    color: white;
+  }
+  
+  .rbc-month-view {
+    background-color: #e0f7fa; /* Very light cyan background */
+  }
+  
+  .rbc-day-bg {
+    background-color: #e3f2fd; /* Light blue for day cells */
+    border: 1px solid #bbdefb; /* Light border */
+  }
+  
+  .rbc-today {
+    background-color: #ffe0b2 !important; /* Highlight today's date */
+  }
+  
+  .rbc-event {
+    background-color: #64b5f6 !important; /* Make events colorful */
+    color: white;
+    border: none;
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+  }
+  

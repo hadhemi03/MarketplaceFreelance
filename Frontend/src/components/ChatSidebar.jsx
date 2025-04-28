@@ -6,7 +6,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const Sidebar = ({ users }) => {
     const navigate = useNavigate();
     const role = localStorage.getItem('userRole'); 
-    const [showModal, setShowModal] = useState(false); // 🔹 Modal state
 
     const handleSelectUser = (userId) => {
         if (role === 'client') {

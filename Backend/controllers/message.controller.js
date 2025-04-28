@@ -1,4 +1,5 @@
 import Message from "../models/message.model.js";
+import Notification from "../models/Notification.model.js";
 import User from "../models/User.model.js";
 import Chat from "../models/Chat.model.js";
 import mongoose from "mongoose";
@@ -42,6 +43,14 @@ export const sendMessage = async (req, res) => {
 
         await message.save();
 
+        await Notification.create({
+            userId: receiverId,
+            type: "new_message",
+            message: "You have received a new message.",
+            // Optionally you can add a link to chatId if you want
+            projectId: chat._id, 
+        });
+
         // Emit to the receiver's socket (if using Socket.io)
         if (typeof io !== "undefined") {
             io.to(receiverId).emit('new_message', message);
@@ -56,19 +65,19 @@ export const sendMessage = async (req, res) => {
 // Get messages for a specific chat
 export const getMessages = async (req, res, next) => {
     try {
-      const currentUserId = req.user._id;
-      const otherUserId = req.params.userId;
-  
-      const messages = await Message.find({
-        $or: [
-          { senderId: currentUserId, receiverId: otherUserId },
-          { senderId: otherUserId, receiverId: currentUserId },
-        ]
-      }).sort({ createdAt: 1 });
-  
-      return res.status(200).json(messages);
+        const currentUserId = req.user._id;
+        const otherUserId = req.params.userId;
+
+        const messages = await Message.find({
+            $or: [
+                { senderId: currentUserId, receiverId: otherUserId },
+                { senderId: otherUserId, receiverId: currentUserId },
+            ]
+        }).sort({ createdAt: 1 });
+
+        return res.status(200).json(messages);
     } catch (err) {
-      return next(err);
+        return next(err);
     }
-  };
-  
+};
+

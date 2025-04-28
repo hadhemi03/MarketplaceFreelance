@@ -1,4 +1,5 @@
 import Project from "../models/Project.model.js";
+import Notification from "../models/Project.model.js";
 import { createError } from "../utils/error.js";
 import User from "../models/User.model.js";
 import multer from "multer";
@@ -66,6 +67,14 @@ export const createProject = async (req, res, next) => {
         });
 
         await newProject.save();
+
+        await Notification.create({
+            userId: req.user._id,
+            type: 'new_project',
+            message: `Your project "${newProject.projectName}" was successfully created.`,
+            projectId: newProject._id,
+        });
+
         res.status(201).json({ message: "Project created successfully", project: newProject });
     } catch (err) {
         console.error("Error:", err);
@@ -197,7 +206,7 @@ export const deleteProject = async (req, res, next) => {
 
 
 
-// Get all projects (Freelancers and Clients )
+// Get all projects 
 export const getAllProjects = async (req, res, next) => {
     const { search, minPrice, maxPrice, category, skill } = req.query;
 
@@ -257,6 +266,32 @@ export const getAllProjects = async (req, res, next) => {
         res.status(200).json({ projects: projectsWithDT });
     } catch (err) {
         next(createError(500, "Server Error, could not fetch projects."));
+    }
+};
+
+// for visitor
+export const getProjectsByCategory = async (req, res, next) => {
+    const { category } = req.query;
+
+    try {
+        if (!category) {
+            return next(createError(400, "Category is required."));
+        }
+
+        const projects = await Project.find({ category: decodeURIComponent(category) });
+
+        const projectsWithDT = projects.map(project => ({
+            ...project.toObject(),
+            price: project.price,
+            currency: 'DT',
+            skillsRequired: Array.isArray(project.skillsRequired)
+                ? project.skillsRequired
+                : JSON.parse(project.skillsRequired || '[]')
+        }));
+
+        res.status(200).json({ projects: projectsWithDT });
+    } catch (err) {
+        next(createError(500, "Server Error, could not fetch projects by category."));
     }
 };
 
@@ -336,6 +371,23 @@ export const completeProject = async (req, res) => {
         project.status = "Completed";
         await project.save();
 
+        const notifications = [
+            {
+                userId: project.clientId,
+                type: "project_completed",
+                message: `Your project "${project.projectName}" has been marked as completed.`,
+                projectId: project._id,
+            },
+            {
+                userId: project.freelancerId,
+                type: "project_completed",
+                message: `The project "${project.projectName}" you worked on has been marked as completed.`,
+                projectId: project._id,
+            }
+        ];
+
+        await Notification.insertMany(notifications);
+
         res.status(200).json({ message: "Project marked as completed", project });
     } catch (err) {
         res.status(500).json({ message: "Server error", err });
@@ -388,6 +440,16 @@ export const addTaskToCalendar = async (req, res) => {
     project.sharedCalendar.push(newTask);
     await project.save();
 
+    // Create a notification for the other user (not the one who added the task)
+    const notifyUserId = project.clientId.toString() === userId.toString() ? project.freelancerId : project.clientId;
+
+    await Notification.create({
+        userId: notifyUserId,
+        type: "task_added",
+        message: `A new task "${title}" has been added to the project "${project.projectName}".`,
+        projectId: project._id,
+    });
+
     res.status(201).json(project.sharedCalendar); // Return updated tasks
 };
 
@@ -408,6 +470,23 @@ export const taskCompleted = async (req, res) => {
 
     task.completed = true;
     await project.save();
+
+    const notifications = [
+        {
+            userId: project.clientId,
+            type: "project_completed",
+            message: `Your project "${project.projectName}" has been marked as completed.`,
+            projectId: project._id,
+        },
+        {
+            userId: project.freelancerId,
+            type: "project_completed",
+            message: `The project "${project.projectName}" you worked on has been marked as completed.`,
+            projectId: project._id,
+        }
+    ];
+
+    await Notification.insertMany(notifications);
 
     res.status(200).json(task);
 };

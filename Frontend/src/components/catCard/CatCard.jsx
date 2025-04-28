@@ -3,16 +3,16 @@ import "./CatCard.scss";
 import { Link } from "react-router-dom";
 
 
-const CatCard = ({ card  }) => {
+const CatCard = ({ card }) => {
   return (
-    <Link to="/projects?cat=design" >
-    <div className="catCard">
-    <img src={card.img} alt="" />
+    <Link to={`/projects?category=${encodeURIComponent(card.title)}`}>
+      <div className="catCard">
+        <img src={card.img} alt="" />
         <span className="desc">{card.desc}</span>
         <span className="title">{card.title}</span>
-        
-      
-    </div>
+
+
+      </div>
     </Link>
   );
 };

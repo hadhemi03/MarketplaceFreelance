@@ -5,6 +5,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 
 const categoryOptions = [
@@ -17,11 +18,12 @@ const Projects = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [comments, setComments] = useState({});
   const [newComment, setNewComment] = useState({});
-  const [searchTerm, setSearchTerm] = useState("");
   const [priceRange, setPriceRange] = useState([0, 10000]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchName, setSearchName] = useState("");
   const [selectedSkills, setSelectedSkills] = useState("");
+  const [isEditing, setIsEditing] = useState(null); // State to track which comment is being edited
+  const [editedCommentText, setEditedCommentText] = useState("");
   const chipColors = ['primary', 'secondary', 'success', 'error', 'warning', 'info'];
 
   const [showComments, setShowComments] = useState({});
@@ -31,6 +33,8 @@ const Projects = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+
       try {
         const res = await axios.get("http://localhost:5000/api/users/get-current-user", {
           headers: {
@@ -49,6 +53,8 @@ const Projects = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
+      const token = localStorage.getItem("token");
+
       try {
         const res = await axios.get("http://localhost:5000/api/projects/view-projects", {
           withCredentials: true,
@@ -109,8 +115,13 @@ const Projects = () => {
   };
 
   const fetchComments = async (projectId) => {
+    const token = localStorage.getItem("token");
+
     try {
       const res = await axios.get(`http://localhost:5000/api/comments/getCommentsByProject/${projectId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         withCredentials: true,
       });
 
@@ -139,6 +150,27 @@ const Projects = () => {
       }));
     } catch (error) {
       console.error("Error deleting comment:", error);
+    }
+  };
+
+  const handleEditComment = async (commentId, projectId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `http://localhost:5000/api/comments/update-comment/${commentId}`,
+        { text: editedCommentText },
+        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+      );
+      setComments((prev) => ({
+        ...prev,
+        [projectId]: prev[projectId].map(comment =>
+          comment._id === commentId ? { ...comment, text: editedCommentText } : comment
+        ),
+      }));
+      setIsEditing(null);
+      setEditedCommentText("");
+    } catch (error) {
+      console.error("Error editing comment:", error);
     }
   };
 
@@ -286,54 +318,58 @@ const Projects = () => {
                   <Stack spacing={1} mt={1}>
                     {comments[project._id]?.map((comment) => (
                       <Stack key={comment._id} direction="row" spacing={2} alignItems="flex-start">
-                      <Box sx={{
-                        bgcolor: "#1976d2",
-                        color: "white",
-                        width: 36,
-                        height: 36,
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "bold",
-                      }}>
-                        {comment.userName?.charAt(0).toUpperCase()}
-                      </Box>
-                    
-                      <Box sx={{
-                        bgcolor: "#f5f5f5",
-                        p: 2,
-                        borderRadius: 2,
-                        flexGrow: 1,
-                        position: "relative",
-                      }}>
-                        <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(comment.createdAt).toLocaleString()}
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 1 }}>
-                          {comment.text}
-                        </Typography>
-                    
-                        {currentUser?._id === comment.userId && (
-                          <DeleteIcon
-                            onClick={() => handleDeleteComment(comment._id, project._id)}
-                            sx={{
-                              color: 'error.main',
-                              cursor: 'pointer',
-                              position: 'absolute',
-                              top: 8,
-                              right: 8,
-                            }}
-                          />
-                        )}
-                      </Box>
-                    </Stack>
-                    
+                        <Box sx={{ bgcolor: "#1976d2", color: "white", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>
+                          {comment.userName?.charAt(0).toUpperCase()}
+                        </Box>
+
+                        <Box sx={{ bgcolor: "#f5f5f5", p: 2, borderRadius: 2, flexGrow: 1, position: "relative" }}>
+                          <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {new Date(comment.createdAt).toLocaleString()}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mt: 1 }}>
+                            {isEditing === comment._id ? (
+                              <TextField
+                                fullWidth
+                                value={editedCommentText}
+                                onChange={(e) => setEditedCommentText(e.target.value)}
+                                variant="outlined"
+                                sx={{ bgcolor: "#f9f9f9" }}
+                              />
+                            ) : (
+                              comment.text
+                            )}
+                          </Typography>
+
+                          {currentUser?._id === comment.userId && (
+                            <>
+                              {isEditing === comment._id ? (
+                                <Button
+                                  onClick={() => handleEditComment(comment._id, project._id)}
+                                  sx={{ color: "#4caf50", position: 'absolute', top: 8, right: 8 }}
+                                >
+                                  Save
+                                </Button>
+                              ) : (
+                                <>
+                                  <DeleteIcon
+                                    onClick={() => handleDeleteComment(comment._id, project._id)}
+                                    sx={{ color: 'error.main', cursor: 'pointer', position: 'absolute', top: 8, right: 30 }}
+                                  />
+                                  <EditIcon
+                                    onClick={() => {
+                                      setIsEditing(comment._id);
+                                      setEditedCommentText(comment.text); // Set the current comment text in the input field
+                                    }}
+                                    sx={{ color: 'primary.main', cursor: 'pointer', position: 'absolute', top: 8, right: 8 }}
+                                  />
+                                </>
+                              )}
+                            </>
+                          )}
+                        </Box>
+                      </Stack>
                     ))}
-
-
-
                   </Stack>
                 </Box>
 

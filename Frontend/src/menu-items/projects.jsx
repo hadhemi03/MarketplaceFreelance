@@ -1,27 +1,15 @@
 // assets
 import {
-  AppstoreAddOutlined,
-  AntDesignOutlined,
-  BarcodeOutlined,
-  BgColorsOutlined,
-  FontSizeOutlined,
-  LoadingOutlined,
-  UserOutlined,
   ProfileOutlined,
-  CommentOutlined
+  CommentOutlined,
+  CreditCardOutlined
 } from '@ant-design/icons';
 
 // icons
 const icons = {
-  FontSizeOutlined,
-  BgColorsOutlined,
-  BarcodeOutlined,
-  AntDesignOutlined,
-  LoadingOutlined,
-  AppstoreAddOutlined,
-  UserOutlined,
   ProfileOutlined,
-  CommentOutlined
+  CommentOutlined,
+  CreditCardOutlined
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -44,6 +32,13 @@ const Projects = {
       type: 'item',
       url: 'crudcomments',
       icon: icons.CommentOutlined
+    },
+    {
+      id: 'viewpayments',
+      title: 'Payments',
+      type: 'item',
+      url: 'viewpayments',
+      icon: icons.CreditCardOutlined
     }
   ]
 };
