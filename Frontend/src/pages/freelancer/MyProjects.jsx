@@ -6,16 +6,15 @@ import {
   CircularProgress,
   Button
 } from '@mui/material';
-import DataTable from 'pages/dashboard/DataTable'; // assuming same DataTable component is used
+import DataTable from 'pages/dashboard/DataTable';
 import EventIcon from '@mui/icons-material/Event';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { useNavigate } from 'react-router-dom';
 
 const FreelancerMyProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const navigate = useNavigate(); // Initialize navigate from useNavigate
+  const navigate = useNavigate();
 
   const fetchFreelancerProjects = async () => {
     try {
@@ -38,10 +37,28 @@ const FreelancerMyProjects = () => {
   }, []);
 
   const navigateToSharedCalendar = (projectId) => {
-    // Use the navigate function to go to the shared calendar page
     navigate(`/freelancer/my-calendar/${projectId}`);
   };
 
+  const completeProject = async (projectId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(`http://localhost:5000/api/projects/${projectId}/complete`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+  
+      // If the project is completed successfully, refetch the projects
+      if (res.status === 200) {
+        fetchFreelancerProjects();
+      }
+    } catch (err) {
+      // Log the error response for better debugging
+      console.error("Error completing project", err.response ? err.response.data : err.message);
+      setError("Failed to complete the project.");
+    }
+  };
+  
   const columns = [
     { id: 'projectName', label: 'Project Name' },
     {
@@ -79,7 +96,6 @@ const FreelancerMyProjects = () => {
       id: 'calendar',
       label: 'Calendar',
       format: (value, row) => (
-        // Check if both clientId and freelancerId are available
         row.clientId && row.freelancerId ? (
           <Button
             variant="outlined"
@@ -91,6 +107,26 @@ const FreelancerMyProjects = () => {
             <EventIcon sx={{ marginRight: '4px' }} />
             Calendar
           </Button>
+        ) : null
+      ),
+    },
+    {
+      id: 'complete',
+      label: 'Complete',
+      format: (value, row) => (
+        row.status === "In Progress" ? (
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => completeProject(row._id)}
+            sx={{ marginTop: '10px' }}
+          >
+            Mark as Completed
+          </Button>
+        ) : row.status === "Completed" ? (
+          <Typography color="green" sx={{ marginTop: '10px' }}>
+            Project Completed
+          </Typography>
         ) : null
       ),
     },

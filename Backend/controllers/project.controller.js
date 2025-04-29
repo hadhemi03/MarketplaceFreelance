@@ -6,6 +6,7 @@ import multer from "multer";
 import path from "path";
 import fs from 'fs';             // node module that delete the old omage from the system
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
 // Configuration de stockage pour les images
 const storage = multer.diskStorage({
@@ -250,7 +251,10 @@ export const getAllProjects = async (req, res, next) => {
             query.$and = conditions;
         }
 
-        const projects = await Project.find(query);
+         // Fetch projects and populate the client data
+         const projects = await Project.find(query)
+         .populate('clientId', 'username img') // Populate client data
+         .exec();
 
         // Return projects with price in DT (Tunisian Dinar)
         const projectsWithDT = projects.map(project => ({
@@ -362,11 +366,26 @@ export const assignFreelancer = async (req, res) => {
 };
 
 // Mark as completed
+
+
 export const completeProject = async (req, res) => {
     try {
         const { projectId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(projectId)) {
+            return res.status(400).json({ message: "Invalid project ID" });
+        }
+
         const project = await Project.findById(projectId);
         if (!project) return res.status(404).json({ message: "Project not found" });
+
+        if (project.freelancerId.toString() !== req.user._id) {
+            return res.status(403).json({ message: "You are not authorized to complete this project" });
+        }
+
+        if (project.status === "Completed") {
+            return res.status(400).json({ message: "Project is already completed" });
+        }
 
         project.status = "Completed";
         await project.save();
@@ -390,7 +409,7 @@ export const completeProject = async (req, res) => {
 
         res.status(200).json({ message: "Project marked as completed", project });
     } catch (err) {
-        res.status(500).json({ message: "Server error", err });
+        res.status(500).json({ message: "Server error", error: err.message });
     }
 };
 
@@ -455,41 +474,47 @@ export const addTaskToCalendar = async (req, res) => {
 
 
 export const taskCompleted = async (req, res) => {
-    const { projectId, taskId } = req.params;
-    const userId = req.user._id;
-
-    const project = await Project.findById(projectId);
-    if (!project) return res.status(404).json({ msg: 'Project not found' });
-
-    const task = project.sharedCalendar.id(taskId);
-    if (!task) return res.status(404).json({ msg: 'Task not found' });
-
-    if (![project.clientId.toString(), project.freelancerId.toString()].includes(userId)) {
+    try {
+      const { projectId, taskId } = req.params;
+      const userId = req.user._id;
+  
+      const project = await Project.findById(projectId);
+      if (!project) return res.status(404).json({ msg: 'Project not found' });
+  
+      const task = project.sharedCalendar.id(taskId);
+      if (!task) return res.status(404).json({ msg: 'Task not found' });
+  
+      if (![project.clientId.toString(), project.freelancerId.toString()].includes(userId.toString())) {
         return res.status(403).json({ msg: 'Not authorized' });
-    }
-
-    task.completed = true;
-    await project.save();
-
-    const notifications = [
+      }
+  
+      task.completed = true;
+      await project.save();
+  
+      const notifications = [
         {
-            userId: project.clientId,
-            type: "project_completed",
-            message: `Your project "${project.projectName}" has been marked as completed.`,
-            projectId: project._id,
+          userId: project.clientId,
+          type: "project_completed",
+          message: `Your project "${project.projectName}" has been marked as completed.`,
+          projectId: project._id,
         },
         {
-            userId: project.freelancerId,
-            type: "project_completed",
-            message: `The project "${project.projectName}" you worked on has been marked as completed.`,
-            projectId: project._id,
+          userId: project.freelancerId,
+          type: "project_completed",
+          message: `The project "${project.projectName}" you worked on has been marked as completed.`,
+          projectId: project._id,
         }
-    ];
-
-    await Notification.insertMany(notifications);
-
-    res.status(200).json(task);
-};
+      ];
+  
+      await Notification.insertMany(notifications);
+  
+      res.status(200).json(task);
+    } catch (err) {
+      console.error("Error in taskCompleted:", err);
+      res.status(500).json({ msg: "Server error" });
+    }
+  };
+  
 
 export const fetchTasksForProject = async (req, res) => {
     try {

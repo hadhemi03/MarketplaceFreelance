@@ -55,11 +55,17 @@ const ProjectDetails = () => {
         <Grid container spacing={4} sx={{ mb: 4 }}>
           <Grid item xs={12} md={6}>
             {project.image && (
-              <img
-                src={project.image ? `http://localhost:5000${project.image}` : ""}
-                alt={project.projectName}
-                style={{ maxWidth: '100%', borderRadius: '10px' }}
-              />
+             <img
+             src={project.image ? `http://localhost:5000${project.image}` : ""}
+             alt={project.projectName}
+             style={{
+               width: '100%',         // Ensure it takes full width of the container
+               height: '300px',       // Set a fixed height to stabilize the size
+               objectFit: 'cover',    // Maintain the aspect ratio, but fill the space without distortion
+               borderRadius: '10px'   // Retain the border radius for rounded corners
+             }}
+           />
+           
             )}
           </Grid>
           <Grid item xs={12} md={6}>

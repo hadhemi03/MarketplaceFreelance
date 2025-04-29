@@ -156,16 +156,16 @@ const MyProjects = () => {
           )}
 
           {/* ✅ Add Pay Now button when deal is made and price is available */}
-        {row.status === "In Progress" && row.freelancerId && row.price && (
-          <Button
-            variant="contained"
-            size="small"
-            color="primary"
-            onClick={() => navigate(`/client/payments/${row.freelancerId?._id}/${row._id}/${row.price}`)}
-          >
-            Pay Now
-          </Button>
-        )}
+          {row.status === "In Progress" && row.freelancerId && row.price && (
+            <Button
+              variant="contained"
+              size="small"
+              color="primary"
+              onClick={() => navigate(`/client/payments/${row.freelancerId?._id}/${row._id}/${row.price}`)}
+            >
+              Pay Now
+            </Button>
+          )}
 
           {/* ✅ Only show Calendar button when the deal has been made (status is "In Progress") */}
           {row.status === "In Progress" && (
@@ -179,6 +179,13 @@ const MyProjects = () => {
               <EventIcon sx={{ marginRight: '4px' }} />
               Calendar
             </Button>
+          )}
+
+          {/* Show "Project Completed" text when project status is "Completed" */}
+          {row.status === "Completed" && (
+            <Typography variant="body2" color="green" sx={{ alignSelf: 'center' }}>
+              Project Completed
+            </Typography>
           )}
         </Box>
       ),

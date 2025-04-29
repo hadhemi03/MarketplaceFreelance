@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Navigate, useNavigate } from 'react-router-dom';
 import {
   Typography, Card, CardContent, CardMedia, Box, Stack, Chip,
   TextField, Button, Divider, Slider, FormControl, Select, MenuItem
@@ -24,6 +25,8 @@ const Projects = () => {
   const [selectedSkills, setSelectedSkills] = useState("");
   const [isEditing, setIsEditing] = useState(null); // State to track which comment is being edited
   const [editedCommentText, setEditedCommentText] = useState("");
+  const navigate = useNavigate();
+
   const chipColors = ['primary', 'secondary', 'success', 'error', 'warning', 'info'];
 
   const [showComments, setShowComments] = useState({});
@@ -42,7 +45,7 @@ const Projects = () => {
           },
           withCredentials: true,
         });
-        
+
         setCurrentUser(res.data); // e.g., { _id: '...', name: '...' }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -174,6 +177,34 @@ const Projects = () => {
     }
   };
 
+  const handleClientClick = async (clientId) => {
+    if (!clientId) {
+      console.error("Client ID is missing");
+      return;
+    }
+  
+    const token = localStorage.getItem("token");
+  
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/chats/get-or-create-chat",
+        { userId1: currentUser._id, userId2: clientId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      );
+  
+      const chat = res.data;
+      navigate(`/freelancer/messages/${clientId}`);
+    } catch (error) {
+      console.error("Error creating or fetching chat:", error);
+    }
+  };
+  
+
 
   return (
     <Box sx={{ p: 3, display: 'flex', backgroundColor: '#f0f2f5' }}>
@@ -275,8 +306,32 @@ const Projects = () => {
                 '&:hover': { boxShadow: 6, backgroundColor: "#f9f9f9" }
               }}
             >
-
               <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  {/* Client's Image/Icon */}
+                  <Box sx={{ bgcolor: "#1976d2", color: "white", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", mr: 2 }}>
+                    {/* Show initial if no profile image */}
+                    {project.clientId?.img ? (
+                      <img
+                        src={`http://localhost:5000${project.clientId.img}`}
+                        alt="Client Avatar"
+                        style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+                      />
+                    ) : (
+                      project.client?.username?.charAt(0).toUpperCase()
+                    )}
+                  </Box>
+                  <Typography
+  variant="subtitle2"
+  fontWeight="bold"
+  onClick={() => handleClientClick(project.clientId?._id)} // Make sure clientId._id exists
+  sx={{ cursor: 'pointer' }}
+>
+  {project.clientId?.username || "Unknown Client"}
+</Typography>
+
+                </Box>
+
                 <Typography variant="h6" fontWeight="bold" gutterBottom>{project.projectName}</Typography>
                 <Typography variant="body2" color="text.secondary">{project.description}</Typography>
 
@@ -294,6 +349,20 @@ const Projects = () => {
                 <Typography variant="subtitle1" color="success.main" fontWeight="bold" sx={{ mt: 2 }}>
                   💰 {project.price} DT
                 </Typography>
+
+                <Chip
+                  label={`Status: ${project.status}`}
+                  color={
+                    project.status === "Completed"
+                      ? "success"
+                      : project.status === "In Progress"
+                        ? "warning"
+                        : "default"
+                  }
+                  sx={{ mt: 1 }}
+                />
+
+
 
                 <Divider sx={{ my: 2 }} />
 
