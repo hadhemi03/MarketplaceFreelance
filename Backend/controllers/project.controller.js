@@ -78,9 +78,8 @@ export const createProject = async (req, res, next) => {
 
         res.status(201).json({ message: "Project created successfully", project: newProject });
     } catch (err) {
-        console.error("Error:", err);
-        next(createError(500, "Server Error, could not create project."));
-    }
+        console.error("Create project error:", err);
+        res.status(500).json({ message: "Could not create project", error: err.message });    }
 };
 
 // Middleware pour gérer l'upload

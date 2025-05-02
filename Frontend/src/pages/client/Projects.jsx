@@ -103,6 +103,7 @@ const Projects = () => {
       const res = await axios.post(
         `http://localhost:5000/api/comments/add-comment/${projectId}`,
         { text: newComment[projectId] },
+    
         { withCredentials: true }
       );
 
@@ -182,9 +183,9 @@ const Projects = () => {
       console.error("Client ID is missing");
       return;
     }
-  
+
     const token = localStorage.getItem("token");
-  
+
     try {
       const res = await axios.post(
         "http://localhost:5000/api/chats/get-or-create-chat",
@@ -196,14 +197,14 @@ const Projects = () => {
           withCredentials: true,
         }
       );
-  
+
       const chat = res.data;
       navigate(`/freelancer/messages/${clientId}`);
     } catch (error) {
       console.error("Error creating or fetching chat:", error);
     }
   };
-  
+
 
 
   return (
@@ -322,13 +323,13 @@ const Projects = () => {
                     )}
                   </Box>
                   <Typography
-  variant="subtitle2"
-  fontWeight="bold"
-  onClick={() => handleClientClick(project.clientId?._id)} // Make sure clientId._id exists
-  sx={{ cursor: 'pointer' }}
->
-  {project.clientId?.username || "Unknown Client"}
-</Typography>
+                    variant="subtitle2"
+                    fontWeight="bold"
+                    onClick={() => handleClientClick(project.clientId?._id)} // Make sure clientId._id exists
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    {project.clientId?.username || "Unknown Client"}
+                  </Typography>
 
                 </Box>
 
@@ -388,57 +389,70 @@ const Projects = () => {
                     {comments[project._id]?.map((comment) => (
                       <Stack key={comment._id} direction="row" spacing={2} alignItems="flex-start">
                         <Box sx={{ bgcolor: "#1976d2", color: "white", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>
-                          {comment.userName?.charAt(0).toUpperCase()}
+                          {/* Avatar */}
+                          {project.clientId?.img ? (
+                            <img
+                              src={`http://localhost:5000${project.clientId.img}`}
+                              alt="Client Avatar"
+                              style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+                            />
+                          ) : (
+                            project.client?.username?.charAt(0).toUpperCase()
+                          )}
                         </Box>
 
-                        <Box sx={{ bgcolor: "#f5f5f5", p: 2, borderRadius: 2, flexGrow: 1, position: "relative" }}>
-                          <Typography variant="subtitle2" fontWeight="bold">{comment.userName}</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(comment.createdAt).toLocaleString()}
-                          </Typography>
-                          <Typography variant="body2" sx={{ mt: 1 }}>
-                            {isEditing === comment._id ? (
+                        <Box sx={{ flex: 1 }}>
+                          {/* If editing, show input box, else show comment text */}
+                          {isEditing === comment._id ? (
+                            <>
                               <TextField
-                                fullWidth
                                 value={editedCommentText}
                                 onChange={(e) => setEditedCommentText(e.target.value)}
+                                fullWidth
                                 variant="outlined"
-                                sx={{ bgcolor: "#f9f9f9" }}
+                                sx={{ mb: 2 }}
                               />
-                            ) : (
-                              comment.text
-                            )}
-                          </Typography>
-
-                          {currentUser?._id === comment.userId && (
+                              <Button
+                                onClick={() => handleEditComment(comment._id, project._id)}
+                                sx={{
+                                  backgroundColor: "#1976d2",
+                                  color: "white",
+                                  '&:hover': { backgroundColor: "#1565c0" }
+                                }}
+                              >
+                                Save
+                              </Button>
+                            </>
+                          ) : (
                             <>
-                              {isEditing === comment._id ? (
-                                <Button
-                                  onClick={() => handleEditComment(comment._id, project._id)}
-                                  sx={{ color: "#4caf50", position: 'absolute', top: 8, right: 8 }}
-                                >
-                                  Save
-                                </Button>
-                              ) : (
-                                <>
-                                  <DeleteIcon
-                                    onClick={() => handleDeleteComment(comment._id, project._id)}
-                                    sx={{ color: 'error.main', cursor: 'pointer', position: 'absolute', top: 8, right: 30 }}
-                                  />
-                                  <EditIcon
-                                    onClick={() => {
-                                      setIsEditing(comment._id);
-                                      setEditedCommentText(comment.text); // Set the current comment text in the input field
-                                    }}
-                                    sx={{ color: 'primary.main', cursor: 'pointer', position: 'absolute', top: 8, right: 8 }}
-                                  />
-                                </>
-                              )}
+                              <Typography variant="body2">{comment.text}</Typography>
+                              <Button
+                                onClick={() => {
+                                  setIsEditing(comment._id);
+                                  setEditedCommentText(comment.text);
+                                }}
+                                sx={{
+                                  textTransform: "none",
+                                  color: "#1976d2",
+                                  '&:hover': { color: "#1565c0" }
+                                }}
+                              >
+                                <EditIcon sx={{ fontSize: 16 }} /> Edit
+                              </Button>
                             </>
                           )}
                         </Box>
+
+                        <Button
+                          onClick={() => handleDeleteComment(comment._id, project._id)}
+                          sx={{ color: "red", minWidth: 0 }}
+                        >
+                          <DeleteIcon /> Delete
+                        </Button>
+
                       </Stack>
                     ))}
+
                   </Stack>
                 </Box>
 
