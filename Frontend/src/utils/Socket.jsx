@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 let socket = null;
 
 // Initialize the socket connection
-export const initSocket = (token = null) => {
+export const initSocket = (token = null, newNotificationCallback) => {
   if (socket) {
     return socket; // If already initialized, return the existing socket
   }
@@ -24,6 +24,18 @@ export const initSocket = (token = null) => {
 
   socket.on('connect', () => {
     console.log('Socket connected:', socket.id);
+
+    const userId = localStorage.getItem('userId'); // <-- or however you store it
+    if (userId) {
+      socket.emit("login", userId); // <-- Register the user with socket server
+    }
+  });
+
+  // Listen for new notifications and call the passed callback
+  socket.on('newNotification', (newNotification) => {
+    if (newNotificationCallback) {
+      newNotificationCallback(newNotification);
+    }
   });
 
   return socket;

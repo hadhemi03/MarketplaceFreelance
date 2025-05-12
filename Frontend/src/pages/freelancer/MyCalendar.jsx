@@ -19,7 +19,7 @@ const CalendarPage = () => {
   useEffect(() => {
     const userData = localStorage.getItem("currentUser");
     console.log("User Data from localStorage:", userData);  // Debugging step
-
+  
     if (userData) {
       try {
         const user = JSON.parse(userData);
@@ -32,7 +32,7 @@ const CalendarPage = () => {
       console.log("No user data found in localStorage");
     }
   }, []);
-
+  
   console.log("Current User:", currentUser);  // Log to check if currentUser is set properly
 
   const fetchTasks = async () => {
@@ -109,19 +109,19 @@ const CalendarPage = () => {
   };
 
   const events = tasks
-    .filter(task => task.date)
-    .map((task) => {
-      const start = new Date(task.date);
-      const end = new Date(start.getTime() + 60 * 60 * 1000); // 1 hour duration
+  .filter(task => task.date)
+  .map((task) => {
+    const start = new Date(task.date);
+    const end = new Date(start.getTime() + 60 * 60 * 1000); // 1 hour duration
 
-      return {
-        id: task._id,
-        title: task.completed ? `✅ ${task.title}` : task.title,
-        start,
-        end,
-        allDay: false, // explicitly false
-      };
-    });
+    return {
+      id: task._id,
+      title: task.completed ? `✅ ${task.title}` : task.title,
+      start,
+      end,
+      allDay: false, // explicitly false
+    };
+  });
 
 
   useEffect(() => {
@@ -204,12 +204,12 @@ const CalendarPage = () => {
 
                 <div className="card-footer d-flex justify-content-between align-items-center bg-white border-0">
                   <button
-                    className="btn btn-sm btn-outline-success"
+                    className={`btn btn-sm ${task.completed ? 'btn-outline-secondary' : 'btn-outline-success'}`}
                     onClick={() => markCompleted(task._id)}
-                    disabled={task.completed}
                   >
-                    ✅ Mark as Completed
+                    {task.completed ? 'Reset' : 'Mark as Completed'}
                   </button>
+
                   {/* 🗑️ Delete button only for creator */}
                   {currentUser && currentUser.userId && task.createdBy.toString() === currentUser.userId.toString() && (
                     <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteTask(task._id)}>

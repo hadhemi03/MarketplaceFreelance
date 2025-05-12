@@ -13,6 +13,8 @@ const ChatPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+
 
   // Fetching users and current user logic (same as before)
   useEffect(() => {
@@ -83,6 +85,23 @@ const ChatPage = () => {
     };
   }, [socket]);
 
+  useEffect(() => {
+  if (socket) {
+    socket.on("newNotification", (notification) => {
+      console.log("New notification received:", notification);
+      // You can update a state here to show the notification to the user
+      // For example:
+      setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+    });
+  }
+
+  return () => {
+    if (socket) {
+      socket.off("newNotification");
+    }
+  };
+}, [socket]);
+
   // Fetch initial messages for the chat
   useEffect(() => {
     if (userId) {
@@ -120,11 +139,10 @@ const ChatPage = () => {
           }
         );
 
-        // Emit the message to the server to be broadcast to the receiver
-        socket.emit("sendMessage", res.data);
-
-        setMessages((prevMessages) => [...prevMessages, res.data]);
+      
         setNewMessage("");
+        console.log("Receiver found:", userId);
+
       } catch (err) {
         console.error("Error sending message:", err.response?.data || err.message);
       }

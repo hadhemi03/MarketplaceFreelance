@@ -71,12 +71,9 @@ export default function AuthLogin({ isDemo = false }) {
 
       initSocket(response.data.token); 
 
-      setUser(response.data.user);
-      toast.success('Login successful!');
 
       // update the user state immediatelt
       setUser(response.data.user);
-
       // Show success toast
       toast.success('Login successful!');
 

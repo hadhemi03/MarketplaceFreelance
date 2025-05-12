@@ -89,6 +89,12 @@ const UserSchema = new mongoose.Schema({
     default: [],
   },
 
+  averageRating: {
+    type: Number,
+    default: 0
+},
+
+
 
 },
   { timestamps: true }

@@ -12,6 +12,7 @@ import ratingRoute from "./routes/rating.route.js";
 import paymentRoute from "./routes/payment.route.js";
 import dashboardRoute from "./routes/dashboard.route.js";
 import notifRoute from "./routes/notification.route.js";
+import Notification from "./models/Notification.model.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import http from "http";
@@ -39,6 +40,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(express.json());
+app.set('io', io);
 
 mongoose.connect(process.env.DB)
   .then(() => {
@@ -68,17 +70,20 @@ app.use("/api/notifications", notifRoute);
 
 // Socket.io connections
 let users = []; // Array to hold connected users
+app.set('users', users);
 
 // Function to add user to the list of connected users
 const addUser = (userId, socketId) => {
   if (!users.some(user => user.userId === userId)) {
     users.push({ userId, socketId });
+    app.set('users', users);
   }
 };
 
 // Function to remove user from the list when they disconnect
 const removeUser = (socketId) => {
   users = users.filter(user => user.socketId !== socketId);
+  app.set('users', users);
 };
 
 // Function to get a user by userId
@@ -97,12 +102,14 @@ io.on("connection", (socket) => {
     } else {
       // Update socketId if reconnecting
       existingUser.socketId = socket.id;
+      app.set('users', users);
     }
     console.log(`User with id ${userId} connected`);
   });
 
+
   // Listen for sending messages
-  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+  socket.on("sendMessage", async ({ senderId, receiverId, text }) => {  // Add async here
     // Emit message to the receiver
     const receiver = getUser(receiverId);
     if (receiver) {
@@ -111,6 +118,25 @@ io.on("connection", (socket) => {
         text,
         createdAt: new Date(),
       });
+
+      io.to(receiver.socketId).emit("newNotification", {
+        message: "You have a new message!",
+        createdAt: new Date(),
+      });
+
+      // Store notification in the DB
+      const notification = new Notification({
+        userId: receiverId,
+        type: "message", // Type of the notification
+        content: `${senderId} sent you a message: "${text}"`,
+      });
+
+      try {
+        await notification.save(); // Now await works because the function is async
+      } catch (error) {
+        console.error('Error saving notification:', error);
+      }
+
     }
   });
 

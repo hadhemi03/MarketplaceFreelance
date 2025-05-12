@@ -19,6 +19,7 @@ import Box from '@mui/material/Box';
 import axios from 'axios';
 import BellOutlined from '@ant-design/icons/BellOutlined';
 import CheckCircleOutlined from '@ant-design/icons/CheckCircleOutlined';
+import { initSocket } from 'utils/Socket';
 
 export default function Notification() {
   const theme = useTheme();
@@ -26,7 +27,9 @@ export default function Notification() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const socketRef = useRef(null);
 
+  // Fetch initial notifications
   useEffect(() => {
     const fetchNotifications = async () => {
       const token = localStorage.getItem('token');
@@ -35,8 +38,7 @@ export default function Notification() {
           withCredentials: true,
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Notifications:", res.data); // Log notifications to verify API response
-        setNotifications(res.data);
+        setNotifications(res.data.slice(0, 20));
       } catch (err) {
         console.error('Error fetching notifications:', err);
       } finally {
@@ -46,6 +48,45 @@ export default function Notification() {
 
     fetchNotifications();
   }, []);
+
+  // Socket connection and notification handling
+  useEffect(() => {
+    const handleNewNotification = (newNotification) => {
+      console.log('Raw notification received:', newNotification);
+      
+      setNotifications(prev => {
+        // Transform the notification to match your expected format
+        const transformedNotif = {
+          _id: newNotification._id || Math.random().toString(36).substr(2, 9),
+          message: newNotification.message,
+          createdAt: newNotification.createdAt || new Date()
+        };
+
+        // Check for duplicates
+        if (prev.some(n => n._id === transformedNotif._id)) {
+          console.log('Duplicate detected, skipping');
+          return prev;
+        }
+
+        console.log('Adding new notification:', transformedNotif);
+        return [transformedNotif, ...prev];
+      });
+    };
+
+    // Initialize socket with callback
+    socketRef.current = initSocket(handleNewNotification);
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off('newNotification', handleNewNotification);
+      }
+    };
+  }, []);
+
+  // Debug effect
+  useEffect(() => {
+    console.log('Current notifications state:', notifications);
+  }, [notifications]);
 
   const handleToggle = () => setOpen((prevOpen) => !prevOpen);
 
@@ -64,8 +105,6 @@ export default function Notification() {
         color="secondary"
         sx={{ color: 'text.primary' }}
         ref={anchorRef}
-        aria-controls={open ? 'notification-popover' : undefined}
-        aria-haspopup="true"
         onClick={handleToggle}
       >
         <Badge badgeContent={notifications.length} color="primary">
@@ -77,67 +116,33 @@ export default function Notification() {
         open={open}
         anchorEl={anchorRef.current}
         placement="bottom-end"
-        role={undefined}
-        disablePortal
-        popperOptions={{
-          modifiers: [
-            {
-              name: 'offset',
-              options: {
-                offset: [0, 10], // Adjust the vertical offset for better positioning
-              },
-            },
-            {
-              name: 'preventOverflow',
-              options: {
-                boundary: 'viewport', // Prevents the popper from being clipped
-              },
-            },
-            {
-              name: 'flip',
-              options: {
-                enabled: true,
-              },
-            },
-          ],
-        }}
       >
-        <Paper sx={{
-          boxShadow: theme.customShadows.z1, 
-          width: '100%', 
-          minWidth: 285,
-          position: 'absolute',
-          right: 0, // Ensures the popper is aligned on the right
-        }}>
+        <Paper sx={{ width: 350, maxHeight: 400, overflow: 'auto' }}>
           <ClickAwayListener onClickAway={handleClose}>
             <Box sx={{ p: 2 }}>
               <Typography variant="h6">Notifications</Typography>
-              <List sx={{ p: 0 }}>
-                {notifications.map((notification) => (
-                  <div key={notification._id}>
-                    <ListItemButton>
-                      <ListItemAvatar>
-                        <Avatar sx={{ bgcolor: 'primary.main' }}>N</Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={notification.message}
-                        secondary={new Date(notification.createdAt).toLocaleString()}
-                      />
-                      <ListItemSecondaryAction>
-                        <Typography variant="caption" noWrap>
-                          {new Date(notification.createdAt).toLocaleTimeString()}
-                        </Typography>
-                      </ListItemSecondaryAction>
-                    </ListItemButton>
-                    <Divider />
-                  </div>
-                ))}
+              <List>
+                {notifications.length === 0 ? (
+                  <Typography variant="body2" sx={{ p: 2 }}>
+                    No new notifications
+                  </Typography>
+                ) : (
+                  notifications.map((notification) => (
+                    <div key={notification._id}>
+                      <ListItemButton>
+                        <ListItemAvatar>
+                          <Avatar sx={{ bgcolor: 'primary.main' }}>N</Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={notification.message}
+                          secondary={new Date(notification.createdAt).toLocaleString()}
+                        />
+                      </ListItemButton>
+                      <Divider />
+                    </div>
+                  ))
+                )}
               </List>
-              <Tooltip title="Mark as all read">
-                <IconButton color="success" size="small" onClick={() => setNotifications([])}>
-                  <CheckCircleOutlined style={{ fontSize: '1.15rem' }} />
-                </IconButton>
-              </Tooltip>
             </Box>
           </ClickAwayListener>
         </Paper>

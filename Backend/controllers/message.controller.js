@@ -10,22 +10,21 @@ export const sendMessage = async (req, res) => {
     try {
         const { senderId, receiverId, text } = req.body;
 
-        // Validate required fields
+        const io = req.app.get('io');
+        const users = req.app.get('users');
+
         if (!senderId || !receiverId || !text) {
             return res.status(400).json({ message: "Missing fields" });
         }
 
-        // Validate ObjectId format
         if (!mongoose.Types.ObjectId.isValid(senderId) || !mongoose.Types.ObjectId.isValid(receiverId)) {
             return res.status(400).json({ message: "Invalid sender or receiver ID" });
         }
 
-        // Step 1: Check if a chat already exists between sender and receiver
         let chat = await Chat.findOne({
             participants: { $all: [senderId, receiverId] }
         });
 
-        // Step 2: If no chat exists, create a new chat
         if (!chat) {
             chat = new Chat({
                 participants: [senderId, receiverId]
@@ -33,7 +32,6 @@ export const sendMessage = async (req, res) => {
             await chat.save();
         }
 
-        // Step 3: Create the message
         const message = new Message({
             chatId: chat._id,
             senderId,
@@ -43,17 +41,34 @@ export const sendMessage = async (req, res) => {
 
         await message.save();
 
-        await Notification.create({
+        const newNotif = await Notification.create({
             userId: receiverId,
             type: "new_message",
             message: "You have received a new message.",
-            // Optionally you can add a link to chatId if you want
-            projectId: chat._id, 
+            projectId: chat._id,
         });
 
-        // Emit to the receiver's socket (if using Socket.io)
-        if (typeof io !== "undefined") {
-            io.to(receiverId).emit('new_message', message);
+        // Emit notification in real-time
+        const receiver = users.find(user => user.userId === receiverId);
+        console.log("Connected users:", users);
+        if (receiver && io) {
+            io.to(receiver.socketId).emit("newNotification", {
+                _id: newNotif._id,
+                userId: newNotif.userId,
+                type: newNotif.type,
+                message: newNotif.message,
+                projectId: newNotif.projectId,
+                createdAt: newNotif.createdAt,
+            });
+        }
+
+        // Emit to all sockets of that user (you need a mapping if using multiple devices)
+        if (io) {
+            io.emit("receiveMessage", {
+                senderId,
+                text,
+                createdAt: new Date(),
+            });
         }
 
         return res.status(200).json(message);
@@ -62,6 +77,7 @@ export const sendMessage = async (req, res) => {
         return res.status(500).json({ message: "Error sending message" });
     }
 };
+
 // Get messages for a specific chat
 export const getMessages = async (req, res, next) => {
     try {
