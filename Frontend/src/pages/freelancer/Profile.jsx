@@ -179,7 +179,7 @@ const Profile = () => {
                 headers: { Authorization: `Bearer ${token}` },
                 withCredentials: true,
             });
-            setAverageRating(refreshed.data.averageRating || 0);
+            setAverageRating(refreshed.data.averageStars || 0);
 
         } catch (err) {
             console.error("Error submitting rating:", err);

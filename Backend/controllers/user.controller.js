@@ -297,7 +297,7 @@ export const getAllFreelancers = async (req, res, next) => {
         query.username = { $regex: name, $options: "i" }; // Recherche insensible à la casse
     }
     if (skill) {
-        query.skills = { $in: [skill] }; // Vérifie si la compétence est dans le tableau des skills
+        query.skills = { $elemMatch: { $regex: skill, $options: "i" } };
     }
     if (country) {
         query.country = { $regex: country, $options: "i" }; // Search by country (case insensitive)
