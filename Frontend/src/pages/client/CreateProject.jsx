@@ -52,7 +52,9 @@ const CreateProject = () => {
     const formData = new FormData();
     formData.append('projectName', projectName);
     formData.append('description', description);
-    formData.append('skillsRequired', JSON.stringify(skillsRequired)); // Ensure array is sent correctly
+    skillsRequired.forEach((skill, i) => {
+      formData.append(`skillsRequired[${i}]`, skill);
+    });
     formData.append('price', price);
     formData.append('category', category);
     if (image) formData.append('image', image);
@@ -68,22 +70,26 @@ const CreateProject = () => {
       const res = await axios.post('http://localhost:5000/api/projects/create-project', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
+         // 'Content-Type': 'multipart/form-data',
         },
         withCredentials: true,
       });
 
       setLoading(false);
-      if (res.status === 201) {
+      if (res.status === 201 || res.status === 200) {
         setSnackbarMessage('Project created successfully!');
         setOpenSnackbar(true);
+        setError(''); // Clear any previous error
         setTimeout(() => {
           navigate('/client/my-projects');
-        }, 1000);
+        }, 100);
+      } else {
+        setError('Unexpected response from server.');
       }
     } catch (err) {
       console.error('Error creating project:', err.response?.data || err.message);
-      setError('Error creating project. Please try again.');
+      const message = err.response?.data?.message || 'Error creating project. Please try again.';
+      setError(message);
       setLoading(false);
     }
   };

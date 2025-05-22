@@ -1,5 +1,5 @@
 import Project from "../models/Project.model.js";
-import Notification from "../models/Project.model.js";
+import Notification from "../models/Notification.model.js";
 import { createError } from "../utils/error.js";
 import User from "../models/User.model.js";
 import multer from "multer";
@@ -37,18 +37,24 @@ export const createProject = async (req, res, next) => {
         }
 
         // Ensure `skillsRequired` is always an array
-        let parsedSkills = [];
-        if (typeof skillsRequired === "string") {
-            try {
-                parsedSkills = JSON.parse(skillsRequired); // Convert JSON string to array
-            } catch (error) {
-                return res.status(400).json({ message: "Invalid skills format." });
+        let parsedSkills;
+
+        try {
+            if (typeof skillsRequired === 'string') {
+                parsedSkills = JSON.parse(skillsRequired);
+            } else if (Array.isArray(skillsRequired)) {
+                parsedSkills = skillsRequired;
+            } else {
+                throw new Error("Skills must be an array or JSON string.");
             }
-        } else if (Array.isArray(skillsRequired)) {
-            parsedSkills = skillsRequired;
-        } else {
-            return res.status(400).json({ message: "Skills must be an array." });
+
+            if (!Array.isArray(parsedSkills)) {
+                throw new Error("Parsed skills must be an array.");
+            }
+        } catch (err) {
+            return res.status(400).json({ message: "Invalid skills format." });
         }
+
 
         console.log("Skills Required after parsing:", parsedSkills);
 
@@ -79,7 +85,8 @@ export const createProject = async (req, res, next) => {
         res.status(201).json({ message: "Project created successfully", project: newProject });
     } catch (err) {
         console.error("Create project error:", err);
-        res.status(500).json({ message: "Could not create project", error: err.message });    }
+        res.status(500).json({ message: "Could not create project", error: err.message });
+    }
 };
 
 // Middleware pour gérer l'upload
@@ -250,10 +257,10 @@ export const getAllProjects = async (req, res, next) => {
             query.$and = conditions;
         }
 
-         // Fetch projects and populate the client data
-         const projects = await Project.find(query)
-         .populate('clientId', 'username img') // Populate client data
-         .exec();
+        // Fetch projects and populate the client data
+        const projects = await Project.find(query)
+            .populate('clientId', 'username img') // Populate client data
+            .exec();
 
         // Return projects with price in DT (Tunisian Dinar)
         const projectsWithDT = projects.map(project => ({
@@ -474,46 +481,46 @@ export const addTaskToCalendar = async (req, res) => {
 
 export const taskCompleted = async (req, res) => {
     try {
-      const { projectId, taskId } = req.params;
-      const userId = req.user._id;
-  
-      const project = await Project.findById(projectId);
-      if (!project) return res.status(404).json({ msg: 'Project not found' });
-  
-      const task = project.sharedCalendar.id(taskId);
-      if (!task) return res.status(404).json({ msg: 'Task not found' });
-  
-      if (![project.clientId.toString(), project.freelancerId.toString()].includes(userId.toString())) {
-        return res.status(403).json({ msg: 'Not authorized' });
-      }
-  
-      task.completed = true;
-      await project.save();
-  
-      const notifications = [
-        {
-          userId: project.clientId,
-          type: "project_completed",
-          message: `Your project "${project.projectName}" has been marked as completed.`,
-          projectId: project._id,
-        },
-        {
-          userId: project.freelancerId,
-          type: "project_completed",
-          message: `The project "${project.projectName}" you worked on has been marked as completed.`,
-          projectId: project._id,
+        const { projectId, taskId } = req.params;
+        const userId = req.user._id;
+
+        const project = await Project.findById(projectId);
+        if (!project) return res.status(404).json({ msg: 'Project not found' });
+
+        const task = project.sharedCalendar.id(taskId);
+        if (!task) return res.status(404).json({ msg: 'Task not found' });
+
+        if (![project.clientId.toString(), project.freelancerId.toString()].includes(userId.toString())) {
+            return res.status(403).json({ msg: 'Not authorized' });
         }
-      ];
-  
-      await Notification.insertMany(notifications);
-  
-      res.status(200).json(task);
+
+        task.completed = true;
+        await project.save();
+
+        const notifications = [
+            {
+                userId: project.clientId,
+                type: "project_completed",
+                message: `Your project "${project.projectName}" has been marked as completed.`,
+                projectId: project._id,
+            },
+            {
+                userId: project.freelancerId,
+                type: "project_completed",
+                message: `The project "${project.projectName}" you worked on has been marked as completed.`,
+                projectId: project._id,
+            }
+        ];
+
+        await Notification.insertMany(notifications);
+
+        res.status(200).json(task);
     } catch (err) {
-      console.error("Error in taskCompleted:", err);
-      res.status(500).json({ msg: "Server error" });
+        console.error("Error in taskCompleted:", err);
+        res.status(500).json({ msg: "Server error" });
     }
-  };
-  
+};
+
 
 export const fetchTasksForProject = async (req, res) => {
     try {
