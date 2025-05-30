@@ -79,9 +79,25 @@ const Freelancers = () => {
             onChange={(e) => setSearchCountry(e.target.value)}
           >
             <MenuItem value="">All</MenuItem>
-            <MenuItem value="Tunisia">Tunisia</MenuItem>
+            <MenuItem value="Argentina">Argentina</MenuItem>
+            <MenuItem value="Australia">Australia</MenuItem>
+            <MenuItem value="Brazil">Brazil</MenuItem>
+            <MenuItem value="Canada">Canada</MenuItem>
+            <MenuItem value="China">China</MenuItem>
+            <MenuItem value="Egypt">Egypt</MenuItem>
             <MenuItem value="France">France</MenuItem>
+            <MenuItem value="Germany">Germany</MenuItem>
+            <MenuItem value="India">India</MenuItem>
+            <MenuItem value="Italy">Italy</MenuItem>
+            <MenuItem value="Japan">Japan</MenuItem>
+            <MenuItem value="Mexico">Mexico</MenuItem>
+            <MenuItem value="Russia">Russia</MenuItem>
+            <MenuItem value="South Africa">South Africa</MenuItem>
+            <MenuItem value="Spain">Spain</MenuItem>
+            <MenuItem value="Tunisia">Tunisia</MenuItem>
+            <MenuItem value="UK">United Kingdom</MenuItem>
             <MenuItem value="USA">USA</MenuItem>
+
           </TextField>
         </Grid>
       </Grid>

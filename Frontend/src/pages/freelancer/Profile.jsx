@@ -217,8 +217,104 @@ const Profile = () => {
                     <div className="col-lg-6">
                         <div className="about-text go-to">
                             {editMode ? (
-                                <form onSubmit={handleSubmit}>
-                                    {/* Form fields */}
+                                 <form onSubmit={handleSubmit}>
+                                    <div className="form-group">
+                                        <label>Username</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="username"
+                                            value={formData.username}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Email</label>
+                                        <input
+                                            type="email"
+                                            className="form-control"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Country</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="country"
+                                            value={formData.country}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Description</label>
+                                        <textarea
+                                            className="form-control"
+                                            name="desc"
+                                            value={formData.desc}
+                                            onChange={handleChange}
+                                            rows="4"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Occupation</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="occupation"
+                                            value={formData.occupation}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Skills</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="skills"
+                                            value={formData.skills}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Certificates</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="certificates"
+                                            value={formData.certificates}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Experiences</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="experiences"
+                                            value={formData.experiences}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Languages</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="languages"
+                                            value={formData.languages}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <button type="submit" className="btn btn-primary">
+                                        Save Changes
+                                    </button>
                                 </form>
                             ) : (
                                 <>

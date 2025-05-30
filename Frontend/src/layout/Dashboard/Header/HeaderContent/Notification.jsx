@@ -50,38 +50,39 @@ export default function Notification() {
   }, []);
 
   // Socket connection and notification handling
-  useEffect(() => {
-    const handleNewNotification = (newNotification) => {
-      console.log('Raw notification received:', newNotification);
-      
-      setNotifications(prev => {
-        // Transform the notification to match your expected format
-        const transformedNotif = {
-          _id: newNotification._id || Math.random().toString(36).substr(2, 9),
-          message: newNotification.message,
-          createdAt: newNotification.createdAt || new Date()
-        };
+useEffect(() => {
+  const token = localStorage.getItem('token');
 
-        // Check for duplicates
-        if (prev.some(n => n._id === transformedNotif._id)) {
-          console.log('Duplicate detected, skipping');
-          return prev;
-        }
+  const handleNewNotification = (newNotification) => {
+    console.log('Raw notification received:', newNotification);
 
-        console.log('Adding new notification:', transformedNotif);
-        return [transformedNotif, ...prev];
-      });
-    };
+    setNotifications(prev => {
+      const transformedNotif = {
+        _id: newNotification._id || Math.random().toString(36).substr(2, 9),
+        message: newNotification.message,
+        createdAt: newNotification.createdAt || new Date()
+      };
 
-    // Initialize socket with callback
-    socketRef.current = initSocket(handleNewNotification);
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.off('newNotification', handleNewNotification);
+      if (prev.some(n => n._id === transformedNotif._id)) {
+        console.log('Duplicate detected, skipping');
+        return prev;
       }
-    };
-  }, []);
+
+      console.log('Adding new notification:', transformedNotif);
+      return [transformedNotif, ...prev];
+    });
+  };
+
+  // ✅ Pass token and callback in correct order
+  socketRef.current = initSocket(token, handleNewNotification);
+
+  return () => {
+    if (socketRef.current) {
+      socketRef.current.off('newNotification', handleNewNotification);
+    }
+  };
+}, []);
+
 
   // Debug effect
   useEffect(() => {
@@ -99,6 +100,9 @@ export default function Notification() {
     return <div className="text-center py-10">Loading notifications...</div>;
   }
 
+  const unreadCount = notifications.length;
+
+
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
       <IconButton
@@ -107,9 +111,10 @@ export default function Notification() {
         ref={anchorRef}
         onClick={handleToggle}
       >
-        <Badge badgeContent={notifications.length} color="primary">
+        <Badge badgeContent={unreadCount} color="primary">
           <BellOutlined />
         </Badge>
+
       </IconButton>
 
       <Popper
